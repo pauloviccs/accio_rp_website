@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050" role="img" aria-labelledby="title desc">
+<title id="title">Accio Roleplay — identidade visual e paleta</title>
+<desc id="desc">Emblema vetorial com monograma A, órbitas e estrelas em dourado e âmbar sobre vinho escuro. À direita, paleta cromática da marca.</desc>
+<defs>
+  <radialGradient id="bg" cx="52%" cy="48%" r="78%"><stop stop-color="#401008"/><stop offset=".62" stop-color="#210604"/><stop offset="1" stop-color="#100303"/></radialGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF0B2"/><stop offset=".28" stop-color="#FFC34F"/><stop offset=".62" stop-color="#F47A16"/><stop offset="1" stop-color="#FFE28A"/></linearGradient>
+  <style>text{font-family:Inter,Arial,sans-serif}.label{font-size:15px;letter-spacing:2.2px;fill:#D6B7A0}.hex{font-size:15px;fill:#F8E9D3;font-family:monospace}.name{font-size:16px;fill:#FFF2DC;font-weight:600}.small{font-size:13px;fill:#BA9B89}</style>
+</defs>
+<rect width="1600" height="1050" fill="#100303"/>
+<rect x="30" y="30" width="1030" height="990" rx="24" fill="url(#bg)" stroke="#572016" stroke-width="2"/>
+<!-- Emblema: círculos concêntricos e órbitas -->
+<g transform="translate(545 520)" fill="none" stroke-linecap="round">
+ <circle r="426" stroke="#F06A13" stroke-width="5"/><circle r="416" stroke="#FFC44F" stroke-width="3"/><circle r="405" stroke="#701D0C" stroke-width="2"/>
+ <circle r="335" stroke="#F4A52B" stroke-width="2.5"/><circle r="318" stroke="#7A260E" stroke-width="1.5"/>
+ <path d="M-245 322 A405 405 0 0 1-280-292" stroke="#F9C45A" stroke-width="2" opacity=".85"/>
+ <path d="M255-318 A405 405 0 0 1 300 285" stroke="#F9C45A" stroke-width="2" opacity=".85"/>
+ <!-- arco interno -->
+ <path d="M-265 185 A322 322 0 0 1 260 185" stroke="#FFD16A" stroke-width="3"/>
+ <!-- A monumental -->
+ <path d="M-275 350 L-54-119 Q0-231 52-119 L279 350 Q292 379 320 386 L214 386 Q193 382 179 356 L9 8 Q0-9-10 9 L-177 354 Q-190 382-218 386 L-327 386 Q-294 376-275 350Z" fill="url(#gold)" stroke="#FFF0B2" stroke-width="4"/>
+ <path d="M-189 309 L-33-30 Q0-96 32-30 L186 309" stroke="#FFEDB0" stroke-width="5" fill="none"/>
+ <!-- curva ascendente/órbita cruzando a base -->
+ <path d="M-366 285 C-210 317-110 140 17 154 C156 169 208 300 369 281" stroke="url(#gold)" stroke-width="13"/>
+ <path d="M-366 285 C-210 317-110 140 17 154 C156 169 208 300 369 281" stroke="#FFF1BD" stroke-width="2.5"/>
+ <!-- estrela principal de oito pontas -->
+ <path d="M0-387 L15-25 135-137 25-17 385 0 25 17 135 137 15 25 0 387-15 25-135 137-25 17-385 0-25-17-135-137-15-25Z" fill="url(#gold)" stroke="#FFF4C9" stroke-width="3"/>
+ <circle r="9" fill="#FFF9DA" stroke="none"/>
+ <!-- estrelas laterais -->
+ <path d="M-310 8 Q-296 0-310-8 Q-318-56-326-8 Q-380 0-326 8 Q-318 58-310 8Z" fill="url(#gold)" stroke="#FFE9A6" stroke-width="2"/>
+ <path d="M310 8 Q324 0 310-8 Q318-56 326-8 Q380 0 326 8 Q318 58 310 8Z" fill="url(#gold)" stroke="#FFE9A6" stroke-width="2"/>
+ <!-- pequeno brilho inferior -->
+ <path d="M0 374 L8 410 0 446 -8 410Z M-20 410 L0 402 20 410 0 418Z" fill="#FFD36A"/>
+</g>
+<text x="545" y="974" text-anchor="middle" fill="#FFF0D2" font-size="20" letter-spacing="7">ACCIO ROLEPLAY</text>
+<!-- Painel de identidade -->
+<text x="1115" y="105" class="label">IDENTIDADE VISUAL</text>
+<text x="1115" y="158" fill="#FFF1D8" font-size="36" font-weight="700">Accio Roleplay</text>
+<text x="1115" y="191" class="small">Paleta cromática · extraída do emblema</text>
+<path d="M1115 220H1535" stroke="#63301F"/>
+<text x="1115" y="267" class="label">CORES PRINCIPAIS</text>
+<g transform="translate(1115 290)">
+ <rect width="64" height="64" rx="14" fill="#160504" stroke="#573025"/><text x="82" y="26" class="name">Vinho profundo</text><text x="82" y="51" class="hex">#160504</text>
+ <rect y="82" width="64" height="64" rx="14" fill="#5B1009"/><text x="82" y="108" class="name">Borgonha arcano</text><text x="82" y="133" class="hex">#5B1009</text>
+ <rect y="164" width="64" height="64" rx="14" fill="#B83A0C"/><text x="82" y="190" class="name">Âmbar queimado</text><text x="82" y="215" class="hex">#B83A0C</text>
+ <rect y="246" width="64" height="64" rx="14" fill="#F47A16"/><text x="82" y="272" class="name">Laranja astral</text><text x="82" y="297" class="hex">#F47A16</text>
+ <rect y="328" width="64" height="64" rx="14" fill="#FFC34F"/><text x="82" y="354" class="name">Ouro luminoso</text><text x="82" y="379" class="hex">#FFC34F</text>
+ <rect y="410" width="64" height="64" rx="14" fill="#FFF0B2"/><text x="82" y="436" class="name">Marfim estelar</text><text x="82" y="461" class="hex">#FFF0B2</text>
+</g>
+<path d="M1115 808H1535" stroke="#63301F"/>
+<text x="1115" y="849" class="label">DIREÇÃO DE USO</text>
+<text x="1115" y="885" class="small">Base escura para profundidade e contraste.</text>
+<text x="1115" y="910" class="small">Âmbar e ouro para destaque e energia.</text>
+<text x="1115" y="935" class="small">Marfim para pontos de luz e leitura.</text>
+<text x="1115" y="991" fill="#8D6656" font-size="11" letter-spacing="1.5">ACCIO ROLEPLAY · PALETA DE MARCA</text>
+</svg>
