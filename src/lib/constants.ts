@@ -76,5 +76,9 @@ export const WAND_FLEXIBILITIES = [
 
 export const MIN_WORDS_BACKSTORY = 3000;
 export const TOTAL_PIONEER_SLOTS = 100;
-export const LOCAL_STORAGE_DRAFT_KEY = 'accio_character_backstory_draft_v1';
-export const LOCAL_STORAGE_FORM_KEY = 'accio_character_form_draft_v1';
+export const LOCAL_STORAGE_DRAFT_KEY = 'accio_character_backstory_draft_v2';
+export const LOCAL_STORAGE_FORM_KEY = 'accio_character_form_draft_v2';
+export const LOCAL_STORAGE_LETTER_KEY = 'accio_letter_opened_v2';
+
+// Data alvo de encerramento do 1º lote de pioneiros (7 dias)
+export const TARGET_PHASE_END_DATE = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();

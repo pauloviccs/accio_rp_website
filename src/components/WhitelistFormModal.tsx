@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, Sparkles, AlertTriangle, Save, Wand2, User, ChevronRight, ChevronLeft } from 'lucide-react';
+import { X, Sparkles, AlertTriangle, Save, Wand2, User, ChevronRight, ChevronLeft, LogIn } from 'lucide-react';
 import { CharacterApplication, DiscordUser, HouseId, BloodStatus } from '../types';
 import { HOUSES, WAND_WOODS, WAND_CORES, WAND_LENGTHS, WAND_FLEXIBILITIES, MIN_WORDS_BACKSTORY, LOCAL_STORAGE_FORM_KEY, LOCAL_STORAGE_DRAFT_KEY } from '../lib/constants';
 
@@ -23,12 +23,12 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
 
-  // Form State
+  // Form State Limpo — Sem Dados Fictícios
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
     birth_date: '1875-09-01',
-    birth_place: 'Hogsmeade',
+    birth_place: '',
     blood_status: 'half-blood' as BloodStatus,
     preferred_house: 'gryffindor' as HouseId,
     wand_wood: WAND_WOODS[0],
@@ -41,10 +41,14 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
     rules_accepted: true,
   });
 
-  // Restaurar dados salvos localmente
+  // Restaurar dados salvos localmente vinculados ao usuário
   useEffect(() => {
-    const savedForm = localStorage.getItem(LOCAL_STORAGE_FORM_KEY);
-    const savedBackstory = localStorage.getItem(LOCAL_STORAGE_DRAFT_KEY);
+    if (!user) return;
+    const userDraftKey = `${LOCAL_STORAGE_DRAFT_KEY}_${user.id}`;
+    const userFormKey = `${LOCAL_STORAGE_FORM_KEY}_${user.id}`;
+
+    const savedForm = localStorage.getItem(userFormKey);
+    const savedBackstory = localStorage.getItem(userDraftKey);
 
     if (savedForm) {
       try {
@@ -58,19 +62,24 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
     if (savedBackstory) {
       setFormData((prev) => ({ ...prev, character_backstory: savedBackstory }));
     }
-  }, []);
+  }, [user]);
 
-  // Auto-save no LocalStorage a cada 3 segundos (Resiliência $500k)
+  // Auto-save no LocalStorage atrelado ao usuário a cada 3 segundos
   useEffect(() => {
+    if (!user || (!formData.first_name && !formData.character_backstory)) return;
+
+    const userDraftKey = `${LOCAL_STORAGE_DRAFT_KEY}_${user.id}`;
+    const userFormKey = `${LOCAL_STORAGE_FORM_KEY}_${user.id}`;
+
     const timer = setInterval(() => {
-      localStorage.setItem(LOCAL_STORAGE_FORM_KEY, JSON.stringify(formData));
-      localStorage.setItem(LOCAL_STORAGE_DRAFT_KEY, formData.character_backstory);
+      localStorage.setItem(userFormKey, JSON.stringify(formData));
+      localStorage.setItem(userDraftKey, formData.character_backstory);
       const now = new Date();
       setLastSaved(now.toLocaleTimeString());
     }, 3000);
 
     return () => clearInterval(timer);
-  }, [formData]);
+  }, [formData, user]);
 
   // Contagem precisa de palavras
   const wordCount = useMemo(() => {
@@ -86,19 +95,25 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
 
   const handleSubmit = async () => {
     if (!user) {
-      setErrorMessage('Por favor, faça login com o Discord antes de enviar.');
-      return;
-    }
-
-    if (wordCount < MIN_WORDS_BACKSTORY) {
-      setErrorMessage(`A história precisa de no mínimo ${MIN_WORDS_BACKSTORY} palavras. Atual: ${wordCount}`);
-      setStep(3);
+      setErrorMessage('Acesso negado: Autentique-se com o Discord para continuar.');
       return;
     }
 
     if (!formData.first_name.trim() || !formData.last_name.trim()) {
-      setErrorMessage('Nome e sobrenome do personagem são obrigatórios.');
+      setErrorMessage('O Nome e o Sobrenome do personagem são obrigatórios.');
       setStep(1);
+      return;
+    }
+
+    if (!formData.birth_place.trim()) {
+      setErrorMessage('O Local de Nascimento do personagem é obrigatório.');
+      setStep(1);
+      return;
+    }
+
+    if (wordCount < MIN_WORDS_BACKSTORY) {
+      setErrorMessage(`A história exige no mínimo ${MIN_WORDS_BACKSTORY.toLocaleString()} palavras. Você possui ${wordCount.toLocaleString()} palavras.`);
+      setStep(3);
       return;
     }
 
@@ -108,7 +123,8 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
     try {
       await onSubmit({
         discord_id: user.id,
-        discord_username: user.username,
+        discord_username: user.global_name || user.username,
+        discord_avatar: user.avatar || undefined,
         first_name: formData.first_name.trim(),
         last_name: formData.last_name.trim(),
         birth_date: formData.birth_date,
@@ -128,12 +144,14 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
       });
 
       // Limpar rascunho local após envio bem-sucedido
-      localStorage.removeItem(LOCAL_STORAGE_DRAFT_KEY);
-      localStorage.removeItem(LOCAL_STORAGE_FORM_KEY);
+      if (user) {
+        localStorage.removeItem(`${LOCAL_STORAGE_DRAFT_KEY}_${user.id}`);
+        localStorage.removeItem(`${LOCAL_STORAGE_FORM_KEY}_${user.id}`);
+      }
       onClose();
     } catch (err: any) {
-      console.error('Erro na submissão:', err);
-      setErrorMessage(err.message || 'Falha ao salvar candidatura no banco de dados.');
+      console.error('Erro ao submeter no Supabase:', err);
+      setErrorMessage(err.message || 'Falha ao registrar candidatura no banco de dados Supabase.');
     } finally {
       setIsSubmitting(false);
     }
@@ -161,7 +179,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                 Ficha de Admissão em Hogwarts
               </h2>
               <span className="text-[11px] text-[#FFC34F] font-semibold">
-                Etapa {step} de 4 — {step === 1 ? 'Identidade' : step === 2 ? 'Varinha & Casa' : step === 3 ? 'História do Bruxo' : 'Revisão'}
+                Etapa {step} de 4 — {step === 1 ? 'Identidade' : step === 2 ? 'Varinha & Casa' : step === 3 ? 'História (3.000+ Palavras)' : 'Revisão'}
               </span>
             </div>
           </div>
@@ -175,7 +193,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
             )}
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-[#5B1009]/50 hover:bg-[#5B1009] text-[#FFF0B2]/70 hover:text-[#FFF0B2] flex items-center justify-center transition"
+              className="w-8 h-8 rounded-full bg-[#5B1009]/50 hover:bg-[#5B1009] text-[#FFF0B2]/70 hover:text-[#FFF0B2] flex items-center justify-center transition cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -193,22 +211,24 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
         {/* Modal Body / Steps */}
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
 
-          {/* Autenticação Discord Gate */}
+          {/* Autenticação Discord Gate Obrigatório */}
           {!user ? (
             <div className="py-12 text-center space-y-4">
               <div className="w-16 h-16 rounded-2xl bg-[#5865F2]/20 border border-[#5865F2]/40 flex items-center justify-center mx-auto text-[#5865F2]">
                 <User className="w-8 h-8" />
               </div>
               <h3 className="font-cinzel text-xl font-bold text-[#FFF0B2]">
-                Identificação do Jogador Necessária
+                Login com Discord Obrigatório
               </h3>
               <p className="text-sm text-[#FFF0B2]/70 max-w-md mx-auto font-sans leading-relaxed">
-                Para vincular seu personagem à sua conta permanente do Arcane MP e receber as permissões no servidor, faça login com o Discord.
+                Para vincular seu personagem de forma autêntica à sua conta no servidor Arcane MP, você deve autenticar-se através do Discord.
               </p>
               <button
+                type="button"
                 onClick={onLogin}
-                className="px-6 py-3 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-bold transition shadow-xl shadow-[#5865F2]/20 inline-flex items-center space-x-2"
+                className="px-6 py-3 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-bold transition shadow-xl shadow-[#5865F2]/20 inline-flex items-center space-x-2 cursor-pointer"
               >
+                <LogIn className="w-4 h-4" />
                 <span>Conectar com Discord</span>
               </button>
             </div>
@@ -224,7 +244,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                       </label>
                       <input
                         type="text"
-                        placeholder="Ex: Alexander"
+                        placeholder="Nome do personagem"
                         value={formData.first_name}
                         onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-[#210604] border border-[#B83A0C]/40 text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[#FFC34F] focus:outline-none text-sm transition"
@@ -236,7 +256,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                       </label>
                       <input
                         type="text"
-                        placeholder="Ex: Blackwood"
+                        placeholder="Sobrenome da linhagem"
                         value={formData.last_name}
                         onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-[#210604] border border-[#B83A0C]/40 text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[#FFC34F] focus:outline-none text-sm transition"
@@ -284,7 +304,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                           key={item.id}
                           type="button"
                           onClick={() => setFormData({ ...formData, blood_status: item.id as BloodStatus })}
-                          className={`py-2.5 px-3 rounded-xl border text-xs font-semibold transition ${
+                          className={`py-2.5 px-3 rounded-xl border text-xs font-semibold transition cursor-pointer ${
                             formData.blood_status === item.id
                               ? 'bg-[#5B1009] border-[#FFC34F] text-[#FFF0B2] shadow-lg shadow-[#5B1009]/50'
                               : 'bg-[#210604]/60 border-[#B83A0C]/30 text-[#FFF0B2]/60 hover:border-[#FFC34F]/40'
@@ -411,13 +431,13 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Textarea de Alta Resiliência */}
+                  {/* Textarea de Alta Resiliência com Auto-Save */}
                   <div className="relative">
                     <textarea
                       rows={12}
                       value={formData.character_backstory}
                       onChange={(e) => setFormData({ ...formData, character_backstory: e.target.value })}
-                      placeholder="Era uma noite fria nas colinas próximas a Hogsmeade quando os primeiros sinais da magia ancestral se manifestaram..."
+                      placeholder="Comece aqui a narrativa do seu personagem..."
                       className="w-full p-4 rounded-2xl bg-[#100303]/90 border border-[#B83A0C]/40 text-[#FFF0B2] placeholder-[#FFF0B2]/25 focus:border-[#FFC34F] focus:outline-none text-sm font-crimson leading-relaxed resize-none transition"
                     />
                     
@@ -435,7 +455,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                     </label>
                     <input
                       type="text"
-                      placeholder="Ex: 2 anos em servidores FiveM/RedM de RP sério"
+                      placeholder="Descreva seu histórico em servidores de RP"
                       value={formData.rp_experience}
                       onChange={(e) => setFormData({ ...formData, rp_experience: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#210604] border border-[#B83A0C]/40 text-[#FFF0B2] text-xs focus:outline-none"
@@ -453,7 +473,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                     <p><strong className="text-[#FFF0B2]">Nascimento:</strong> {formData.birth_date} em {formData.birth_place}</p>
                     <p><strong className="text-[#FFF0B2]">Casa:</strong> {HOUSES[formData.preferred_house].name}</p>
                     <p><strong className="text-[#FFF0B2]">Varinha:</strong> {formData.wand_wood}, {formData.wand_core}, {formData.wand_length} ({formData.wand_flexibility})</p>
-                    <p><strong className="text-[#FFF0B2]">Tamanho da História:</strong> {wordCount.toLocaleString()} palavras ({wordCount >= MIN_WORDS_BACKSTORY ? '✅ Aprovada' : '❌ Insuficiente'})</p>
+                    <p><strong className="text-[#FFF0B2]">Contagem da História:</strong> {wordCount.toLocaleString()} palavras ({wordCount >= MIN_WORDS_BACKSTORY ? '✅ Aprovada' : '❌ Insuficiente'})</p>
                     <p><strong className="text-[#FFF0B2]">Discord Vinculado:</strong> {user.username} ({user.id})</p>
                   </div>
 
@@ -482,7 +502,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
               <button
                 type="button"
                 onClick={() => setStep((prev) => (prev - 1) as any)}
-                className="px-4 py-2 rounded-xl bg-[#5B1009]/40 hover:bg-[#5B1009] text-xs font-semibold text-[#FFF0B2] transition flex items-center space-x-1"
+                className="px-4 py-2 rounded-xl bg-[#5B1009]/40 hover:bg-[#5B1009] text-xs font-semibold text-[#FFF0B2] transition flex items-center space-x-1 cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Voltar</span>
@@ -496,7 +516,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                   setErrorMessage(null);
                   setStep((prev) => (prev + 1) as any);
                 }}
-                className="px-5 py-2.5 rounded-xl btn-accio-gold text-xs font-bold transition flex items-center space-x-1"
+                className="px-5 py-2.5 rounded-xl btn-accio-gold text-xs font-bold transition flex items-center space-x-1 cursor-pointer"
               >
                 <span>Avançar</span>
                 <ChevronRight className="w-4 h-4" />
@@ -506,10 +526,10 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                 type="button"
                 disabled={isSubmitting || wordCount < MIN_WORDS_BACKSTORY || !formData.rules_accepted}
                 onClick={handleSubmit}
-                className="px-6 py-2.5 rounded-xl btn-accio-gold text-xs font-bold transition flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#F47A16]/20"
+                className="px-6 py-2.5 rounded-xl btn-accio-gold text-xs font-bold transition flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#F47A16]/20 cursor-pointer"
               >
                 {isSubmitting ? (
-                  <span>Enviando aos Mestres...</span>
+                  <span>Salvando no Supabase...</span>
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4" />

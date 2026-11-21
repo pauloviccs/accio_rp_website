@@ -6,7 +6,9 @@ import { Footer } from './components/Footer';
 import { ParticleCanvas } from './components/ParticleCanvas';
 import { WhitelistFormModal } from './components/WhitelistFormModal';
 import { TicketModal } from './components/TicketModal';
+import { HogwartsLetterModal } from './components/HogwartsLetterModal';
 import { CharacterApplication, DiscordUser } from './types';
+import { LOCAL_STORAGE_LETTER_KEY } from './lib/constants';
 import {
   supabase,
   signInWithDiscord,
@@ -19,18 +21,25 @@ import {
 export const App: React.FC = () => {
   const [user, setUser] = useState<DiscordUser | null>(null);
   const [application, setApplication] = useState<CharacterApplication | null>(null);
-  const [totalRegistered, setTotalRegistered] = useState<number>(73);
+  const [totalRegistered, setTotalRegistered] = useState<number>(0);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isTicketOpen, setIsTicketOpen] = useState(false);
+  const [isLetterOpen, setIsLetterOpen] = useState(false);
 
-  // Monitorar sessão do Supabase Auth
+  // Inicialização e Verificação de 1ª Visita
   useEffect(() => {
-    // 1. Obter contagem de inscritos
+    // 1. Verificar se é a 1ª vez do usuário para abrir a Carta de Hogwarts 3D
+    const hasSeenLetter = localStorage.getItem(LOCAL_STORAGE_LETTER_KEY);
+    if (!hasSeenLetter) {
+      setIsLetterOpen(true);
+    }
+
+    // 2. Obter contagem real de inscritos do Supabase
     getTotalApplicationsCount().then((count) => {
-      setTotalRegistered(Math.max(count, 73));
+      setTotalRegistered(count);
     });
 
-    // 2. Verificar sessão atual
+    // 3. Monitorar sessão real do Discord via Supabase Auth
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         const u = session.user;
@@ -46,7 +55,7 @@ export const App: React.FC = () => {
       }
     });
 
-    // 3. Ouvinte de mudanças de Auth (login/logout)
+    // 4. Ouvinte de mudanças de Auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         const u = session.user;
@@ -80,18 +89,9 @@ export const App: React.FC = () => {
   const handleLogin = async () => {
     try {
       await signInWithDiscord();
-    } catch (err) {
-      console.error('Falha no login com Discord:', err);
-      // Fallback para desenvolvimento local caso precise testar sem credentials de dev
-      const mockId = '123456789012345678';
-      const mockUser: DiscordUser = {
-        id: mockId,
-        username: 'LordVoldy',
-        avatar: null,
-        global_name: 'Tom Riddle',
-      };
-      setUser(mockUser);
-      loadUserApplication(mockId);
+    } catch (err: any) {
+      console.error('Falha na autenticação com o Discord:', err);
+      alert('Falha ao conectar com o Discord: ' + (err.message || 'Verifique sua conexão ou tente novamente.'));
     }
   };
 
@@ -109,6 +109,11 @@ export const App: React.FC = () => {
     setIsTicketOpen(true);
   };
 
+  const handleCloseLetter = () => {
+    localStorage.setItem(LOCAL_STORAGE_LETTER_KEY, 'true');
+    setIsLetterOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-accio-deep relative overflow-hidden flex flex-col justify-between">
       {/* Efeito de Poeira Mágica Estelar */}
@@ -122,6 +127,7 @@ export const App: React.FC = () => {
         onOpenForm={() => setIsFormOpen(true)}
         hasApplication={!!application}
         onViewTicket={() => setIsTicketOpen(true)}
+        onOpenLetter={() => setIsLetterOpen(true)}
       />
 
       {/* Conteúdo Principal */}
@@ -137,6 +143,7 @@ export const App: React.FC = () => {
           totalRegistered={totalRegistered}
           hasApplication={!!application}
           onViewTicket={() => setIsTicketOpen(true)}
+          onOpenLetter={() => setIsLetterOpen(true)}
         />
 
         <Features />
@@ -144,6 +151,18 @@ export const App: React.FC = () => {
 
       {/* Rodapé */}
       <Footer />
+
+      {/* Animação da Carta de Hogwarts 3D (Primeira Visita ou Chamada) */}
+      <HogwartsLetterModal
+        isOpen={isLetterOpen}
+        onClose={handleCloseLetter}
+        user={user}
+        onLogin={handleLogin}
+        onProceedToForm={() => {
+          handleCloseLetter();
+          setIsFormOpen(true);
+        }}
+      />
 
       {/* Modal / Bottom Sheet do Formulário de 3.000 Palavras */}
       <WhitelistFormModal

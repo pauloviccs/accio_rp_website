@@ -31,6 +31,27 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
+/* ─── Efeitos 3D para a Carta de Hogwarts ───────────────────── */
+.perspective-1200 {
+  perspective: 1200px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.rotate-x-0 {
+  transform: rotateX(0deg);
+}
+
+.-rotate-x-180 {
+  transform: rotateX(-180deg);
+}
+
+.origin-top {
+  transform-origin: top center;
+}
+
 /* ─── Gradientes e Estéticas Mágicas ────────────────────────── */
 .bg-accio-deep {
   background: radial-gradient(ellipse at 50% 0%, #401008 0%, #210604 55%, #100303 100%);

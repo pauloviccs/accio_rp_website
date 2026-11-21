@@ -1,6 +1,6 @@
 import React from 'react';
 import { DiscordUser } from '../types';
-import { LogIn, LogOut, Sparkles } from 'lucide-react';
+import { LogIn, LogOut, Sparkles, Mail } from 'lucide-react';
 
 interface NavbarProps {
   user: DiscordUser | null;
@@ -9,6 +9,7 @@ interface NavbarProps {
   onOpenForm: () => void;
   hasApplication: boolean;
   onViewTicket: () => void;
+  onOpenLetter: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -18,6 +19,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenForm,
   hasApplication,
   onViewTicket,
+  onOpenLetter,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[#B83A0C]/20 bg-[#160504]/80 backdrop-blur-xl">
@@ -41,14 +43,20 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Status Pill & User Actions */}
-        <div className="flex items-center space-x-3 sm:space-x-4">
-          <div className="hidden md:flex items-center space-x-2 px-3 py-1 rounded-full bg-[#5B1009]/40 border border-[#B83A0C]/40 text-xs text-[#FFF0B2]">
-            <span className="w-2 h-2 rounded-full bg-[#F47A16] animate-pulse"></span>
-            <span>1º Lote de Admissão</span>
-          </div>
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          
+          {/* Botão para Rever a Carta de Admissão */}
+          <button
+            onClick={onOpenLetter}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#5B1009]/40 border border-[#B83A0C]/40 text-xs text-[#FFF0B2] hover:bg-[#5B1009]/80 transition cursor-pointer"
+            title="Abrir Carta Oficial de Hogwarts"
+          >
+            <Mail className="w-3.5 h-3.5 text-[#FFC34F]" />
+            <span className="hidden sm:inline">Carta de Hogwarts</span>
+          </button>
 
           {user ? (
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               {hasApplication ? (
                 <button
                   onClick={onViewTicket}
@@ -68,7 +76,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
 
               {/* User profile dropdown / info */}
-              <div className="flex items-center space-x-2.5 bg-[#210604] border border-[#B83A0C]/30 px-2.5 py-1.5 rounded-xl">
+              <div className="flex items-center space-x-2 bg-[#210604] border border-[#B83A0C]/30 px-2.5 py-1.5 rounded-xl">
                 {user.avatar ? (
                   <img
                     src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`}
@@ -86,7 +94,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={onLogout}
                   title="Desconectar"
-                  className="text-[#FFF0B2]/60 hover:text-[#F47A16] p-1 transition"
+                  className="text-[#FFF0B2]/60 hover:text-[#F47A16] p-1 transition cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                 </button>
@@ -95,7 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : (
             <button
               onClick={onLogin}
-              className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs sm:text-sm font-semibold transition shadow-lg shadow-[#5865F2]/20 active:scale-95"
+              className="flex items-center space-x-2 px-3.5 sm:px-4 py-2 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs sm:text-sm font-semibold transition shadow-lg shadow-[#5865F2]/20 active:scale-95 cursor-pointer"
             >
               <LogIn className="w-4 h-4" />
               <span>Entrar com Discord</span>

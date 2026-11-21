@@ -39,7 +39,7 @@ export async function getExistingApplication(discordId: string): Promise<Charact
     }
     return data as CharacterApplication | null;
   } catch (err) {
-    console.error('Falha de rede ao buscar candidatura:', err);
+    console.error('Falha ao buscar candidatura no Supabase:', err);
     return null;
   }
 }
@@ -62,11 +62,12 @@ export async function getTotalApplicationsCount(): Promise<number> {
       .select('*', { count: 'exact', head: true });
 
     if (error) {
-      console.warn('Erro ao contar aplicações:', error.message);
-      return 67; // Fallback psicológico para manter o FOMO se offline
+      console.warn('Falha na consulta de contagem:', error.message);
+      return 0;
     }
-    return count ?? 67;
-  } catch {
-    return 67;
+    return count ?? 0;
+  } catch (err) {
+    console.error('Falha de rede ao consultar contagem:', err);
+    return 0;
   }
 }

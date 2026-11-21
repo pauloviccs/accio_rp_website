@@ -9,6 +9,7 @@ export interface CharacterApplication {
   user_id?: string;
   discord_id: string;
   discord_username: string;
+  discord_avatar?: string;
   registration_number?: number;
   first_name: string;
   last_name: string;
@@ -39,3 +40,4 @@ export interface DiscordUser {
   global_name?: string;
   email?: string;
 }
+
