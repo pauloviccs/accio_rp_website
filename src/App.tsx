@@ -25,9 +25,26 @@ export const App: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isTicketOpen, setIsTicketOpen] = useState(false);
   const [isLetterOpen, setIsLetterOpen] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   // Inicialização e Verificação de 1ª Visita
   useEffect(() => {
+    // 0. Capturar possíveis erros de redirecionamento do OAuth (Discord / Supabase)
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const searchParams = new URLSearchParams(window.location.search);
+    const errorDesc = hashParams.get('error_description') || searchParams.get('error_description');
+    const error = hashParams.get('error') || searchParams.get('error');
+
+    if (error || errorDesc) {
+      const rawMsg = errorDesc || error || '';
+      if (rawMsg.includes('exchange external code')) {
+        setAuthError('O Discord não autorizou a troca de credenciais (Unable to exchange external code). É necessário sincronizar o Client Secret e a Redirect URL no painel do Supabase Auth e Discord Developer Portal.');
+      } else {
+        setAuthError(decodeURIComponent(rawMsg));
+      }
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     // 1. Verificar se é a 1ª vez do usuário para abrir a Carta de Hogwarts 3D
     const hasSeenLetter = localStorage.getItem(LOCAL_STORAGE_LETTER_KEY);
     if (!hasSeenLetter) {
@@ -118,6 +135,26 @@ export const App: React.FC = () => {
     <div className="min-h-screen bg-accio-deep relative overflow-hidden flex flex-col justify-between">
       {/* Efeito de Poeira Mágica Estelar */}
       <ParticleCanvas />
+
+      {/* Toast de Alerta de Autenticação / OAuth */}
+      {authError && (
+        <div className="relative z-50 bg-[#5B1009]/95 border-b border-[#F47A16]/60 px-4 py-3 text-white backdrop-blur-md shadow-2xl transition-all">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="text-xl">⚠️</span>
+              <div className="text-xs sm:text-sm font-medium text-[#FFF0B2]">
+                <strong className="text-[#FFC34F]">Status da Conexão:</strong> {authError}
+              </div>
+            </div>
+            <button
+              onClick={() => setAuthError(null)}
+              className="text-xs text-[#FFF0B2]/80 hover:text-white px-3 py-1 rounded-lg bg-black/40 border border-[#F47A16]/30 transition-colors flex-shrink-0"
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Navbar Superior */}
       <Navbar

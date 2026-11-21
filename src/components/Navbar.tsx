@@ -24,7 +24,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[#B83A0C]/20 bg-[#160504]/80 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-        
+
         {/* Logo & Brand */}
         <div className="flex items-center space-x-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
           <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#FFC34F] via-[#F47A16] to-[#5B1009] p-0.5 shadow-lg shadow-[#F47A16]/20">
@@ -44,7 +44,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Status Pill & User Actions */}
         <div className="flex items-center space-x-2 sm:space-x-4">
-          
+
           {/* Botão para Rever a Carta de Admissão */}
           <button
             onClick={onOpenLetter}
