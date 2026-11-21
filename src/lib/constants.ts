@@ -80,5 +80,9 @@ export const LOCAL_STORAGE_DRAFT_KEY = 'accio_character_backstory_draft_v2';
 export const LOCAL_STORAGE_FORM_KEY = 'accio_character_form_draft_v2';
 export const LOCAL_STORAGE_LETTER_KEY = 'accio_letter_opened_v2';
 
-// Data alvo de encerramento do 1º lote de pioneiros (7 dias)
-export const TARGET_PHASE_END_DATE = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+// Prazo de pré-registro: 61 dias exatos a partir da data de abertura (21/11/2026 até 21/01/2027)
+export const PRE_REGISTRATION_DAYS = 61;
+export const TARGET_PHASE_END_DATE = '2027-01-21T23:59:59.000Z';
+
+// Webhook oficial do Discord para notificações formatadas de inscrições
+export const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1573768137713651712/11WwWCSYtxX6X19_rwJZOK6fD-Vy3pMtCo1VBzS-fD1pa9eVel4AQccBJgbmsxbof6EP';

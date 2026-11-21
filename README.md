@@ -115,3 +115,4 @@ Tabelas essenciais criadas com Row Level Security (RLS):
 
 ACCIO Roleplay é um projeto comunitário sem fins lucrativos desenvolvido com o framework **Arcane MP**.  
 *Hogwarts Legacy* e o *Wizarding World* são marcas registradas da Warner Bros. Entertainment Inc. e Avalanche Software. Este projeto não possui afiliação oficial com as detentoras da propriedade intelectual.
+

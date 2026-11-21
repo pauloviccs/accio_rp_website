@@ -1,6 +1,6 @@
 import React from 'react';
 import { DiscordUser } from '../types';
-import { LogIn, LogOut, Sparkles, Mail } from 'lucide-react';
+import { LogIn, LogOut, Sparkles, Mail, ShieldCheck, Shield } from 'lucide-react';
 
 interface NavbarProps {
   user: DiscordUser | null;
@@ -10,6 +10,8 @@ interface NavbarProps {
   hasApplication: boolean;
   onViewTicket: () => void;
   onOpenLetter: () => void;
+  onOpenValidation: () => void;
+  onOpenAdmin: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -20,6 +22,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   hasApplication,
   onViewTicket,
   onOpenLetter,
+  onOpenValidation,
+  onOpenAdmin,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[#B83A0C]/20 bg-[#160504]/80 backdrop-blur-xl">
@@ -43,7 +47,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Status Pill & User Actions */}
-        <div className="flex items-center space-x-2 sm:space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+
+          {/* Botão de Acesso ao Painel ADM */}
+          <button
+            onClick={onOpenAdmin}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#160504] border border-[#B83A0C]/40 text-xs text-[#FFF0B2]/80 hover:text-[#FFC34F] hover:border-[#FFC34F]/40 transition cursor-pointer"
+            title="Abrir Painel Administrativo do Ministério da Magia"
+          >
+            <Shield className="w-3.5 h-3.5 text-[#FFC34F]" />
+            <span className="hidden md:inline">Painel ADM</span>
+          </button>
 
           {/* Botão para Rever a Carta de Admissão */}
           <button
@@ -58,24 +72,34 @@ export const Navbar: React.FC<NavbarProps> = ({
           {user ? (
             <div className="flex items-center space-x-2 sm:space-x-3">
               {hasApplication ? (
-                <button
-                  onClick={onViewTicket}
-                  className="hidden sm:flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-[#FFC34F]/15 border border-[#FFC34F]/40 text-[#FFF0B2] hover:bg-[#FFC34F]/25 text-xs font-semibold transition"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-[#FFC34F]" />
-                  <span>Meu Bilhete</span>
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={onOpenValidation}
+                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#FFC34F]/15 border border-[#FFC34F]/40 text-[#FFF0B2] hover:bg-[#FFC34F]/25 text-xs font-semibold transition cursor-pointer"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#FFC34F]" />
+                    <span className="hidden sm:inline">Minha Validação</span>
+                  </button>
+
+                  <button
+                    onClick={onViewTicket}
+                    className="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#210604] border border-[#B83A0C]/40 text-[#FFF0B2] hover:bg-[#5B1009] text-xs font-semibold transition cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#FFC34F]" />
+                    <span>Bilhete</span>
+                  </button>
+                </div>
               ) : (
                 <button
                   onClick={onOpenForm}
-                  className="hidden sm:flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg btn-accio-gold text-xs font-bold transition"
+                  className="hidden sm:flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg btn-accio-gold text-xs font-bold transition cursor-pointer"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Preencher Ficha</span>
                 </button>
               )}
 
-              {/* User profile dropdown / info */}
+              {/* User profile info */}
               <div className="flex items-center space-x-2 bg-[#210604] border border-[#B83A0C]/30 px-2.5 py-1.5 rounded-xl">
                 {user.avatar ? (
                   <img

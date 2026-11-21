@@ -7,6 +7,8 @@ import { ParticleCanvas } from './components/ParticleCanvas';
 import { WhitelistFormModal } from './components/WhitelistFormModal';
 import { TicketModal } from './components/TicketModal';
 import { HogwartsLetterModal } from './components/HogwartsLetterModal';
+import { ValidationModal } from './components/ValidationModal';
+import { AdminPanelModal } from './components/AdminPanelModal';
 import { CharacterApplication, DiscordUser } from './types';
 import { LOCAL_STORAGE_LETTER_KEY } from './lib/constants';
 import {
@@ -25,6 +27,8 @@ export const App: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isTicketOpen, setIsTicketOpen] = useState(false);
   const [isLetterOpen, setIsLetterOpen] = useState(false);
+  const [isValidationOpen, setIsValidationOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
   // Inicialização e Verificação de 1ª Visita
@@ -88,6 +92,7 @@ export const App: React.FC = () => {
       } else {
         setUser(null);
         setApplication(null);
+        setIsValidationOpen(false);
       }
     });
 
@@ -100,6 +105,7 @@ export const App: React.FC = () => {
     const existing = await getExistingApplication(discordId);
     if (existing) {
       setApplication(existing);
+      setIsValidationOpen(true);
     }
   };
 
@@ -116,6 +122,7 @@ export const App: React.FC = () => {
     await signOut();
     setUser(null);
     setApplication(null);
+    setIsValidationOpen(false);
   };
 
   const handleSubmitApplication = async (appData: CharacterApplication) => {
@@ -123,7 +130,8 @@ export const App: React.FC = () => {
     setApplication(created);
     setTotalRegistered((prev) => prev + 1);
     setIsFormOpen(false);
-    setIsTicketOpen(true);
+    // Abre a página de validação de pré-registro com todos os detalhes
+    setIsValidationOpen(true);
   };
 
   const handleCloseLetter = () => {
@@ -165,6 +173,8 @@ export const App: React.FC = () => {
         hasApplication={!!application}
         onViewTicket={() => setIsTicketOpen(true)}
         onOpenLetter={() => setIsLetterOpen(true)}
+        onOpenValidation={() => setIsValidationOpen(true)}
+        onOpenAdmin={() => setIsAdminOpen(true)}
       />
 
       {/* Conteúdo Principal */}
@@ -181,6 +191,7 @@ export const App: React.FC = () => {
           hasApplication={!!application}
           onViewTicket={() => setIsTicketOpen(true)}
           onOpenLetter={() => setIsLetterOpen(true)}
+          onOpenValidation={() => setIsValidationOpen(true)}
         />
 
         <Features />
@@ -210,11 +221,28 @@ export const App: React.FC = () => {
         onSubmit={handleSubmitApplication}
       />
 
+      {/* Página / Modal de Validação de Pré-Registro */}
+      <ValidationModal
+        isOpen={isValidationOpen}
+        onClose={() => setIsValidationOpen(false)}
+        application={application}
+        onViewTicket={() => {
+          setIsValidationOpen(false);
+          setIsTicketOpen(true);
+        }}
+      />
+
       {/* Modal do Bilhete de Embarque do Expresso de Hogwarts */}
       <TicketModal
         isOpen={isTicketOpen}
         onClose={() => setIsTicketOpen(false)}
         application={application}
+      />
+
+      {/* Painel Administrativo Ministerial (ADM) */}
+      <AdminPanelModal
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
       />
     </div>
   );

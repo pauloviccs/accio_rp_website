@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Users, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Users, ArrowRight, CheckCircle2, Clock, ShieldCheck, Ticket } from 'lucide-react';
 import { TOTAL_PIONEER_SLOTS, TARGET_PHASE_END_DATE } from '../lib/constants';
 
 interface HeroProps {
@@ -8,6 +8,7 @@ interface HeroProps {
   hasApplication: boolean;
   onViewTicket: () => void;
   onOpenLetter: () => void;
+  onOpenValidation: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
@@ -16,8 +17,9 @@ export const Hero: React.FC<HeroProps> = ({
   hasApplication,
   onViewTicket,
   onOpenLetter,
+  onOpenValidation,
 }) => {
-  // Contagem regressiva calculada contra a data alvo de encerramento da fase
+  // Contagem regressiva de 61 dias para o encerramento do pré-registro
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -77,7 +79,7 @@ export const Hero: React.FC<HeroProps> = ({
       </p>
 
       {/* Progress Bar de Vagas (FOMO 100% Real do Banco) */}
-      <div className="w-full max-w-md bg-[#210604]/90 border border-[#B83A0C]/40 rounded-2xl p-5 mb-10 shadow-2xl backdrop-blur-xl">
+      <div className="w-full max-w-md bg-[#210604]/90 border border-[#B83A0C]/40 rounded-2xl p-5 mb-8 shadow-2xl backdrop-blur-xl">
         <div className="flex justify-between items-center text-xs sm:text-sm font-semibold mb-3">
           <span className="text-[#FFF0B2] flex items-center space-x-1.5">
             <Users className="w-4 h-4 text-[#FFC34F]" />
@@ -101,43 +103,60 @@ export const Hero: React.FC<HeroProps> = ({
         </div>
 
         <p className="text-[11px] text-[#FFF0B2]/60 mt-3 text-left">
-          ⚠️ As inscrições do 1º Lote encerram quando as 100 vagas forem atingidas ou no término do cronômetro.
+          ⚠️ O Pré-Registro de Pioneiros possui prazo improrrogável de 61 dias (ou até o limite de 100 vagas no banco).
         </p>
       </div>
 
-      {/* Countdown Timer Real */}
-      <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-xs sm:max-w-sm mb-10">
-        {[
-          { label: 'DIAS', value: timeLeft.days },
-          { label: 'HORAS', value: timeLeft.hours },
-          { label: 'MINUTOS', value: timeLeft.minutes },
-          { label: 'SEGUNDOS', value: timeLeft.seconds },
-        ].map((item, index) => (
-          <div key={index} className="bg-[#160504]/90 border border-[#B83A0C]/30 rounded-xl p-2 sm:p-3 text-center">
-            <span className="font-mono text-xl sm:text-2xl font-bold text-gold-gradient block">
-              {String(item.value).padStart(2, '0')}
-            </span>
-            <span className="text-[9px] sm:text-[10px] text-[#FFF0B2]/60 font-semibold tracking-wider">
-              {item.label}
-            </span>
-          </div>
-        ))}
+      {/* Indicador e Cronômetro de 61 Dias */}
+      <div className="flex flex-col items-center mb-10">
+        <div className="flex items-center space-x-1.5 text-xs text-[#FFC34F] font-semibold mb-3">
+          <Clock className="w-3.5 h-3.5 text-[#F47A16]" />
+          <span>Contagem Regressiva para Encerramento do Pré-Registro (61 Dias):</span>
+        </div>
+
+        <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-xs sm:max-w-sm">
+          {[
+            { label: 'DIAS', value: timeLeft.days },
+            { label: 'HORAS', value: timeLeft.hours },
+            { label: 'MINUTOS', value: timeLeft.minutes },
+            { label: 'SEGUNDOS', value: timeLeft.seconds },
+          ].map((item, index) => (
+            <div key={index} className="bg-[#160504]/90 border border-[#B83A0C]/30 rounded-xl p-2 sm:p-3 text-center min-w-[65px] sm:min-w-[75px]">
+              <span className="font-mono text-xl sm:text-2xl font-bold text-gold-gradient block">
+                {String(item.value).padStart(2, '0')}
+              </span>
+              <span className="text-[9px] sm:text-[10px] text-[#FFF0B2]/60 font-semibold tracking-wider">
+                {item.label}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* CTA Button */}
+      {/* CTA Buttons */}
       {hasApplication ? (
-        <button
-          onClick={onViewTicket}
-          className="btn-accio-gold px-8 sm:px-10 py-4 rounded-2xl text-base sm:text-lg flex items-center space-x-3 cursor-pointer group"
-        >
-          <Sparkles className="w-5 h-5 text-[#160504]" />
-          <span>Visualizar Meu Bilhete de Embarque</span>
-          <ArrowRight className="w-5 h-5 text-[#160504] group-hover:translate-x-1 transition" />
-        </button>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <button
+            onClick={onOpenValidation}
+            className="btn-accio-gold px-8 sm:px-10 py-4 rounded-2xl text-base sm:text-lg flex items-center space-x-3 cursor-pointer group shadow-xl"
+          >
+            <ShieldCheck className="w-5 h-5 text-[#160504]" />
+            <span>Validação de Pré-Registro</span>
+            <ArrowRight className="w-5 h-5 text-[#160504] group-hover:translate-x-1 transition" />
+          </button>
+
+          <button
+            onClick={onViewTicket}
+            className="px-6 py-4 rounded-2xl bg-[#210604] hover:bg-[#5B1009] border border-[#FFC34F]/40 text-[#FFF0B2] text-sm sm:text-base flex items-center space-x-2 font-semibold transition"
+          >
+            <Ticket className="w-4 h-4 text-[#FFC34F]" />
+            <span>Meu Bilhete</span>
+          </button>
+        </div>
       ) : (
         <button
           onClick={onOpenForm}
-          className="btn-accio-gold px-8 sm:px-10 py-4 rounded-2xl text-base sm:text-lg flex items-center space-x-3 cursor-pointer group"
+          className="btn-accio-gold px-8 sm:px-10 py-4 rounded-2xl text-base sm:text-lg flex items-center space-x-3 cursor-pointer group shadow-xl"
         >
           <Sparkles className="w-5 h-5 text-[#160504]" />
           <span>Garantir Minha Vaga de Pioneiro</span>
@@ -157,7 +176,7 @@ export const Hero: React.FC<HeroProps> = ({
         </span>
         <span className="flex items-center space-x-1.5">
           <CheckCircle2 className="w-3.5 h-3.5 text-[#4CAF7C]" />
-          <span>Auto-Save contra perda de texto</span>
+          <span>Notificação Instantânea no Discord</span>
         </span>
       </div>
     </section>
