@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Sparkles, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { DiscordUser } from '../types';
+import { soundManager } from '../lib/audio';
 
 interface HogwartsLetterModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface HogwartsLetterModalProps {
   user: DiscordUser | null;
   onLogin: () => void;
   onProceedToForm: () => void;
+  onExploreCastle?: () => void;
 }
 
 export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
@@ -16,6 +18,7 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
   onClose,
   user,
   onProceedToForm,
+  onExploreCastle,
 }) => {
   const [isBroken, setIsBroken] = useState(false);
 
@@ -24,6 +27,7 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
   const handleBreakSeal = () => {
     if (isBroken) return;
     setIsBroken(true);
+    soundManager.playWaxBreak();
 
     // Efeito de estilhaços mágicos de cera e faíscas douradas
     confetti({
@@ -35,6 +39,7 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
   };
 
   const handleAcceptLetter = () => {
+    soundManager.playClick();
     onClose();
     onProceedToForm();
   };
@@ -189,7 +194,14 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
 
                 <button
                   type="button"
-                  onClick={onClose}
+                  onClick={() => {
+                    soundManager.playHover();
+                    if (onExploreCastle) {
+                      onExploreCastle();
+                    } else {
+                      onClose();
+                    }
+                  }}
                   className="w-full py-2 text-xs text-[#6B4E3D] hover:text-[#160504] font-semibold transition cursor-pointer"
                 >
                   Explorar os terrenos de Hogwarts primeiro

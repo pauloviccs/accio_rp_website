@@ -89,7 +89,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                 Ficha em Análise pelo Conselho de Magizoologia
               </h4>
               <p className="text-xs text-[#FFF0B2]/80 mt-1 leading-relaxed">
-                Sua história foi arquivada no Supabase e transmitida via canal seguro para a equipe de moderação. A aprovação final confirmará sua vaga no 1º lote de pioneiros.
+                Sua história foi lavrada no Livro da Admissão pela Pena da Aceitação e transmitida por canal oficial à banca examinadora de Hogwarts. A aprovação final confirmará sua vaga no 1º lote de pioneiros.
               </p>
             </div>
           </div>

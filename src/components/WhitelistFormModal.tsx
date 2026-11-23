@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { X, Sparkles, AlertTriangle, Save, Wand2, User, ChevronRight, ChevronLeft, LogIn } from 'lucide-react';
 import { CharacterApplication, DiscordUser, HouseId, BloodStatus } from '../types';
 import { HOUSES, WAND_WOODS, WAND_CORES, WAND_LENGTHS, WAND_FLEXIBILITIES, MIN_WORDS_BACKSTORY, LOCAL_STORAGE_FORM_KEY, LOCAL_STORAGE_DRAFT_KEY } from '../lib/constants';
+import { soundManager } from '../lib/audio';
 
 interface WhitelistFormModalProps {
   isOpen: boolean;
@@ -181,8 +182,8 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
 
       onClose();
     } catch (err: any) {
-      console.error('Erro ao submeter no Supabase:', err);
-      setErrorMessage(err.message || 'Falha ao registrar candidatura no banco de dados Supabase.');
+      console.error('Erro ao submeter no Livro da Admissão:', err);
+      setErrorMessage(err.message || 'Falha ao lavrar candidatura no Livro da Admissão de Hogwarts.');
     } finally {
       setIsSubmitting(false);
     }
@@ -559,7 +560,10 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
           {step > 1 ? (
             <button
               type="button"
-              onClick={() => setStep((prev) => (prev - 1) as any)}
+              onClick={() => {
+                soundManager.playQuill();
+                setStep((prev) => (prev - 1) as any);
+              }}
               className="px-4 py-2 rounded-xl bg-[#5B1009]/40 hover:bg-[#5B1009] text-xs font-semibold text-[#FFF0B2] transition flex items-center space-x-1 cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -571,6 +575,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
             <button
               type="button"
               onClick={() => {
+                soundManager.playQuill();
                 setErrorMessage(null);
                 setStep((prev) => (prev + 1) as any);
               }}

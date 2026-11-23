@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { DiscordUser } from '../types';
-import { LogIn, LogOut, Sparkles, Mail, ShieldCheck, Shield } from 'lucide-react';
+import { LogIn, LogOut, Sparkles, Mail, ShieldCheck, Shield, Volume2, VolumeX } from 'lucide-react';
+import { soundManager } from '../lib/audio';
 
 interface NavbarProps {
   user: DiscordUser | null;
@@ -25,6 +26,18 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenValidation,
   onOpenAdmin,
 }) => {
+  const [isMuted, setIsMuted] = useState(soundManager.isMuted());
+
+  useEffect(() => {
+    const unsubscribe = soundManager.subscribe((muted) => {
+      setIsMuted(muted);
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleToggleSound = () => {
+    soundManager.toggleMute();
+  };
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[#B83A0C]/20 bg-[#160504]/80 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -67,6 +80,30 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Mail className="w-3.5 h-3.5 text-[#FFC34F]" />
             <span className="hidden sm:inline">Carta de Hogwarts</span>
+          </button>
+
+          {/* Botão Universal de Mutar / Desmutar Sons do Site */}
+          <button
+            onClick={handleToggleSound}
+            className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-full border text-xs transition cursor-pointer ${
+              isMuted
+                ? 'bg-[#210604] border-[#CF4A4A]/50 text-[#CF4A4A] hover:bg-[#CF4A4A]/20'
+                : 'bg-[#160504] border-[#4CAF7C]/40 text-[#4CAF7C] hover:border-[#4CAF7C] hover:bg-[#4CAF7C]/10'
+            }`}
+            title={isMuted ? 'Sons Mágicos Mutados (Clique para Ativar)' : 'Sons Mágicos Ativados (Clique para Mutar)'}
+            aria-label={isMuted ? 'Desmutar áudio' : 'Mutar áudio'}
+          >
+            {isMuted ? (
+              <>
+                <VolumeX className="w-3.5 h-3.5" />
+                <span className="text-[10px] font-bold hidden md:inline">Mudo</span>
+              </>
+            ) : (
+              <>
+                <Volume2 className="w-3.5 h-3.5 animate-pulse" />
+                <span className="text-[10px] font-bold hidden md:inline">Som</span>
+              </>
+            )}
           </button>
 
           {user ? (

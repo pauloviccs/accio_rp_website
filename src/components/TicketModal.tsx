@@ -93,7 +93,7 @@ export const TicketModal: React.FC<TicketModalProps> = ({
               <span className="text-[10px] text-[#FFF0B2]/60 uppercase tracking-wider block">Status da Admissão</span>
               <span className="text-xs font-bold text-[#4CAF7C] flex items-center space-x-1">
                 <Check className="w-3.5 h-3.5" />
-                <span>Registrado no Supabase</span>
+                <span>Inscrito no Livro da Admissão</span>
               </span>
             </div>
           </div>

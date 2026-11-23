@@ -127,3 +127,76 @@ export async function getTotalApplicationsCount(): Promise<number> {
     return 0;
   }
 }
+
+export interface CountdownTimerData {
+  target_date: string;
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  updated_by?: string;
+}
+
+export async function getCountdownTimer(): Promise<CountdownTimerData | null> {
+  try {
+    const { data, error } = await supabase
+      .from('accio_settings')
+      .select('value')
+      .eq('key', 'countdown_timer')
+      .maybeSingle();
+
+    if (error || !data) {
+      console.warn('Erro ao consultar cronômetro de accio_settings:', error?.message);
+      return null;
+    }
+    return data.value as CountdownTimerData;
+  } catch (err) {
+    console.error('Falha de rede ao consultar cronômetro:', err);
+    return null;
+  }
+}
+
+export async function updateCountdownTimer(timer: CountdownTimerData): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('accio_settings')
+      .upsert({
+        key: 'countdown_timer',
+        value: timer,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'key' });
+
+    if (error) {
+      console.error('Erro ao atualizar cronômetro em accio_settings:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Falha de rede ao salvar cronômetro:', err);
+    return false;
+  }
+}
+
+export function subscribeToCountdownTimer(onUpdate: (timer: CountdownTimerData) => void): () => void {
+  const channel = supabase
+    .channel('accio_settings_timer_changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'accio_settings',
+        filter: 'key=eq.countdown_timer',
+      },
+      (payload) => {
+        if (payload.new && (payload.new as any).value) {
+          onUpdate((payload.new as any).value as CountdownTimerData);
+        }
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}

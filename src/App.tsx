@@ -10,6 +10,7 @@ import { HogwartsLetterModal } from './components/HogwartsLetterModal';
 import { ValidationModal } from './components/ValidationModal';
 import { AdminPanelModal } from './components/AdminPanelModal';
 import { EnchantedSubmissionModal } from './components/EnchantedSubmissionModal';
+import { CastleBanners3D } from './components/CastleBanners3D';
 import { CharacterApplication, DiscordUser } from './types';
 import { LOCAL_STORAGE_LETTER_KEY } from './lib/constants';
 import {
@@ -19,12 +20,15 @@ import {
   getExistingApplication,
   submitApplication,
   getTotalApplicationsCount,
+  getCountdownTimer,
+  subscribeToCountdownTimer,
 } from './lib/supabase';
 
 export const App: React.FC = () => {
   const [user, setUser] = useState<DiscordUser | null>(null);
   const [application, setApplication] = useState<CharacterApplication | null>(null);
   const [totalRegistered, setTotalRegistered] = useState<number>(0);
+  const [targetEndDate, setTargetEndDate] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isTicketOpen, setIsTicketOpen] = useState(false);
   const [isLetterOpen, setIsLetterOpen] = useState(false);
@@ -57,9 +61,23 @@ export const App: React.FC = () => {
       setIsLetterOpen(true);
     }
 
-    // 2. Obter contagem real de inscritos do Supabase
+    // 2. Obter contagem real de inscritos do Livro da Admissão
     getTotalApplicationsCount().then((count) => {
       setTotalRegistered(count);
+    });
+
+    // 2.1 Obter cronômetro configurado do Livro da Admissão
+    getCountdownTimer().then((timer) => {
+      if (timer?.target_date) {
+        setTargetEndDate(timer.target_date);
+      }
+    });
+
+    // 2.2 Sincronização Realtime de Cronômetro para todos os usuários
+    const unsubTimer = subscribeToCountdownTimer((newTimer) => {
+      if (newTimer?.target_date) {
+        setTargetEndDate(newTimer.target_date);
+      }
     });
 
     // 3. Monitorar sessão real do Discord via Supabase Auth
@@ -100,6 +118,7 @@ export const App: React.FC = () => {
 
     return () => {
       subscription.unsubscribe();
+      unsubTimer();
     };
   }, []);
 
@@ -190,7 +209,17 @@ export const App: React.FC = () => {
           onViewTicket={() => setIsTicketOpen(true)}
           onOpenLetter={() => setIsLetterOpen(true)}
           onOpenValidation={() => setIsValidationOpen(true)}
+          targetEndDate={targetEndDate}
         />
+
+        {/* Estandartes 3D das Quatro Casas & Exploração do Castelo */}
+        <div id="castle-exploration">
+          <CastleBanners3D
+            onOpenFormWithHouse={(_houseId) => {
+              setIsFormOpen(true);
+            }}
+          />
+        </div>
 
         <Features />
       </main>
@@ -207,6 +236,13 @@ export const App: React.FC = () => {
         onProceedToForm={() => {
           handleCloseLetter();
           setIsFormOpen(true);
+        }}
+        onExploreCastle={() => {
+          handleCloseLetter();
+          const el = document.getElementById('castle-exploration');
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
         }}
       />
 
@@ -253,6 +289,11 @@ export const App: React.FC = () => {
       <AdminPanelModal
         isOpen={isAdminOpen}
         onClose={() => setIsAdminOpen(false)}
+        onTimerUpdated={(newTimer) => {
+          if (newTimer?.target_date) {
+            setTargetEndDate(newTimer.target_date);
+          }
+        }}
       />
     </div>
   );

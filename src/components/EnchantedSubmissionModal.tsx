@@ -3,6 +3,7 @@ import { CheckCircle2, Ticket, ShieldCheck, ArrowRight, X, Clock, Wand2 } from '
 import confetti from 'canvas-confetti';
 import { CharacterApplication } from '../types';
 import { HOUSES } from '../lib/constants';
+import { soundManager } from '../lib/audio';
 
 interface EnchantedSubmissionModalProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
 
     // Iniciar sequência mágica
     setStage('sealing');
+    soundManager.playWaxBreak();
 
     // 1. Efeito de selagem com cera aos 1.2s
     const timer1 = setTimeout(() => {
@@ -43,6 +45,7 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
         origin: { y: 0.55 },
         colors: ['#FFF0B2', '#FFC34F', '#F47A16', '#5B1009'],
       });
+      soundManager.playOwl();
       setStage('flying');
     }, 1400);
 
@@ -55,6 +58,7 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
         origin: { y: 0.5 },
         colors: ['#FFC34F', '#F47A16', '#FFF0B2', '#4CAF7C'],
       });
+      soundManager.playSparkle();
       setStage('confirmed');
     }, 3200);
 
@@ -173,11 +177,11 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
                 Submissão enviada à Escola, aguarde retorno.
               </h2>
               <p className="font-crimson text-sm sm:text-base text-[#FFF0B2]/80 max-w-md mx-auto leading-relaxed">
-                Sua crônica e antecedentes foram arquivados com sucesso no banco de dados ministerial. O Conselho de Magizoologia iniciará a análise formal de sua admissão.
+                Sua crônica e antecedentes foram lavrados no Livro da Admissão pela lendária Pena da Aceitação. O Conselho de Magizoologia iniciará a análise formal de sua admissão.
               </p>
             </div>
 
-            {/* Comprovante do Aluno / Recibo Oficial do Supabase */}
+            {/* Comprovante do Aluno / Recibo Oficial do Livro da Admissão */}
             <div className="my-5 p-4 sm:p-5 rounded-2xl bg-[#210604]/90 border border-[#B83A0C]/30 space-y-3.5">
               
               <div className="flex items-center justify-between pb-3 border-b border-white/10">
@@ -230,7 +234,7 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
 
                 <div className="sm:col-span-2 flex items-center justify-between pt-2 border-t border-white/5 text-[11px]">
                   <span className="text-[#4CAF7C] font-mono font-semibold">
-                    ✓ {application.word_count.toLocaleString('pt-BR')} palavras registradas no Supabase
+                    ✓ {application.word_count.toLocaleString('pt-BR')} palavras inscritas no Livro da Admissão
                   </span>
                   <span className="text-[#FFC34F] flex items-center space-x-1">
                     <Clock className="w-3 h-3" />

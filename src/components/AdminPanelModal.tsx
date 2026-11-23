@@ -4,17 +4,20 @@ import {
   Search, RefreshCw, BookOpen, Check, Ban, Eye, Wand2
 } from 'lucide-react';
 import { CharacterApplication } from '../types';
-import { getAllApplications, updateApplicationStatus } from '../lib/supabase';
+import { getAllApplications, updateApplicationStatus, CountdownTimerData } from '../lib/supabase';
 import { HOUSES } from '../lib/constants';
+import { AppleTimerModal } from './AppleTimerModal';
 
 interface AdminPanelModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onTimerUpdated?: (newTimer: CountdownTimerData) => void;
 }
 
 export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   isOpen,
   onClose,
+  onTimerUpdated,
 }) => {
   const [applications, setApplications] = useState<CharacterApplication[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +27,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const [selectedApp, setSelectedApp] = useState<CharacterApplication | null>(null);
   const [reviewerNotes, setReviewerNotes] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -103,19 +107,29 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                 Painel Administrativo & Whitelist
               </span>
               <h2 className="font-cinzel text-xl sm:text-2xl font-bold text-[#FFF0B2]">
-                Ministério da Magia — Registros Supabase
+                Ministério da Magia — O Livro da Admissão
               </h2>
             </div>
           </div>
 
           <div className="flex items-center space-x-2">
+            {/* Botão de Ajustar Timer Apple */}
+            <button
+              onClick={() => setIsTimerModalOpen(true)}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#FFC34F]/15 border border-[#FFC34F]/40 text-xs text-[#FFF0B2] hover:bg-[#FFC34F]/25 hover:text-white transition cursor-pointer"
+              title="Ajustar o cronômetro oficial do pré-registro (Roleta Apple)"
+            >
+              <Clock className="w-3.5 h-3.5 text-[#FFC34F]" />
+              <span className="hidden sm:inline">Ajustar Cronômetro</span>
+            </button>
+
             <button
               onClick={loadApplications}
               disabled={isLoading}
               className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#210604] border border-[#B83A0C]/40 text-xs text-[#FFF0B2] hover:bg-[#5B1009] transition disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-              <span>Sincronizar Banco</span>
+              <span>Consultar Livro</span>
             </button>
             <button
               onClick={onClose}
@@ -227,7 +241,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
               {filteredApps.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-8 text-center text-[#FFF0B2]/40">
-                    Nenhum registro encontrado no Supabase para os filtros selecionados.
+                    Nenhuma inscrição encontrada no Livro da Admissão para os filtros selecionados.
                   </td>
                 </tr>
               ) : (
@@ -424,6 +438,15 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
             </div>
           </div>
         )}
+
+        {/* Modal de Ajuste de Cronômetro Estilo Roleta Apple */}
+        <AppleTimerModal
+          isOpen={isTimerModalOpen}
+          onClose={() => setIsTimerModalOpen(false)}
+          onTimerSaved={(newTimer) => {
+            if (onTimerUpdated) onTimerUpdated(newTimer);
+          }}
+        />
       </div>
     </div>
   );

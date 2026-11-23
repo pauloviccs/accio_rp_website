@@ -9,6 +9,7 @@ interface HeroProps {
   onViewTicket: () => void;
   onOpenLetter: () => void;
   onOpenValidation: () => void;
+  targetEndDate?: string | null;
 }
 
 export const Hero: React.FC<HeroProps> = ({
@@ -18,8 +19,9 @@ export const Hero: React.FC<HeroProps> = ({
   onViewTicket,
   onOpenLetter,
   onOpenValidation,
+  targetEndDate,
 }) => {
-  // Contagem regressiva de 61 dias para o encerramento do pré-registro
+  // Contagem regressiva sincronizada em tempo real com o Livro da Admissão
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -28,7 +30,7 @@ export const Hero: React.FC<HeroProps> = ({
   });
 
   useEffect(() => {
-    const target = new Date(TARGET_PHASE_END_DATE).getTime();
+    const target = targetEndDate ? new Date(targetEndDate).getTime() : new Date(TARGET_PHASE_END_DATE).getTime();
 
     const updateTimer = () => {
       const now = Date.now();
@@ -45,7 +47,7 @@ export const Hero: React.FC<HeroProps> = ({
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [targetEndDate]);
 
   const percentage = Math.min(Math.round((totalRegistered / TOTAL_PIONEER_SLOTS) * 100), 100);
 
@@ -78,12 +80,12 @@ export const Hero: React.FC<HeroProps> = ({
         Escreva sua história, garanta seu assento no Expresso e viva o verdadeiro mundo bruxo.
       </p>
 
-      {/* Progress Bar de Vagas (FOMO 100% Real do Banco) */}
+      {/* Progress Bar de Vagas (FOMO 100% Real do Livro da Admissão) */}
       <div className="w-full max-w-md bg-[#210604]/90 border border-[#B83A0C]/40 rounded-2xl p-5 mb-8 shadow-2xl backdrop-blur-xl">
         <div className="flex justify-between items-center text-xs sm:text-sm font-semibold mb-3">
           <span className="text-[#FFF0B2] flex items-center space-x-1.5">
             <Users className="w-4 h-4 text-[#FFC34F]" />
-            <span>Vagas Registradas no Supabase:</span>
+            <span>Bruxos Inscritos no Livro da Admissão:</span>
           </span>
           <span className="text-[#FFC34F] font-mono text-base">
             {totalRegistered} / {TOTAL_PIONEER_SLOTS} ({percentage}%)
@@ -103,15 +105,15 @@ export const Hero: React.FC<HeroProps> = ({
         </div>
 
         <p className="text-[11px] text-[#FFF0B2]/60 mt-3 text-left">
-          ⚠️ O Pré-Registro de Pioneiros possui prazo improrrogável de 61 dias (ou até o limite de 100 vagas no banco).
+          ⚠️ O Pré-Registro de Pioneiros possui prazo estipulado (ou até o limite de 100 vagas no Livro da Admissão).
         </p>
       </div>
 
-      {/* Indicador e Cronômetro de 61 Dias */}
+      {/* Indicador e Cronômetro */}
       <div className="flex flex-col items-center mb-10">
         <div className="flex items-center space-x-1.5 text-xs text-[#FFC34F] font-semibold mb-3">
           <Clock className="w-3.5 h-3.5 text-[#F47A16]" />
-          <span>Contagem Regressiva para Encerramento do Pré-Registro (61 Dias):</span>
+          <span>Contagem Regressiva para Encerramento do Pré-Registro:</span>
         </div>
 
         <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-xs sm:max-w-sm">
@@ -172,7 +174,7 @@ export const Hero: React.FC<HeroProps> = ({
         </span>
         <span className="flex items-center space-x-1.5">
           <CheckCircle2 className="w-3.5 h-3.5 text-[#4CAF7C]" />
-          <span>Bilhete Numerado no Supabase</span>
+          <span>Inscrição Lavrada no Livro da Admissão</span>
         </span>
         <span className="flex items-center space-x-1.5">
           <CheckCircle2 className="w-3.5 h-3.5 text-[#4CAF7C]" />
