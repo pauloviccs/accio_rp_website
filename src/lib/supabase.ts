@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import { CharacterApplication, DiscordUser, UserRole, UserRoleRecord } from '../types';
 import { sendRegistrationToDiscord } from './discordWebhook';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://btxwhsbccfwhajrmopzm.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0eHdoc2JjY2Z3aGFqcm1vcHptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMjIyOTQsImV4cCI6MjA4NTc5ODI5NH0.kzmICdyH1OtIiymfl-zwWK8Rur3BxKKzfOU8tNO_TC0';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://siwjyavftankitbdagzo.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2p5YXZmdGFua2l0YmRhZ3pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUyNzU3NjcsImV4cCI6MjExMDg1MTc2N30.wnRe2Pk2f0PQbY4JT-iKjN27_xKot88QO3WY-YkphtU';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
