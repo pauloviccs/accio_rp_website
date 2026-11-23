@@ -41,3 +41,16 @@ export interface DiscordUser {
   email?: string;
 }
 
+export type UserRole = 'user' | 'student' | 'mod' | 'admin' | 'super_admin';
+
+export interface UserRoleRecord {
+  id?: string;
+  discord_id: string;
+  discord_username: string;
+  discord_avatar?: string | null;
+  role: UserRole;
+  assigned_by?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+

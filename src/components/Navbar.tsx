@@ -5,6 +5,8 @@ import { soundManager } from '../lib/audio';
 
 interface NavbarProps {
   user: DiscordUser | null;
+  userRole?: string | null;
+  canAccessAdmin?: boolean;
   onLogin: () => void;
   onLogout: () => void;
   onOpenForm: () => void;
@@ -17,6 +19,8 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({
   user,
+  userRole,
+  canAccessAdmin = false,
   onLogin,
   onLogout,
   onOpenForm,
@@ -62,15 +66,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Status Pill & User Actions */}
         <div className="flex items-center space-x-2 sm:space-x-3">
 
-          {/* Botão de Acesso ao Painel ADM */}
-          <button
-            onClick={onOpenAdmin}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#160504] border border-[#B83A0C]/40 text-xs text-[#FFF0B2]/80 hover:text-[#FFC34F] hover:border-[#FFC34F]/40 transition cursor-pointer"
-            title="Abrir Painel Administrativo do Ministério da Magia"
-          >
-            <Shield className="w-3.5 h-3.5 text-[#FFC34F]" />
-            <span className="hidden md:inline">Painel ADM</span>
-          </button>
+          {/* Botão de Acesso ao Painel ADM (Exclusivo para admin, super_admin e mod) */}
+          {canAccessAdmin && (
+            <button
+              onClick={onOpenAdmin}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#160504] border border-[#FFC34F]/50 text-xs text-[#FFC34F] hover:bg-[#5B1009]/60 transition cursor-pointer shadow-md shadow-[#FFC34F]/10"
+              title="Abrir Painel Administrativo do Ministério da Magia"
+            >
+              <Shield className="w-3.5 h-3.5 text-[#FFC34F]" />
+              <span className="hidden md:inline">Painel ADM</span>
+            </button>
+          )}
 
           {/* Botão para Rever a Carta de Admissão */}
           <button
@@ -149,9 +155,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {user.username.charAt(0).toUpperCase()}
                   </div>
                 )}
-                <span className="text-xs font-medium text-[#FFF0B2] hidden sm:inline max-w-[100px] truncate">
-                  {user.global_name || user.username}
-                </span>
+                <div className="hidden sm:flex flex-col">
+                  <span className="text-xs font-medium text-[#FFF0B2] max-w-[110px] truncate leading-tight">
+                    {user.global_name || user.username}
+                  </span>
+                  {userRole && (
+                    <span className="text-[9px] uppercase tracking-wider text-[#FFC34F] font-bold leading-none">
+                      {userRole.replace('_', ' ')}
+                    </span>
+                  )}
+                </div>
                 <button
                   onClick={onLogout}
                   title="Desconectar"

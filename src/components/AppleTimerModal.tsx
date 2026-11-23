@@ -9,7 +9,6 @@ interface AppleTimerModalProps {
   onTimerSaved?: (newTimer: CountdownTimerData) => void;
 }
 
-// Coluna individual estilo Roleta Cilindrica da Apple (iOS Wheel Drum)
 interface WheelColumnProps {
   label: string;
   value: number;
@@ -33,9 +32,8 @@ const WheelColumn: React.FC<WheelColumnProps> = ({
   const startVal = useRef(value);
   const lastSoundVal = useRef(value);
 
-  const ITEM_HEIGHT = 44; // Altura exata da lente central iOS
+  const ITEM_HEIGHT = 36; // Altura precisa e compacta para encaixe perfeito em qualquer tela
 
-  // Incrementar / decrementar com som
   const step = (delta: number) => {
     let next = value + delta;
     if (next > max) next = min;
@@ -44,7 +42,6 @@ const WheelColumn: React.FC<WheelColumnProps> = ({
     onChange(next);
   };
 
-  // Tratar rolagem por roda do mouse (Wheel event)
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
     if (e.deltaY > 0) {
@@ -54,7 +51,6 @@ const WheelColumn: React.FC<WheelColumnProps> = ({
     }
   };
 
-  // Tratar toque / arrasto (Touch / Mouse drag)
   const handleMouseDown = (e: React.MouseEvent) => {
     isDragging.current = true;
     startY.current = e.clientY;
@@ -67,7 +63,6 @@ const WheelColumn: React.FC<WheelColumnProps> = ({
     const itemsScrolled = Math.round(deltaY / ITEM_HEIGHT);
     let nextVal = startVal.current + itemsScrolled;
 
-    // Wrap around
     const range = max - min + 1;
     nextVal = ((((nextVal - min) % range) + range) % range) + min;
 
@@ -82,7 +77,6 @@ const WheelColumn: React.FC<WheelColumnProps> = ({
     isDragging.current = false;
   };
 
-  // Gerar itens visíveis: [value - 2, value - 1, value, value + 1, value + 2]
   const visibleItems = [-2, -1, 0, 1, 2].map((offset) => {
     const range = max - min + 1;
     let val = value + offset;
@@ -91,17 +85,16 @@ const WheelColumn: React.FC<WheelColumnProps> = ({
   });
 
   return (
-    <div className="flex flex-col items-center select-none">
-      {/* Botão de incremento rápido superior */}
+    <div className="flex flex-col items-center select-none flex-1">
       <button
         onClick={() => step(-1)}
-        className="p-1 text-[#FFF0B2]/40 hover:text-[#FFC34F] hover:bg-white/5 rounded-full transition mb-1"
+        className="p-1 text-[#FFF0B2]/40 hover:text-[#FFC34F] hover:bg-white/5 rounded-full transition mb-0.5"
         title={`Diminuir ${label}`}
       >
-        <ChevronUp className="w-4 h-4" />
+        <ChevronUp className="w-3.5 h-3.5" />
       </button>
 
-      {/* Roda cilíndrica com lente central */}
+      {/* Roda Cilíndrica Apple com Altura Controlada */}
       <div
         ref={containerRef}
         onWheel={handleWheel}
@@ -109,32 +102,31 @@ const WheelColumn: React.FC<WheelColumnProps> = ({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        className="relative w-16 sm:w-20 h-[220px] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden rounded-2xl bg-[#100303]/90 border border-[#B83A0C]/25 shadow-inner"
-        style={{ perspective: '600px' }}
+        className="relative w-full max-w-[72px] h-[160px] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden rounded-2xl bg-[#0D0202] border border-[#B83A0C]/30 shadow-inner"
+        style={{ perspective: '500px' }}
       >
-        {/* Lente Central Apple (Highlight Bar com vidro fosco) */}
-        <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 h-[44px] bg-[#FFC34F]/10 border-y border-[#FFC34F]/40 pointer-events-none z-10 backdrop-blur-[1px]" />
+        {/* Lente Central Apple com Vidro Fosco */}
+        <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 h-[38px] bg-[#FFC34F]/10 border-y border-[#FFC34F]/40 pointer-events-none z-10 backdrop-blur-[1px]" />
 
-        {/* Gradiente superior e inferior para profundidade cilíndrica 3D */}
-        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#100303] via-[#100303]/80 to-transparent pointer-events-none z-20" />
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#100303] via-[#100303]/80 to-transparent pointer-events-none z-20" />
+        {/* Gradientes Superior e Inferior para Efeito 3D */}
+        <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-[#0D0202] via-[#0D0202]/85 to-transparent pointer-events-none z-20" />
+        <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#0D0202] via-[#0D0202]/85 to-transparent pointer-events-none z-20" />
 
-        {/* Itens do tambor */}
         <div className="relative w-full h-full flex flex-col items-center justify-center pointer-events-none">
           {visibleItems.map(({ val, offset }) => {
             const isCenter = offset === 0;
-            const rotateX = offset * 26; // Rotação 3D cilíndrica
-            const translateY = offset * 42;
-            const scale = isCenter ? 1.15 : 1 - Math.abs(offset) * 0.18;
-            const opacity = isCenter ? 1 : 1 - Math.abs(offset) * 0.42;
+            const rotateX = offset * 26;
+            const translateY = offset * 34;
+            const scale = isCenter ? 1.15 : 1 - Math.abs(offset) * 0.2;
+            const opacity = isCenter ? 1 : 1 - Math.abs(offset) * 0.45;
 
             return (
               <div
                 key={offset}
-                className={`absolute font-mono transition-transform duration-100 flex items-center justify-center ${
+                className={`absolute font-mono transition-transform duration-75 flex items-center justify-center ${
                   isCenter
-                    ? 'text-2xl sm:text-3xl font-black text-gold-gradient drop-shadow-[0_0_12px_rgba(255,195,79,0.5)]'
-                    : 'text-lg sm:text-xl font-medium text-[#FFF0B2]/40'
+                    ? 'text-xl sm:text-2xl font-black text-gold-gradient drop-shadow-[0_0_10px_rgba(255,195,79,0.5)]'
+                    : 'text-base sm:text-lg font-medium text-[#FFF0B2]/40'
                 }`}
                 style={{
                   transform: `translateY(${translateY}px) rotateX(${rotateX}deg) scale(${scale})`,
@@ -148,17 +140,15 @@ const WheelColumn: React.FC<WheelColumnProps> = ({
         </div>
       </div>
 
-      {/* Botão de incremento rápido inferior */}
       <button
         onClick={() => step(1)}
-        className="p-1 text-[#FFF0B2]/40 hover:text-[#FFC34F] hover:bg-white/5 rounded-full transition mt-1"
+        className="p-1 text-[#FFF0B2]/40 hover:text-[#FFC34F] hover:bg-white/5 rounded-full transition mt-0.5"
         title={`Aumentar ${label}`}
       >
-        <ChevronDown className="w-4 h-4" />
+        <ChevronDown className="w-3.5 h-3.5" />
       </button>
 
-      {/* Legenda inferior */}
-      <span className="text-[10px] sm:text-xs font-bold tracking-widest uppercase text-[#FFC34F] mt-1">
+      <span className="text-[10px] sm:text-xs font-bold tracking-widest uppercase text-[#FFC34F] mt-0.5">
         {label}
       </span>
     </div>
@@ -178,7 +168,6 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [calculatedEnd, setCalculatedEnd] = useState<Date>(new Date());
 
-  // Carregar dados salvos no Supabase ao abrir
   useEffect(() => {
     if (!isOpen) return;
 
@@ -192,7 +181,6 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
     });
   }, [isOpen]);
 
-  // Recalcular data final ao alterar qualquer roleta
   useEffect(() => {
     const now = Date.now();
     const totalMs =
@@ -205,7 +193,6 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Aplicar atalhos rápidos
   const applyPreset = (d: number, h: number = 0, m: number = 0) => {
     soundManager.playSparkle();
     setDays(d);
@@ -240,49 +227,49 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
       setTimeout(() => {
         setSaveSuccess(false);
         onClose();
-      }, 1200);
+      }, 1000);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-xl animate-apple-modal">
-      <div className="relative w-full max-w-xl bg-[#160504] border border-[#B83A0C]/50 rounded-3xl shadow-2xl p-6 sm:p-8 overflow-hidden">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-2xl overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-[#160504] border border-[#B83A0C]/50 rounded-3xl p-5 sm:p-6 shadow-2xl my-auto animate-apple-modal">
         
         {/* Glow de fundo */}
-        <div className="absolute top-0 right-1/4 w-80 h-80 bg-[#FFC34F]/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-60 h-60 bg-[#FFC34F]/10 rounded-full blur-[80px] pointer-events-none" />
 
         {/* Topo do Modal */}
-        <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFC34F] to-[#5B1009] p-0.5 shadow-md">
+        <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FFC34F] to-[#5B1009] p-0.5 shadow-md">
               <div className="w-full h-full rounded-[10px] bg-[#160504] flex items-center justify-center">
-                <Clock className="w-5 h-5 text-[#FFC34F] animate-pulse" />
+                <Clock className="w-4 h-4 text-[#FFC34F] animate-pulse" />
               </div>
             </div>
             <div>
               <span className="text-[10px] uppercase tracking-widest text-[#FFC34F] font-bold block">
-                Gabinete da Diretoria · Livro da Admissão
+                Livro da Admissão · Configuração
               </span>
-              <h3 className="font-cinzel text-lg sm:text-xl font-bold text-[#FFF0B2]">
-                Ajustar Cronômetro de Lançamento
+              <h3 className="font-cinzel text-base sm:text-lg font-bold text-[#FFF0B2]">
+                Cronômetro de Lançamento
               </h3>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-white/10 text-[#FFF0B2]/60 hover:text-white transition"
+            className="p-1.5 rounded-full hover:bg-white/10 text-[#FFF0B2]/60 hover:text-white transition cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Atalhos Rápidos de Dias */}
-        <div className="mb-6">
-          <span className="text-[11px] uppercase tracking-wider text-[#FFF0B2]/60 font-semibold block mb-2 text-center">
+        {/* Atalhos Rápidos */}
+        <div className="mb-4">
+          <span className="text-[10px] uppercase tracking-wider text-[#FFF0B2]/60 font-semibold block mb-1.5 text-center">
             Prazos Canônicos Predefinidos:
           </span>
-          <div className="flex flex-wrap justify-center gap-2">
+          <div className="flex flex-wrap justify-center gap-1.5">
             {[
               { label: '⚡ 60 Dias (Padrão)', d: 60 },
               { label: '⏳ 30 Dias', d: 30 },
@@ -293,7 +280,7 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
               <button
                 key={preset.label}
                 onClick={() => applyPreset(preset.d)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition cursor-pointer ${
                   days === preset.d && hours === 0
                     ? 'bg-[#FFC34F] text-[#160504] border-[#FFC34F] font-bold shadow-md shadow-[#FFC34F]/20'
                     : 'bg-[#210604] text-[#FFF0B2]/80 border-[#B83A0C]/30 hover:border-[#FFC34F]/50 hover:text-white'
@@ -306,8 +293,8 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
         </div>
 
         {/* ROLETA APPLE DE 4 COLUNAS: DIAS, HORAS, MINUTOS, SEGUNDOS */}
-        <div className="bg-[#0D0202] border border-[#B83A0C]/40 rounded-2xl p-4 sm:p-6 mb-6 shadow-2xl">
-          <div className="flex items-center justify-center space-x-2 sm:space-x-4">
+        <div className="bg-[#100303] border border-[#B83A0C]/40 rounded-2xl p-3 sm:p-4 mb-4 shadow-2xl">
+          <div className="flex items-center justify-between space-x-1 sm:space-x-3">
             <WheelColumn
               label="Dias"
               value={days}
@@ -317,7 +304,7 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
               padZero={false}
             />
 
-            <span className="text-xl font-mono text-[#FFC34F]/40 font-bold -mt-6">:</span>
+            <span className="text-lg font-mono text-[#FFC34F]/40 font-bold -mt-5">:</span>
 
             <WheelColumn
               label="Horas"
@@ -327,7 +314,7 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
               onChange={setHours}
             />
 
-            <span className="text-xl font-mono text-[#FFC34F]/40 font-bold -mt-6">:</span>
+            <span className="text-lg font-mono text-[#FFC34F]/40 font-bold -mt-5">:</span>
 
             <WheelColumn
               label="Minutos"
@@ -337,7 +324,7 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
               onChange={setMinutes}
             />
 
-            <span className="text-xl font-mono text-[#FFC34F]/40 font-bold -mt-6">:</span>
+            <span className="text-lg font-mono text-[#FFC34F]/40 font-bold -mt-5">:</span>
 
             <WheelColumn
               label="Segundos"
@@ -349,30 +336,30 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
           </div>
         </div>
 
-        {/* Prévia da Data de Término */}
-        <div className="bg-[#210604]/80 border border-[#B83A0C]/30 rounded-xl p-3.5 mb-6 text-center text-xs">
-          <span className="text-[#FFF0B2]/60 block mb-1">
-            Data e Hora Estimadas de Encerramento:
+        {/* Previsão de Encerramento */}
+        <div className="bg-[#210604]/80 border border-[#B83A0C]/30 rounded-xl p-3 mb-4 text-center text-xs">
+          <span className="text-[#FFF0B2]/60 block mb-0.5 text-[11px]">
+            Data Estimada de Término no Livro da Admissão:
           </span>
-          <span className="font-mono text-sm sm:text-base font-bold text-gold-gradient block">
+          <span className="font-mono text-xs sm:text-sm font-bold text-gold-gradient block">
             {calculatedEnd.toLocaleDateString('pt-BR', {
-              weekday: 'long',
+              weekday: 'short',
               day: '2-digit',
-              month: 'long',
+              month: 'short',
               year: 'numeric',
             })}{' '}
             às {calculatedEnd.toLocaleTimeString('pt-BR')}
           </span>
           <span className="text-[10px] text-[#4CAF7C] block mt-1">
-            ⚡ Todos os usuários conectados verão a contagem atualizar em tempo real.
+            ⚡ Sincronizado instantaneamente via Supabase Realtime para todos os jogadores.
           </span>
         </div>
 
         {/* Ações */}
-        <div className="flex items-center justify-end space-x-3">
+        <div className="flex items-center justify-end space-x-2.5">
           <button
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl bg-[#210604] border border-[#B83A0C]/30 text-xs text-[#FFF0B2]/70 hover:text-white hover:bg-[#5B1009] transition cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-[#210604] border border-[#B83A0C]/30 text-xs text-[#FFF0B2]/70 hover:text-white hover:bg-[#5B1009] transition cursor-pointer"
           >
             Cancelar
           </button>
@@ -380,21 +367,21 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
           <button
             onClick={handleSave}
             disabled={isSaving || saveSuccess}
-            className="px-6 py-2.5 rounded-xl btn-accio-gold text-xs font-bold transition flex items-center space-x-2 cursor-pointer disabled:opacity-60"
+            className="px-5 py-2 rounded-xl btn-accio-gold text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer disabled:opacity-60"
           >
             {isSaving ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin" />
-                <span>Gravando no Livro...</span>
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                <span>Gravando...</span>
               </>
             ) : saveSuccess ? (
               <>
-                <Check className="w-4 h-4 text-[#160504]" />
+                <Check className="w-3.5 h-3.5 text-[#160504]" />
                 <span>Encantamento Salvo!</span>
               </>
             ) : (
               <>
-                <Wand2 className="w-4 h-4" />
+                <Wand2 className="w-3.5 h-3.5" />
                 <span>Salvar & Encantar Cronômetro</span>
               </>
             )}

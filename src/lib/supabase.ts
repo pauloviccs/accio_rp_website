@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { CharacterApplication } from '../types';
+import { CharacterApplication, DiscordUser, UserRole, UserRoleRecord } from '../types';
 import { sendRegistrationToDiscord } from './discordWebhook';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://btxwhsbccfwhajrmopzm.supabase.co';
@@ -191,6 +191,146 @@ export function subscribeToCountdownTimer(onUpdate: (timer: CountdownTimerData) 
       (payload) => {
         if (payload.new && (payload.new as any).value) {
           onUpdate((payload.new as any).value as CountdownTimerData);
+        }
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}
+
+// -------------------------------------------------------------
+// SISTEMA DE CARGOS & RBAC (Role-Based Access Control)
+// Cargos permitidos: user, student, mod, admin, super_admin
+// -------------------------------------------------------------
+
+export async function getUserRole(discordId: string): Promise<UserRoleRecord | null> {
+  try {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('*')
+      .eq('discord_id', discordId)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('Erro ao consultar cargo do usuário:', error.message);
+      return null;
+    }
+    return data as UserRoleRecord | null;
+  } catch (err) {
+    console.error('Falha de rede ao consultar cargo:', err);
+    return null;
+  }
+}
+
+export async function syncUserRole(user: DiscordUser): Promise<UserRoleRecord> {
+  // Se for o fundador (PauloViccs) ou ID cadastrado, concede super_admin
+  const isFounder =
+    user.id === '149567984597466064' ||
+    user.id === '1466833236213891085' ||
+    user.username.toLowerCase() === 'pauloviccs';
+
+  const defaultRole: UserRole = isFounder ? 'super_admin' : 'user';
+
+  try {
+    const existing = await getUserRole(user.id);
+    if (existing) {
+      // Se for fundador e ainda não for super_admin, eleva
+      if (isFounder && existing.role !== 'super_admin') {
+        await updateUserRole(user.id, 'super_admin', 'Fundador');
+        return { ...existing, role: 'super_admin' };
+      }
+      return existing;
+    }
+
+    const newRecord: UserRoleRecord = {
+      discord_id: user.id,
+      discord_username: user.global_name || user.username,
+      discord_avatar: user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : null,
+      role: defaultRole,
+      assigned_by: isFounder ? 'Fundador' : 'Primeiro Login Discord',
+    };
+
+    const { data, error } = await supabase
+      .from('user_roles')
+      .insert([newRecord])
+      .select()
+      .single();
+
+    if (error) {
+      console.warn('Erro ao inserir cargo inicial:', error.message);
+      return newRecord;
+    }
+    return data as UserRoleRecord;
+  } catch (err) {
+    console.error('Falha de rede ao sincronizar cargo:', err);
+    return {
+      discord_id: user.id,
+      discord_username: user.username,
+      role: defaultRole,
+    };
+  }
+}
+
+export async function getAllUserRoles(): Promise<UserRoleRecord[]> {
+  try {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.warn('Erro ao listar cargos de usuários:', error.message);
+      return [];
+    }
+    return (data || []) as UserRoleRecord[];
+  } catch (err) {
+    console.error('Falha de rede ao buscar todos os cargos:', err);
+    return [];
+  }
+}
+
+export async function updateUserRole(
+  discordId: string,
+  role: UserRole,
+  assignedBy: string = 'Ministério da Magia'
+): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('user_roles')
+      .update({
+        role,
+        assigned_by: assignedBy,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('discord_id', discordId);
+
+    if (error) {
+      console.error('Erro ao atualizar cargo no Supabase:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Falha de rede ao atualizar cargo:', err);
+    return false;
+  }
+}
+
+export function subscribeToUserRoles(onUpdate: (roleRecord: UserRoleRecord) => void): () => void {
+  const channel = supabase
+    .channel('user_roles_realtime_changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'user_roles',
+      },
+      (payload) => {
+        if (payload.new) {
+          onUpdate(payload.new as UserRoleRecord);
         }
       }
     )

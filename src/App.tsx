@@ -11,7 +11,8 @@ import { ValidationModal } from './components/ValidationModal';
 import { AdminPanelModal } from './components/AdminPanelModal';
 import { EnchantedSubmissionModal } from './components/EnchantedSubmissionModal';
 import { CastleBanners3D } from './components/CastleBanners3D';
-import { CharacterApplication, DiscordUser } from './types';
+import { AppleTimerModal } from './components/AppleTimerModal';
+import { CharacterApplication, DiscordUser, UserRole } from './types';
 import { LOCAL_STORAGE_LETTER_KEY } from './lib/constants';
 import {
   supabase,
@@ -22,10 +23,12 @@ import {
   getTotalApplicationsCount,
   getCountdownTimer,
   subscribeToCountdownTimer,
+  syncUserRole,
 } from './lib/supabase';
 
 export const App: React.FC = () => {
   const [user, setUser] = useState<DiscordUser | null>(null);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [application, setApplication] = useState<CharacterApplication | null>(null);
   const [totalRegistered, setTotalRegistered] = useState<number>(0);
   const [targetEndDate, setTargetEndDate] = useState<string | null>(null);
@@ -34,6 +37,7 @@ export const App: React.FC = () => {
   const [isLetterOpen, setIsLetterOpen] = useState(false);
   const [isValidationOpen, setIsValidationOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
   const [isSubmissionSuccessOpen, setIsSubmissionSuccessOpen] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -92,6 +96,9 @@ export const App: React.FC = () => {
           email: u.email,
         };
         setUser(discordUser);
+        syncUserRole(discordUser).then((roleRec) => {
+          setUserRole(roleRec.role);
+        });
         loadUserApplication(discordUser.id);
       }
     });
@@ -108,9 +115,13 @@ export const App: React.FC = () => {
           email: u.email,
         };
         setUser(discordUser);
+        syncUserRole(discordUser).then((roleRec) => {
+          setUserRole(roleRec.role);
+        });
         loadUserApplication(discordUser.id);
       } else {
         setUser(null);
+        setUserRole(null);
         setApplication(null);
         setIsValidationOpen(false);
       }
@@ -142,6 +153,7 @@ export const App: React.FC = () => {
   const handleLogout = async () => {
     await signOut();
     setUser(null);
+    setUserRole(null);
     setApplication(null);
     setIsValidationOpen(false);
   };
@@ -185,9 +197,11 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* Navbar Superior */}
+      {/* Navbar Superior com Proteção de Cargos RBAC */}
       <Navbar
         user={user}
+        userRole={userRole}
+        canAccessAdmin={['super_admin', 'admin', 'mod'].includes(userRole || '')}
         onLogin={handleLogin}
         onLogout={handleLogout}
         onOpenForm={() => setIsFormOpen(true)}
@@ -255,6 +269,9 @@ export const App: React.FC = () => {
         onSubmit={handleSubmitApplication}
         onManualUserSet={(manualUser) => {
           setUser(manualUser);
+          syncUserRole(manualUser).then((roleRec) => {
+            setUserRole(roleRec.role);
+          });
         }}
       />
 
@@ -285,11 +302,19 @@ export const App: React.FC = () => {
         application={application}
       />
 
-      {/* Painel Administrativo Ministerial (ADM) */}
+      {/* Painel Administrativo Ministerial (ADM com Controle de Acesso) */}
       <AdminPanelModal
         isOpen={isAdminOpen}
         onClose={() => setIsAdminOpen(false)}
-        onTimerUpdated={(newTimer) => {
+        currentUserRole={userRole}
+        onOpenTimerModal={() => setIsTimerModalOpen(true)}
+      />
+
+      {/* Modal de Cronômetro Apple na Raiz (Layout 100% responsivo sem corte) */}
+      <AppleTimerModal
+        isOpen={isTimerModalOpen}
+        onClose={() => setIsTimerModalOpen(false)}
+        onTimerSaved={(newTimer) => {
           if (newTimer?.target_date) {
             setTargetEndDate(newTimer.target_date);
           }

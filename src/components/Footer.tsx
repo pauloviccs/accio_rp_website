@@ -21,24 +21,6 @@ export const Footer: React.FC = () => {
             <span>Discord Oficial</span>
             <ExternalLink className="w-3 h-3" />
           </a>
-          <a
-            href="https://docs.arcane.mp"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-[#FFC34F] transition flex items-center space-x-1"
-          >
-            <span>Documentação Arcane MP</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
-          <a
-            href="https://github.com/pauloviccs/VICCS_ACCIO"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-[#FFC34F] transition flex items-center space-x-1"
-          >
-            <span>Repositório GitHub</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
         </div>
 
         <p className="max-w-md text-[11px] leading-relaxed text-[#FFF0B2]/50">
