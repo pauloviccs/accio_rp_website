@@ -54,16 +54,16 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <section className="relative pt-12 pb-20 sm:pt-20 sm:pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
       
-      {/* Glow Superior */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[350px] sm:w-[650px] h-[350px] bg-gradient-to-b from-[#B83A0C]/25 to-transparent rounded-full blur-[100px] pointer-events-none" />
+      {/* Glow Superior Adaptativo da Casa */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[350px] sm:w-[650px] h-[350px] bg-gradient-to-b from-[var(--house-primary)]/35 to-transparent rounded-full blur-[100px] pointer-events-none transition-all duration-700" />
 
       {/* Badge de Urgência / FOMO */}
       <button
         onClick={onOpenLetter}
-        className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-[#5B1009]/60 hover:bg-[#5B1009] border border-[#FFC34F]/30 text-xs sm:text-sm text-[#FFF0B2] mb-8 shadow-lg shadow-[#5B1009]/50 transition cursor-pointer"
+        className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-[var(--house-pill-bg)] hover:brightness-125 border border-[var(--house-border)] text-xs sm:text-sm text-[#FFF0B2] mb-8 shadow-lg transition cursor-pointer"
       >
-        <Sparkles className="w-4 h-4 text-[#FFC34F]" />
-        <span className="font-semibold text-[#FFC34F]">Carta Oficial de Convocação</span>
+        <Sparkles className="w-4 h-4 text-[var(--house-accent)]" />
+        <span className="font-semibold text-[var(--house-accent)]">Carta Oficial de Convocação</span>
         <span className="text-[#FFF0B2]/60">·</span>
         <span>Clique para Abrir a Carta</span>
       </button>
@@ -81,21 +81,21 @@ export const Hero: React.FC<HeroProps> = ({
       </p>
 
       {/* Progress Bar de Vagas (FOMO 100% Real do Livro da Admissão) */}
-      <div className="w-full max-w-md bg-[#210604]/90 border border-[#B83A0C]/40 rounded-2xl p-5 mb-8 shadow-2xl backdrop-blur-xl">
+      <div className="w-full max-w-md bg-[var(--house-card-bg)] border border-[var(--house-border)] rounded-2xl p-5 mb-8 shadow-2xl backdrop-blur-xl transition-all duration-700">
         <div className="flex justify-between items-center text-xs sm:text-sm font-semibold mb-3">
           <span className="text-[#FFF0B2] flex items-center space-x-1.5">
-            <Users className="w-4 h-4 text-[#FFC34F]" />
+            <Users className="w-4 h-4 text-[var(--house-accent)]" />
             <span>Bruxos Inscritos no Livro da Admissão:</span>
           </span>
-          <span className="text-[#FFC34F] font-mono text-base">
+          <span className="text-[var(--house-accent)] font-mono text-base font-bold">
             {totalRegistered} / {TOTAL_PIONEER_SLOTS} ({percentage}%)
           </span>
         </div>
 
         {/* Barra de Progresso */}
-        <div className="w-full h-3 bg-[#100303] rounded-full overflow-hidden p-0.5 border border-[#B83A0C]/30">
+        <div className="w-full h-3 bg-[#100303] rounded-full overflow-hidden p-0.5 border border-[var(--house-border)]">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-[#B83A0C] via-[#F47A16] to-[#FFC34F] transition-all duration-1000 relative"
+            className="h-full rounded-full bg-gradient-to-r from-[var(--house-primary)] via-[var(--house-btn-start)] to-[var(--house-btn-end)] transition-all duration-1000 relative"
             style={{ width: `${Math.max(percentage, totalRegistered > 0 ? 5 : 0)}%` }}
           >
             {totalRegistered > 0 && (
@@ -111,8 +111,8 @@ export const Hero: React.FC<HeroProps> = ({
 
       {/* Indicador e Cronômetro */}
       <div className="flex flex-col items-center mb-10">
-        <div className="flex items-center space-x-1.5 text-xs text-[#FFC34F] font-semibold mb-3">
-          <Clock className="w-3.5 h-3.5 text-[#F47A16]" />
+        <div className="flex items-center space-x-1.5 text-xs text-[var(--house-accent)] font-semibold mb-3">
+          <Clock className="w-3.5 h-3.5 text-[var(--house-accent)]" />
           <span>Contagem Regressiva para Encerramento do Pré-Registro:</span>
         </div>
 
@@ -123,7 +123,7 @@ export const Hero: React.FC<HeroProps> = ({
             { label: 'MINUTOS', value: timeLeft.minutes },
             { label: 'SEGUNDOS', value: timeLeft.seconds },
           ].map((item, index) => (
-            <div key={index} className="bg-[#160504]/90 border border-[#B83A0C]/30 rounded-xl p-2 sm:p-3 text-center min-w-[65px] sm:min-w-[75px]">
+            <div key={index} className="bg-[var(--house-card-bg)] border border-[var(--house-border)] rounded-xl p-2 sm:p-3 text-center min-w-[65px] sm:min-w-[75px] transition-all duration-700">
               <span className="font-mono text-xl sm:text-2xl font-bold text-gold-gradient block">
                 {String(item.value).padStart(2, '0')}
               </span>

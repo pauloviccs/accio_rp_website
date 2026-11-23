@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, Sparkles, AlertTriangle, Save, Wand2, User, ChevronRight, ChevronLeft, LogIn, FileDown } from 'lucide-react';
+import { 
+  X, Sparkles, AlertTriangle, Save, Wand2, User, ChevronRight, ChevronLeft, 
+  LogIn, FileDown, Check, Shield, BookOpen, Scroll
+} from 'lucide-react';
 import { CharacterApplication, DiscordUser, HouseId, BloodStatus } from '../types';
 import { 
   HOUSES, 
@@ -23,6 +26,8 @@ interface WhitelistFormModalProps {
   onLogin: () => void;
   onSubmit: (app: CharacterApplication) => Promise<void>;
   onManualUserSet?: (user: DiscordUser) => void;
+  activeHouseTheme?: HouseId;
+  onSelectHouseTheme?: (house: HouseId) => void;
 }
 
 export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
@@ -32,6 +37,8 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
   onLogin,
   onSubmit,
   onManualUserSet,
+  activeHouseTheme = 'gryffindor',
+  onSelectHouseTheme,
 }) => {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,6 +47,8 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
   const [manualDiscordInput, setManualDiscordInput] = useState('');
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [pdfProgress, setPdfProgress] = useState<string | null>(null);
+  const [wandViewMode, setWandViewMode] = useState<'3d' | 'sketch'>('3d');
+  const [handleCategory, setHandleCategory] = useState<string>('todos');
 
   // Form State Limpo — Sem Dados Fictícios (Anos 2000 Lore)
   const [formData, setFormData] = useState({
@@ -48,7 +57,8 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
     birth_date: '1989-09-01',
     birth_place: '',
     blood_status: 'half-blood' as BloodStatus,
-    preferred_house: 'gryffindor' as HouseId,
+    dormitory: 'wizard' as 'witch' | 'wizard',
+    preferred_house: activeHouseTheme,
     wand_wood: WAND_WOODS[0],
     wand_core: WAND_CORES[0],
     wand_length: WAND_LENGTHS[3],
@@ -66,6 +76,13 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
       musicPlayer.setContextTheme('creation');
     }
   }, [isOpen]);
+
+  // Sincronizar casa preferida quando o tema externo mudar
+  useEffect(() => {
+    if (activeHouseTheme && !formData.preferred_house) {
+      setFormData((prev) => ({ ...prev, preferred_house: activeHouseTheme }));
+    }
+  }, [activeHouseTheme]);
 
   // Restaurar dados salvos localmente vinculados ao usuário
   useEffect(() => {
@@ -118,6 +135,8 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
 
   if (!isOpen) return null;
 
+  const currentWandHandle = WAND_HANDLES.find((w) => w.name === formData.wand_handle) || WAND_HANDLES[0];
+
   const handleManualLink = () => {
     if (!manualDiscordInput.trim()) {
       setErrorMessage('Informe seu usuário ou tag do Discord.');
@@ -135,6 +154,54 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
       onManualUserSet(newUser);
     }
     setErrorMessage(null);
+  };
+
+  const handleHouseSelect = (hId: HouseId) => {
+    soundManager.playSparkle();
+    setFormData({ ...formData, preferred_house: hId });
+    if (onSelectHouseTheme) {
+      onSelectHouseTheme(hId);
+    }
+  };
+
+  const handleDownloadDraftPdf = async () => {
+    setIsGeneratingPdf(true);
+    setPdfProgress('Transcrevendo Ficha de Hogwarts...');
+    soundManager.playSparkle();
+
+    try {
+      const draftApp: CharacterApplication = {
+        discord_id: user?.id || '0000000000000000',
+        discord_username: user?.username || 'Bruxo Convocado',
+        discord_avatar: user?.avatar || undefined,
+        first_name: formData.first_name || 'Nome',
+        last_name: formData.last_name || 'Sobrenome',
+        birth_date: formData.birth_date,
+        birth_place: formData.birth_place || 'Grã-Bretanha',
+        blood_status: formData.blood_status,
+        preferred_house: formData.preferred_house,
+        wand_wood: formData.wand_wood,
+        wand_core: formData.wand_core,
+        wand_length: formData.wand_length,
+        wand_flexibility: formData.wand_flexibility,
+        wand_handle: formData.wand_handle,
+        patronus: formData.patronus || undefined,
+        character_backstory: formData.character_backstory,
+        word_count: wordCount,
+        rp_experience: formData.rp_experience || undefined,
+        rules_accepted: formData.rules_accepted,
+        status: 'pending',
+      };
+
+      await generateAndDownloadCharacterPdf(draftApp);
+      setPdfProgress(null);
+    } catch (err: any) {
+      console.error('Falha ao gerar prévia PDF:', err);
+      setPdfProgress('Erro ao gerar pergaminho.');
+      setTimeout(() => setPdfProgress(null), 3000);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -212,50 +279,121 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-md">
-      
-      {/* Modal Card / Bottom Sheet */}
-      <div className="w-full sm:max-w-3xl max-h-[92vh] sm:max-h-[88vh] bg-[#160504] border border-[#B83A0C]/40 rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-apple-sheet sm:animate-apple-modal">
-        
-        {/* Mobile Pull-to-close Indicator */}
-        <div className="w-12 h-1.5 bg-[#B83A0C]/40 rounded-full mx-auto mt-3 mb-1 sm:hidden cursor-pointer" onClick={onClose} />
+  // Filtro de cabos
+  const filteredHandles = WAND_HANDLES.filter((h) => {
+    if (handleCategory === 'todos') return true;
+    if (handleCategory === 'classicos') return h.id.includes('column') || h.id.includes('corkscrew');
+    if (handleCategory === 'exoticos') return h.id.includes('celestial') || h.id.includes('checkerboard');
+    if (handleCategory === 'botanicos') return h.id.includes('botanical') || h.id.includes('arrow');
+    if (handleCategory === 'imperiais') return h.id.includes('imperial') || h.id.includes('regal') || h.id.includes('orbicular') || h.id.includes('avian');
+    return true;
+  });
 
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-[#B83A0C]/20 flex items-center justify-between bg-[#210604]/50">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FFC34F] to-[#5B1009] p-0.5">
-              <div className="w-full h-full bg-[#160504] rounded-[6px] flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-[#FFC34F]" />
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/90 backdrop-blur-xl overflow-y-auto">
+      
+      {/* Container Principal Estilo Hogwarts Legacy Character Creation */}
+      <div className="relative w-full max-w-4xl max-h-[94vh] bg-[#120404] border-2 border-[var(--house-border-strong)] rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden animate-apple-modal my-auto">
+        
+        {/* Glow de Ambiente da Casa Selecionada */}
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-[var(--house-glow)] rounded-full blur-[120px] pointer-events-none opacity-40" />
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[var(--house-primary)] rounded-full blur-[140px] pointer-events-none opacity-20" />
+
+        {/* ─── Topo: Stepper com Medalhões Inspirado em Hogwarts Legacy ─── */}
+        <div className="relative z-10 px-5 sm:px-8 pt-5 pb-4 border-b border-[var(--house-border)] bg-[#180504]/90 backdrop-blur-md">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--house-btn-start)] to-[var(--house-primary)] p-0.5 shadow-lg">
+                <div className="w-full h-full bg-[#120404] rounded-[10px] flex items-center justify-center">
+                  <Wand2 className="w-5 h-5 text-[var(--house-accent)]" />
+                </div>
+              </div>
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.25em] text-[var(--house-accent)] font-bold block">
+                  Ministério da Magia · Criação de Personagem
+                </span>
+                <h2 className="font-cinzel text-lg sm:text-2xl font-black text-[#FFF0B2] leading-tight">
+                  Ficha de Admissão em Hogwarts
+                </h2>
               </div>
             </div>
-            <div>
-              <h2 className="font-cinzel text-lg sm:text-xl font-bold text-[#FFF0B2] leading-tight">
-                Ficha de Admissão em Hogwarts
-              </h2>
-              <span className="text-[11px] text-[#FFC34F] font-semibold">
-                Etapa {step} de 4 — {step === 1 ? 'Identidade' : step === 2 ? 'Varinha & Casa' : step === 3 ? 'História (3.000+ Palavras)' : 'Revisão'}
-              </span>
+
+            <div className="flex items-center space-x-3">
+              {lastSaved && (
+                <span className="text-[10px] text-[#FFF0B2]/50 items-center space-x-1 hidden sm:flex">
+                  <Save className="w-3 h-3 text-[var(--house-accent)]" />
+                  <span>Salvo {lastSaved}</span>
+                </span>
+              )}
+              <button
+                onClick={onClose}
+                className="p-2 rounded-full bg-[#240604] hover:bg-[#5B1009] text-[#FFF0B2]/70 hover:text-white transition cursor-pointer border border-white/10"
+                title="Fechar formulário"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
-            {lastSaved && (
-              <span className="text-[10px] text-[#FFF0B2]/50 flex items-center space-x-1 hidden sm:flex">
-                <Save className="w-3 h-3 text-[#FFC34F]" />
-                <span>Salvo {lastSaved}</span>
-              </span>
-            )}
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-[#5B1009]/50 hover:bg-[#5B1009] text-[#FFF0B2]/70 hover:text-[#FFF0B2] flex items-center justify-center transition cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
+          {/* Barra de Trilho com Medalhões estilo Hogwarts Legacy (Gear / Character Creation) */}
+          <div className="relative flex items-center justify-between max-w-2xl mx-auto pt-2 pb-1">
+            {/* Trilho Ornamental de Latão */}
+            <div className="absolute top-1/2 left-4 right-4 -translate-y-1/2 h-[2px] bg-gradient-to-r from-[#FFC34F]/20 via-[#FFC34F]/60 to-[#FFC34F]/20 z-0" />
+
+            {[
+              { num: 1, label: 'Identidade', icon: User },
+              { num: 2, label: 'Varinha Ollivanders', icon: Wand2 },
+              { num: 3, label: 'Casa & Crônica', icon: Shield },
+              { num: 4, label: 'Matrícula Oficial', icon: Scroll },
+            ].map((item) => {
+              const isActive = step === item.num;
+              const isDone = step > item.num;
+              const IconComp = item.icon;
+
+              return (
+                <button
+                  key={item.num}
+                  type="button"
+                  onClick={() => {
+                    soundManager.playClick();
+                    setStep(item.num as any);
+                  }}
+                  className="relative z-10 flex flex-col items-center group cursor-pointer focus:outline-none"
+                >
+                  <div
+                    className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${
+                      isActive
+                        ? 'bg-[var(--house-primary)] border-[var(--house-accent)] ring-4 ring-[var(--house-glow)] scale-110 shadow-lg'
+                        : isDone
+                        ? 'bg-[#2A0604] border-[#FFC34F]/80 text-[#FFC34F]'
+                        : 'bg-[#120404] border-[#B83A0C]/40 text-[#FFF0B2]/40 hover:border-[#FFC34F]/50'
+                    }`}
+                  >
+                    <IconComp className={`w-4 h-4 ${isActive ? 'text-[var(--house-accent-bright)] animate-pulse' : ''}`} />
+                    {isDone && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#4CAF7C] flex items-center justify-center text-[10px] text-white">
+                        <Check className="w-2.5 h-2.5 stroke-[3]" />
+                      </div>
+                    )}
+                  </div>
+                  <span
+                    className={`text-[10px] sm:text-xs font-cinzel font-bold mt-1.5 transition ${
+                      isActive
+                        ? 'text-gold-gradient scale-105'
+                        : isDone
+                        ? 'text-[#FFF0B2]/80'
+                        : 'text-[#FFF0B2]/40'
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Error Notification */}
+        {/* Notificação de Erro */}
         {errorMessage && (
           <div className="px-6 py-2.5 bg-[#CF4A4A]/20 border-b border-[#CF4A4A]/40 text-xs text-[#FFC34F] flex items-center space-x-2">
             <AlertTriangle className="w-4 h-4 text-[#CF4A4A] shrink-0" />
@@ -263,26 +401,26 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
           </div>
         )}
 
-        {/* Modal Body / Steps */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-6">
+        {/* ─── Corpo do Formulário com Rolagem Suave ─── */}
+        <div className="p-5 sm:p-7 overflow-y-auto flex-1 space-y-6 relative z-10 custom-scrollbar">
 
-          {/* Banner de Vinculação com Discord (se não conectado) */}
+          {/* Banner Discord (se não conectado) */}
           {!user && (
             <div className="p-4 rounded-2xl bg-[#5865F2]/10 border border-[#5865F2]/30 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center space-x-3 text-left">
-                <div className="w-9 h-9 rounded-xl bg-[#5865F2] flex items-center justify-center text-white shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-[#5865F2] flex items-center justify-center text-white shrink-0 shadow-md">
                   <User className="w-5 h-5" />
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-white">Vincule sua Conta do Discord</h4>
-                  <p className="text-[11px] text-[#FFF0B2]/70">Necessário para emitir seu bilhete e notificar no canal oficial.</p>
+                  <p className="text-[11px] text-[#FFF0B2]/70">Necessário para emitir seu bilhete e notificar no canal oficial de Whitelist.</p>
                 </div>
               </div>
               <div className="flex items-center space-x-2 w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={onLogin}
-                  className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold flex items-center justify-center space-x-1.5 transition cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold flex items-center justify-center space-x-1.5 transition cursor-pointer shadow-lg"
                 >
                   <LogIn className="w-3.5 h-3.5" />
                   <span>Conectar OAuth</span>
@@ -291,39 +429,51 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
             </div>
           )}
 
-          {/* ETAPA 1: Identidade Pessoal */}
+          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* ETAPA 1: Identidade & Linhagem (Hogwarts Legacy Character Spec) */}
+          {/* ═══════════════════════════════════════════════════════════════ */}
           {step === 1 && (
-            <div className="space-y-4">
+            <div className="space-y-5 animate-apple-modal">
+              <div className="border-b border-white/10 pb-2">
+                <span className="text-[11px] uppercase tracking-widest text-[var(--house-accent)] font-bold block">
+                  Passo 1 de 4
+                </span>
+                <h3 className="font-cinzel text-xl font-bold text-[#FFF0B2]">
+                  Identidade do Bruxo(a) & Origem
+                </h3>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#FFC34F] mb-1.5">
-                    Nome do Bruxo *
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--house-accent)] mb-1.5">
+                    Nome do Personagem *
                   </label>
                   <input
                     type="text"
-                    placeholder="Nome do personagem"
+                    placeholder="Ex: Alastair, Lyra, Edward"
                     value={formData.first_name}
                     onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#210604] border border-[#B83A0C]/40 text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[#FFC34F] focus:outline-none text-sm transition"
+                    className="w-full px-4 py-3 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#FFC34F] mb-1.5">
-                    Sobrenome do Bruxo *
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--house-accent)] mb-1.5">
+                    Sobrenome da Linhagem *
                   </label>
                   <input
                     type="text"
-                    placeholder="Sobrenome da linhagem"
+                    placeholder="Ex: Blackwood, Pendelton, Vance"
                     value={formData.last_name}
                     onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#210604] border border-[#B83A0C]/40 text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[#FFC34F] focus:outline-none text-sm transition"
+                    className="w-full px-4 py-3 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#FFC34F] mb-1.5">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--house-accent)] mb-1.5">
                     Data de Nascimento (Anos 80/90 para os Anos 2000) *
                   </label>
                   <input
@@ -332,44 +482,74 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                     max="1995-12-31"
                     value={formData.birth_date}
                     onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#210604] border border-[#B83A0C]/40 text-[#FFF0B2] focus:border-[#FFC34F] focus:outline-none text-sm transition"
+                    className="w-full px-4 py-3 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-[#FFF0B2] focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#FFC34F] mb-1.5">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--house-accent)] mb-1.5">
                     Local de Nascimento *
                   </label>
                   <input
                     type="text"
-                    placeholder="Ex: Hogsmeade, Godric's Hollow, Londres, Edimburgo"
+                    placeholder="Ex: Hogsmeade, Godric's Hollow, Londres Mágica"
                     value={formData.birth_place}
                     onChange={(e) => setFormData({ ...formData, birth_place: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#210604] border border-[#B83A0C]/40 text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[#FFC34F] focus:outline-none text-sm transition"
+                    className="w-full px-4 py-3 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
                   />
                 </div>
               </div>
 
+              {/* Dormitório & Pronomes (Witch / Wizard - Canônico Hogwarts Legacy) */}
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#FFC34F] mb-1.5">
-                  Pureza de Sangue *
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--house-accent)] mb-1.5">
+                  Acomodação dos Dormitórios de Hogwarts *
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { id: 'wizard', label: 'Bruxo (Wizard Dormitory)', desc: 'Ala masculina das torres e masmorras' },
+                    { id: 'witch', label: 'Bruxa (Witch Dormitory)', desc: 'Ala feminina com encanto anti-intrusão' },
+                  ].map((d) => (
+                    <button
+                      key={d.id}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, dormitory: d.id as any })}
+                      className={`p-3 rounded-xl border text-left transition cursor-pointer ${
+                        formData.dormitory === d.id
+                          ? 'bg-[var(--house-primary)] border-[var(--house-accent)] text-[#FFF0B2] shadow-lg'
+                          : 'bg-[#1C0604] border-[var(--house-border)] text-[#FFF0B2]/60 hover:border-[var(--house-accent)]/50'
+                      }`}
+                    >
+                      <span className="font-cinzel text-xs font-bold block">{d.label}</span>
+                      <span className="text-[10px] text-[#FFF0B2]/50 block mt-0.5">{d.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pureza de Sangue */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--house-accent)] mb-1.5">
+                  Linhagem Mágica (Pureza de Sangue) *
                 </label>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { id: 'pure-blood', label: 'Sangue-Puro' },
-                    { id: 'half-blood', label: 'Mestiço' },
-                    { id: 'muggle-born', label: 'Nascido-Trouxa' },
+                    { id: 'pure-blood', label: 'Sangue-Puro 🩸', desc: 'Tradição ancestral das Sagradas 28' },
+                    { id: 'half-blood', label: 'Mestiço ⚖️', desc: 'Herança mágica e laços trouxas' },
+                    { id: 'muggle-born', label: 'Nascido-Trouxa ⚡', desc: 'A magia espontânea nascida de surpresa' },
                   ].map((item) => (
                     <button
                       key={item.id}
                       type="button"
                       onClick={() => setFormData({ ...formData, blood_status: item.id as BloodStatus })}
-                      className={`py-2.5 px-3 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+                      className={`p-3 rounded-xl border text-left transition cursor-pointer ${
                         formData.blood_status === item.id
-                          ? 'bg-[#5B1009] border-[#FFC34F] text-[#FFF0B2] shadow-lg shadow-[#5B1009]/50'
-                          : 'bg-[#210604]/60 border-[#B83A0C]/30 text-[#FFF0B2]/60 hover:border-[#FFC34F]/40'
+                          ? 'bg-[var(--house-primary)] border-[var(--house-accent)] text-[#FFF0B2] shadow-lg'
+                          : 'bg-[#1C0604] border-[var(--house-border)] text-[#FFF0B2]/60 hover:border-[var(--house-accent)]/50'
                       }`}
                     >
-                      {item.label}
+                      <span className="text-xs font-bold block">{item.label}</span>
+                      <span className="text-[10px] text-[#FFF0B2]/50 block mt-0.5">{item.desc}</span>
                     </button>
                   ))}
                 </div>
@@ -377,42 +557,95 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
             </div>
           )}
 
-          {/* ETAPA 2: Varinha & Casa (Oficina Ollivanders & Pottermore) */}
-          {step === 2 && (() => {
-            const currentWandHandle = WAND_HANDLES.find((w) => w.name === formData.wand_handle) || WAND_HANDLES[0];
-            return (
-              <div className="space-y-5">
-                {/* 1. Escolha da Casa de Hogwarts */}
+          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* ETAPA 2: OFICINA DE VARINHAS OLLIVANDERS (Hogwarts Legacy Look) */}
+          {/* ═══════════════════════════════════════════════════════════════ */}
+          {step === 2 && (
+            <div className="space-y-6 animate-apple-modal">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#FFC34F] mb-1.5">
-                    Aspiração de Casa de Hogwarts *
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {(Object.keys(HOUSES) as HouseId[]).map((hId) => {
-                      const house = HOUSES[hId];
-                      const isSelected = formData.preferred_house === hId;
+                  <span className="text-[11px] uppercase tracking-widest text-[var(--house-accent)] font-bold block">
+                    Passo 2 de 4 · Artesania Arcana
+                  </span>
+                  <h3 className="font-cinzel text-xl font-bold text-[#FFF0B2]">
+                    Oficina de Varinhas Ollivanders · Beco Diagonal
+                  </h3>
+                </div>
+                <span className="text-xs font-crimson italic text-[var(--house-accent)] hidden sm:block">
+                  "A varinha escolhe o bruxo, Sr. {formData.last_name || 'Bruxo'}..."
+                </span>
+              </div>
+
+              {/* Vitrine Superior: Inventário de Cabos (Esq) vs Pedestal de Inspeção (Dir) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                
+                {/* COLUNA ESQUERDA: Slots de Equipamentos de Hogwarts Legacy (7 Colunas) */}
+                <div className="lg:col-span-7 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-cinzel font-bold text-[#FFF0B2] flex items-center space-x-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[var(--house-accent)]" />
+                      <span>Cabos de Varinha (Hogwarts Legacy Gear)</span>
+                    </label>
+                    <span className="text-[10px] font-mono text-[var(--house-accent)] font-bold">
+                      {WAND_HANDLES.length} MODELOS
+                    </span>
+                  </div>
+
+                  {/* Filtro de Estilos */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { id: 'todos', label: 'Todos' },
+                      { id: 'imperiais', label: 'Imperiais & Régios' },
+                      { id: 'botanicos', label: 'Botânicos' },
+                      { id: 'exoticos', label: 'Celestiais & Xadrez' },
+                      { id: 'classicos', label: 'Clássicos' },
+                    ].map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setHandleCategory(cat.id)}
+                        className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold border transition cursor-pointer ${
+                          handleCategory === cat.id
+                            ? 'bg-[var(--house-accent)] text-[#160504] border-[var(--house-accent)] font-bold shadow-md'
+                            : 'bg-[#1C0604] text-[#FFF0B2]/60 border-white/10 hover:border-[var(--house-accent)]/40 hover:text-white'
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Grade de Slots de Equipamentos (Estilo Hogwarts Legacy Gear) */}
+                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-2.5 max-h-60 overflow-y-auto p-2 rounded-2xl bg-[#0B0202] border border-[var(--house-border)] shadow-inner custom-scrollbar">
+                    {filteredHandles.map((handle) => {
+                      const isSelected = formData.wand_handle === handle.name;
                       return (
                         <button
-                          key={hId}
+                          key={handle.id}
                           type="button"
                           onClick={() => {
                             soundManager.playSparkle();
-                            setFormData({ ...formData, preferred_house: hId });
+                            setFormData({ ...formData, wand_handle: handle.name });
                           }}
-                          className={`p-3 rounded-xl border text-left transition relative overflow-hidden cursor-pointer ${
+                          className={`relative aspect-square rounded-xl p-1 border transition-all duration-200 cursor-pointer flex flex-col items-center justify-center group ${
                             isSelected
-                              ? 'border-[#FFC34F] shadow-lg shadow-[#FFC34F]/10'
-                              : 'border-[#B83A0C]/30 hover:border-[#FFC34F]/30 bg-[#210604]/40'
+                              ? 'bg-gradient-to-b from-[var(--house-primary)] to-[#0B0202] border-[var(--house-accent)] ring-2 ring-[var(--house-accent)] shadow-[0_0_16px_var(--house-glow)] scale-105 z-10'
+                              : 'bg-[#140404] border-white/10 hover:border-[var(--house-accent)]/50 hover:bg-[#200604]'
                           }`}
-                          style={{
-                            background: isSelected ? house.bgGradient : undefined,
-                          }}
+                          title={`${handle.name} — ${handle.colorName}`}
                         >
-                          <span className="font-cinzel text-sm font-bold block text-white">
-                            {house.name}
-                          </span>
-                          <span className="text-[10px] text-[#FFF0B2]/70 block mt-0.5 line-clamp-2">
-                            {house.motto}
+                          <img
+                            src={handle.iconImg}
+                            alt={handle.name}
+                            draggable={false}
+                            onDragStart={(e) => e.preventDefault()}
+                            className="w-full h-full object-contain filter drop-shadow-md select-none pointer-events-none group-hover:scale-110 transition duration-300"
+                          />
+                          {isSelected && (
+                            <div className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[var(--house-accent)] shadow-[0_0_8px_var(--house-accent)] animate-pulse" />
+                          )}
+                          <span className="text-[8px] font-cinzel font-bold text-[#FFF0B2]/90 truncate w-full px-0.5 text-center mt-0.5">
+                            {handle.family}
                           </span>
                         </button>
                       );
@@ -420,390 +653,451 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                   </div>
                 </div>
 
-                {/* 2. Oficina de Varinhas Ollivanders (Pottermore & Hogwarts Legacy) */}
-                <div className="p-4 rounded-2xl bg-[#1c0605] border border-[#FFC34F]/35 space-y-4 shadow-xl">
-                  <div className="flex items-center justify-between border-b border-[#B83A0C]/30 pb-2.5">
-                    <div className="flex items-center space-x-2 text-[#FFC34F] text-xs font-bold uppercase tracking-wider">
-                      <Wand2 className="w-4 h-4 text-[#FFC34F] animate-pulse" />
-                      <span>Oficina de Varinhas Ollivanders · Beco Diagonal</span>
+                {/* COLUNA DIREITA: Pedestal de Inspeção de Relíquia (5 Colunas) */}
+                <div className="lg:col-span-5 rounded-2xl bg-[#140404] border border-[var(--house-border-strong)] p-4 shadow-2xl space-y-3 relative overflow-hidden">
+                  
+                  {/* Seletor de Modo de Exibição */}
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                    <span className="text-[10px] font-cinzel font-bold uppercase tracking-wider text-[var(--house-accent)]">
+                      ✦ Relíquia de Duelo 1890 ✦
+                    </span>
+                    <div className="flex items-center bg-[#0B0202] p-0.5 rounded-lg border border-white/10">
+                      <button
+                        type="button"
+                        onClick={() => setWandViewMode('3d')}
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold transition flex items-center space-x-1 cursor-pointer ${
+                          wandViewMode === '3d'
+                            ? 'bg-[var(--house-accent)] text-[#120404]'
+                            : 'text-[#FFF0B2]/60 hover:text-white'
+                        }`}
+                      >
+                        <Wand2 className="w-2.5 h-2.5" />
+                        <span>3D Macro</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setWandViewMode('sketch')}
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold transition flex items-center space-x-1 cursor-pointer ${
+                          wandViewMode === 'sketch'
+                            ? 'bg-[var(--house-accent)] text-[#120404]'
+                            : 'text-[#FFF0B2]/60 hover:text-white'
+                        }`}
+                      >
+                        <BookOpen className="w-2.5 h-2.5" />
+                        <span>Guia Campo</span>
+                      </button>
                     </div>
-                    <span className="text-[11px] text-[#FFF0B2]/70 font-serif italic">
-                      "A Varinha Escolhe o Bruxo"
+                  </div>
+
+                  {/* O Mostruário Cinematográfico (Sem Imagens Arrastáveis) */}
+                  <div className="h-44 rounded-xl bg-gradient-to-b from-[#100303] to-[#080202] border border-[var(--house-border)] relative flex items-center justify-center p-3 overflow-hidden shadow-inner select-none">
+                    {/* Brilho radial no centro */}
+                    <div className="absolute inset-0 bg-radial from-[var(--house-glow)]/25 via-transparent to-transparent pointer-events-none" />
+
+                    {wandViewMode === '3d' ? (
+                      <div className="relative w-full h-full flex items-center justify-center">
+                        <img
+                          src={currentWandHandle.handleImg}
+                          alt={currentWandHandle.name}
+                          draggable={false}
+                          onDragStart={(e) => e.preventDefault()}
+                          className="max-h-40 object-contain rotate-[-35deg] filter drop-shadow-[0_0_24px_var(--house-glow)] select-none pointer-events-none transition-transform duration-500 hover:scale-105"
+                        />
+                      </div>
+                    ) : (
+                      <div className="relative w-full h-full flex items-center justify-center bg-[#DFCDA4]/5 rounded-lg p-2 border border-[#C59A4E]/30">
+                        <img
+                          src={currentWandHandle.sketchImg}
+                          alt={currentWandHandle.name}
+                          draggable={false}
+                          onDragStart={(e) => e.preventDefault()}
+                          className="max-h-32 object-contain filter drop-shadow select-none pointer-events-none"
+                        />
+                      </div>
+                    )}
+
+                    <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/60 border border-white/10 text-[8px] font-mono uppercase tracking-widest text-[#FFF0B2]/60 pointer-events-none">
+                      {wandViewMode === '3d' ? '✦ Fuste e Empunhadura' : '📜 Guia de Campo'}
                     </span>
                   </div>
 
-                  {/* Seletor Visual de Cabos (11 Modelos Extraídos de Hogwarts Legacy) */}
+                  {/* Dados Heráldicos da Varinha */}
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-xs font-semibold text-[#FFF0B2]">
-                        1. Selecione o Cabo da Varinha (Hogwarts Legacy):
-                      </label>
-                      <span className="text-[11px] text-[#FFC34F] font-bold font-mono">
-                        {currentWandHandle.name}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 max-h-44 overflow-y-auto pr-1">
-                      {WAND_HANDLES.map((handle) => {
-                        const isHandleSelected = formData.wand_handle === handle.name;
-                        return (
-                          <button
-                            key={handle.id}
-                            type="button"
-                            onClick={() => {
-                              soundManager.playSparkle();
-                              setFormData({ ...formData, wand_handle: handle.name });
-                            }}
-                            className={`p-2 rounded-xl border flex flex-col items-center text-center transition cursor-pointer relative group ${
-                              isHandleSelected
-                                ? 'bg-[#5B1009] border-[#FFC34F] shadow-lg shadow-[#FFC34F]/25 scale-105 ring-1 ring-[#FFC34F]'
-                                : 'bg-[#100303] border-[#B83A0C]/30 hover:border-[#FFC34F]/40'
-                            }`}
-                          >
-                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#210604] flex items-center justify-center mb-1">
-                              <img
-                                src={handle.iconImg}
-                                alt={handle.name}
-                                className="w-full h-full object-contain group-hover:scale-110 transition duration-300"
-                              />
-                            </div>
-                            <span className="text-[10px] font-cinzel font-bold text-[#FFF0B2] truncate w-full">
-                              {handle.family}
-                            </span>
-                            <span className="text-[8px] text-[#FFF0B2]/50 truncate w-full">
-                              {handle.colorName.split('&')[0]}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Vitrine Estilo Pottermore & Guia de Campo */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-[#0D0202] border border-[#B83A0C]/40">
-                    <div className="relative rounded-lg overflow-hidden border border-[#C4973B]/50 bg-[#DFCDA4] h-32 flex items-center justify-center p-2 shadow-inner">
-                      <img
-                        src={currentWandHandle.sketchImg}
-                        alt={`Esboço de ${currentWandHandle.name}`}
-                        className="max-h-full max-w-full object-contain filter drop-shadow"
-                      />
-                      <span className="absolute bottom-1 right-2 text-[9px] font-mono text-[#3B1207]/70 font-bold uppercase tracking-widest">
-                        Esboço Guia de Campo
-                      </span>
-                    </div>
-
-                    <div className="relative rounded-lg overflow-hidden border border-[#B83A0C]/50 bg-[#160504] h-32 flex flex-col items-center justify-center p-3">
-                      <img
-                        src={currentWandHandle.handleImg}
-                        alt={`Cabo 3D ${currentWandHandle.name}`}
-                        className="max-h-16 w-full object-contain filter drop-shadow-[0_0_8px_rgba(255,195,79,0.3)] mb-1.5"
-                      />
-                      <p className="text-[10px] text-[#FFF0B2]/80 font-crimson italic text-center line-clamp-2">
-                        {currentWandHandle.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Fuste: Madeira, Núcleo, Comprimento e Flexibilidade */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                    <div>
-                      <label className="block text-[11px] text-[#FFF0B2]/70 mb-1 font-semibold">
-                        2. Madeira do Fuste:
-                      </label>
-                      <select
-                        value={formData.wand_wood}
-                        onChange={(e) => setFormData({ ...formData, wand_wood: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-[#160504] border border-[#B83A0C]/40 text-xs text-[#FFF0B2] focus:border-[#FFC34F] outline-none"
-                      >
-                        {WAND_WOODS.map((wood) => (
-                          <option key={wood} value={wood}>{wood}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-[11px] text-[#FFF0B2]/70 mb-1 font-semibold">
-                        3. Núcleo Mágico (Tradição Ollivanders):
-                      </label>
-                      <select
-                        value={formData.wand_core}
-                        onChange={(e) => setFormData({ ...formData, wand_core: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-[#160504] border border-[#B83A0C]/40 text-xs text-[#FFF0B2] focus:border-[#FFC34F] outline-none"
-                      >
-                        {WAND_CORES.map((core) => (
-                          <option key={core} value={core}>{core}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-[11px] text-[#FFF0B2]/70 mb-1 font-semibold">
-                        4. Comprimento:
-                      </label>
-                      <select
-                        value={formData.wand_length}
-                        onChange={(e) => setFormData({ ...formData, wand_length: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-[#160504] border border-[#B83A0C]/40 text-xs text-[#FFF0B2] focus:border-[#FFC34F] outline-none"
-                      >
-                        {WAND_LENGTHS.map((len) => (
-                          <option key={len} value={len}>{len}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-[11px] text-[#FFF0B2]/70 mb-1 font-semibold">
-                        5. Flexibilidade:
-                      </label>
-                      <select
-                        value={formData.wand_flexibility}
-                        onChange={(e) => setFormData({ ...formData, wand_flexibility: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-[#160504] border border-[#B83A0C]/40 text-xs text-[#FFF0B2] focus:border-[#FFC34F] outline-none"
-                      >
-                        {WAND_FLEXIBILITIES.map((flex) => (
-                          <option key={flex} value={flex}>{flex}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Lore Dinâmica de Ollivanders para o Núcleo Selecionado */}
-                  <div className="p-2.5 rounded-xl bg-[#210604]/80 border border-[#B83A0C]/30 text-[11px] text-[#FFF0B2]/75 font-crimson italic">
-                    <span className="text-[#FFC34F] font-bold not-italic">Propriedades Arcanas de {formData.wand_core}: </span>
-                    {OLLIVANDERS_CORE_LORE[formData.wand_core] || 'Núcleo de extraordinária ressonância mágica.'}
+                    <h4 className="font-cinzel text-sm sm:text-base font-extrabold text-[#FFF0B2]">
+                      {currentWandHandle.name}
+                    </h4>
+                    <span className="text-[10px] text-[var(--house-accent)] font-semibold block uppercase tracking-wider">
+                      {currentWandHandle.family} · {currentWandHandle.colorName}
+                    </span>
+                    <p className="font-crimson italic text-xs text-[#FFF0B2]/80 mt-1 leading-relaxed">
+                      "{currentWandHandle.description}"
+                    </p>
                   </div>
                 </div>
-              </div>
-            );
-          })()}
 
-          {/* ETAPA 3: História do Personagem (Mínimo de 3.000 Palavras) */}
-          {step === 3 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              </div>
+
+              {/* ─── Especificações Tradicionais de Garrick Ollivanders ─── */}
+              <div className="space-y-4 pt-2 border-t border-white/10">
+                <span className="text-xs font-cinzel font-bold text-[#FFF0B2] block">
+                  Propriedades Arcanas do Fuste & Núcleo:
+                </span>
+
+                {/* 3 Grandes Núcleos Canônicos em Cards */}
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#FFC34F]">
-                    Crônica & Trajetória do Personagem *
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--house-accent)] mb-1.5">
+                    Núcleo Mágico Canônico:
                   </label>
-                  <span className="text-[11px] text-[#FFF0B2]/60">
-                    Narre a infância, despertar do poder mágico e eventos até a chegada a Hogwarts.
-                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    {WAND_CORES.slice(0, 3).map((core) => {
+                      const isCoreSelected = formData.wand_core === core;
+                      return (
+                        <button
+                          key={core}
+                          type="button"
+                          onClick={() => {
+                            soundManager.playSparkle();
+                            setFormData({ ...formData, wand_core: core });
+                          }}
+                          className={`p-3 rounded-xl border text-left transition cursor-pointer relative ${
+                            isCoreSelected
+                              ? 'bg-[var(--house-primary)] border-[var(--house-accent)] text-[#FFF0B2] shadow-lg ring-1 ring-[var(--house-accent)]'
+                              : 'bg-[#1C0604] border-white/10 text-[#FFF0B2]/70 hover:border-[var(--house-accent)]/40'
+                          }`}
+                        >
+                          <span className="font-cinzel text-xs font-bold block">{core}</span>
+                          <span className="text-[9px] text-[#FFF0B2]/60 block mt-1 line-clamp-2">
+                            {OLLIVANDERS_CORE_LORE[core] || 'Núcleo arcano nobre.'}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                <div className="text-right">
-                  <span className={`font-mono text-xs font-bold ${wordCount >= MIN_WORDS_BACKSTORY ? 'text-[#4CAF7C]' : 'text-[#FFC34F]'}`}>
-                    {wordCount.toLocaleString()} / {MIN_WORDS_BACKSTORY.toLocaleString()}
-                  </span>
-                  <span className="text-[10px] text-[#FFF0B2]/50 block">palavras</span>
+                {/* Madeira, Comprimento e Flexibilidade */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[#FFF0B2]/80 mb-1">
+                      Madeira do Fuste:
+                    </label>
+                    <select
+                      value={formData.wand_wood}
+                      onChange={(e) => setFormData({ ...formData, wand_wood: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-xs text-[#FFF0B2] focus:border-[var(--house-accent)] outline-none"
+                    >
+                      {WAND_WOODS.map((wood) => (
+                        <option key={wood} value={wood}>{wood}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[#FFF0B2]/80 mb-1">
+                      Comprimento:
+                    </label>
+                    <select
+                      value={formData.wand_length}
+                      onChange={(e) => setFormData({ ...formData, wand_length: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-xs text-[#FFF0B2] focus:border-[var(--house-accent)] outline-none"
+                    >
+                      {WAND_LENGTHS.map((len) => (
+                        <option key={len} value={len}>{len}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[#FFF0B2]/80 mb-1">
+                      Flexibilidade:
+                    </label>
+                    <select
+                      value={formData.wand_flexibility}
+                      onChange={(e) => setFormData({ ...formData, wand_flexibility: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-xs text-[#FFF0B2] focus:border-[var(--house-accent)] outline-none"
+                    >
+                      {WAND_FLEXIBILITIES.map((flex) => (
+                        <option key={flex} value={flex}>{flex}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-              </div>
 
-              {/* Barra de Progresso de Palavras */}
-              <div className="w-full h-2 bg-[#210604] rounded-full overflow-hidden border border-[#B83A0C]/30">
-                <div
-                  className={`h-full transition-all duration-300 rounded-full ${
-                    wordCount >= MIN_WORDS_BACKSTORY
-                      ? 'bg-[#4CAF7C]'
-                      : 'bg-gradient-to-r from-[#B83A0C] via-[#F47A16] to-[#FFC34F]'
-                  }`}
-                  style={{ width: `${wordProgress}%` }}
-                />
               </div>
-
-              <textarea
-                rows={12}
-                placeholder="Comece sua narrativa aqui... Escreva detalhadamente sobre suas origens, manifestações mágicas, relações com sua família e sua visão do mundo bruxo nos anos 2000."
-                value={formData.character_backstory}
-                onChange={(e) => setFormData({ ...formData, character_backstory: e.target.value })}
-                className="w-full px-4 py-3 rounded-2xl bg-[#210604] border border-[#B83A0C]/40 text-[#FFF0B2] placeholder-[#FFF0B2]/25 focus:border-[#FFC34F] focus:outline-none text-xs sm:text-sm font-crimson leading-relaxed transition resize-none select-text"
-              />
             </div>
           )}
 
-          {/* ETAPA 4: Revisão Final */}
-          {step === 4 && (() => {
-            const currentWandHandle = WAND_HANDLES.find((w) => w.name === formData.wand_handle) || WAND_HANDLES[0];
-            
-            const handleDownloadPdfPreview = async () => {
-              setIsGeneratingPdf(true);
-              soundManager.playSparkle();
-              const activeUser = user || {
-                id: '14' + Math.floor(1000000000000000 + Math.random() * 9000000000000000),
-                username: manualDiscordInput.trim().replace(/^@/, '') || 'Bruxo Pioneiro',
-                avatar: null,
-              };
-              const tempApp: CharacterApplication = {
-                discord_id: activeUser.id,
-                discord_username: activeUser.username,
-                first_name: formData.first_name || 'Bruxo',
-                last_name: formData.last_name || 'Convocado',
-                birth_date: formData.birth_date,
-                birth_place: formData.birth_place || 'Godric Hollow',
-                blood_status: formData.blood_status,
-                preferred_house: formData.preferred_house,
-                wand_wood: formData.wand_wood,
-                wand_core: formData.wand_core,
-                wand_length: formData.wand_length,
-                wand_flexibility: formData.wand_flexibility,
-                wand_handle: formData.wand_handle,
-                patronus: formData.patronus || undefined,
-                character_backstory: formData.character_backstory || 'Crônica em elaboração.',
-                word_count: wordCount,
-                rules_accepted: formData.rules_accepted,
-              };
-              await generateAndDownloadCharacterPdf(tempApp, (msg) => setPdfProgress(msg));
-              setIsGeneratingPdf(false);
-              setPdfProgress(null);
-            };
+          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* ETAPA 3: Aspiração de Casa & Crônica do Bruxo (3.000 Palavras) */}
+          {/* ═══════════════════════════════════════════════════════════════ */}
+          {step === 3 && (
+            <div className="space-y-5 animate-apple-modal">
+              <div className="border-b border-white/10 pb-2">
+                <span className="text-[11px] uppercase tracking-widest text-[var(--house-accent)] font-bold block">
+                  Passo 3 de 4 · Destino & Crônica
+                </span>
+                <h3 className="font-cinzel text-xl font-bold text-[#FFF0B2]">
+                  Aspiração de Casa de Hogwarts & História Pessoal
+                </h3>
+              </div>
 
-            return (
-              <div className="space-y-4">
-                <div className="bg-[#210604] border border-[#B83A0C]/30 rounded-2xl p-4 text-xs space-y-3">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                    <h4 className="font-cinzel text-sm font-bold text-[#FFC34F]">Resumo da Ficha de Matrícula</h4>
-                    <span className="text-[10px] text-[#4CAF7C] font-mono font-bold">
-                      Hogwarts Legacy • Anos 2000
+              {/* Seletor Dinâmico de Casas (Muda o Tema Instantaneamente com Animação Suave) */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--house-accent)] mb-2">
+                  1. Aspiração da Casa Ancestral (Dispara a Adaptação de Cores do Website):
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {(Object.keys(HOUSES) as HouseId[]).map((hId) => {
+                    const house = HOUSES[hId];
+                    const isSelected = formData.preferred_house === hId;
+
+                    return (
+                      <button
+                        key={hId}
+                        type="button"
+                        onClick={() => handleHouseSelect(hId)}
+                        className={`p-3.5 rounded-2xl border text-left transition-all duration-500 relative overflow-hidden cursor-pointer group ${
+                          isSelected
+                            ? 'border-[var(--house-accent)] ring-2 ring-[var(--house-accent)] shadow-xl scale-105'
+                            : 'border-white/10 hover:border-white/30 bg-[#160404]'
+                        }`}
+                        style={{
+                          background: isSelected ? house.bgGradient : undefined,
+                        }}
+                      >
+                        <span className="font-cinzel text-sm sm:text-base font-extrabold block text-white">
+                          {house.name}
+                        </span>
+                        <span className="text-[10px] text-[#FFF0B2]/75 block mt-1 line-clamp-2">
+                          "{house.motto}"
+                        </span>
+                        {isSelected && (
+                          <div className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-white shadow-md animate-pulse" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Patrono do Bruxo (Opcional) */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--house-accent)] mb-1.5">
+                  Forma do Feitiço do Patrono (Se manifestado nos Anos 2000):
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ex: Corça Prateada, Falcão-Peregrino, Lobo Ártico, Doninha"
+                  value={formData.patronus}
+                  onChange={(e) => setFormData({ ...formData, patronus: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
+                />
+              </div>
+
+              {/* Crônica de 3.000 Palavras */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[var(--house-accent)]">
+                    Crônica Oficial do Bruxo (Mínimo de 3.000 Palavras para o Roleplay):
+                  </label>
+                  <span className={`text-xs font-mono font-bold ${wordCount >= MIN_WORDS_BACKSTORY ? 'text-[#4CAF7C]' : 'text-[var(--house-accent)]'}`}>
+                    {wordCount.toLocaleString()} / {MIN_WORDS_BACKSTORY.toLocaleString()} palavras ({wordProgress}%)
+                  </span>
+                </div>
+
+                {/* Barra de Progresso */}
+                <div className="w-full h-2 rounded-full bg-[#0D0202] border border-white/10 overflow-hidden mb-2">
+                  <div
+                    className={`h-full transition-all duration-300 rounded-full ${
+                      wordCount >= MIN_WORDS_BACKSTORY
+                        ? 'bg-gradient-to-r from-[#4CAF7C] to-[#2ECC71]'
+                        : 'bg-gradient-to-r from-[var(--house-primary)] to-[var(--house-accent)]'
+                    }`}
+                    style={{ width: `${wordProgress}%` }}
+                  />
+                </div>
+
+                <textarea
+                  rows={9}
+                  placeholder="Escreva a biografia detalhada do seu personagem, manifestações mágicas infantis, árvore genealógica, aspirações acadêmicas nos anos 2000 em Hogwarts..."
+                  value={formData.character_backstory}
+                  onChange={(e) => setFormData({ ...formData, character_backstory: e.target.value })}
+                  className="w-full p-4 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-xs sm:text-sm font-crimson leading-relaxed custom-scrollbar transition"
+                />
+
+                <span className="text-[11px] text-[#FFF0B2]/60 block mt-1">
+                  💡 O rascunho é gravado automaticamente no seu navegador. Você pode pausar e continuar a qualquer momento.
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* ETAPA 4: Revisão, Download do PDF & Matrícula Oficial           */}
+          {/* ═══════════════════════════════════════════════════════════════ */}
+          {step === 4 && (
+            <div className="space-y-5 animate-apple-modal">
+              <div className="border-b border-white/10 pb-2">
+                <span className="text-[11px] uppercase tracking-widest text-[var(--house-accent)] font-bold block">
+                  Passo 4 de 4 · Selamento do Pergaminho
+                </span>
+                <h3 className="font-cinzel text-xl font-bold text-[#FFF0B2]">
+                  Revisão Final & Convocação no Livro da Admissão
+                </h3>
+              </div>
+
+              {/* Resumo em Estilo Pergaminho */}
+              <div className="p-5 rounded-2xl bg-[#1C0604] border border-[var(--house-border-strong)] space-y-4 shadow-xl">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                  <div>
+                    <span className="text-[var(--house-accent)] block font-semibold">Nome Completo:</span>
+                    <span className="text-sm font-cinzel font-bold text-[#FFF0B2]">
+                      {formData.first_name || '—'} {formData.last_name || '—'}
                     </span>
                   </div>
+                  <div>
+                    <span className="text-[var(--house-accent)] block font-semibold">Casa Solicitada:</span>
+                    <span className="text-sm font-cinzel font-bold text-[#FFF0B2]">
+                      {HOUSES[formData.preferred_house]?.name || formData.preferred_house}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[var(--house-accent)] block font-semibold">Linhagem:</span>
+                    <span className="text-sm text-[#FFF0B2] capitalize">
+                      {formData.blood_status}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[var(--house-accent)] block font-semibold">Palavras da Crônica:</span>
+                    <span className="text-sm font-mono font-bold text-[#4CAF7C]">
+                      {wordCount.toLocaleString()} palavras
+                    </span>
+                  </div>
+                </div>
 
-                  <p><strong className="text-[#FFF0B2]">Bruxo:</strong> {formData.first_name} {formData.last_name}</p>
-                  <p><strong className="text-[#FFF0B2]">Nascimento:</strong> {formData.birth_date} em {formData.birth_place}</p>
-                  <p><strong className="text-[#FFF0B2]">Casa de Hogwarts:</strong> {HOUSES[formData.preferred_house].name}</p>
-                  
-                  {/* Detalhes da Varinha com Imagem do Cabo */}
-                  <div className="p-2.5 rounded-xl bg-[#160504] border border-[#B83A0C]/30 flex items-center justify-between gap-3">
-                    <div>
-                      <span className="text-[10px] uppercase font-bold text-[#FFC34F] block">Varinha Mágica Escolhida:</span>
-                      <p className="text-[11px] text-[#FFF0B2]">
-                        Cabo <strong>{currentWandHandle.name}</strong> • Madeira de <strong>{formData.wand_wood}</strong> • {formData.wand_length} ({formData.wand_flexibility})
-                      </p>
-                      <p className="text-[10px] text-[#FFF0B2]/60 italic">Núcleo: {formData.wand_core}</p>
-                    </div>
+                <div className="pt-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="flex items-center space-x-3">
                     <img
                       src={currentWandHandle.iconImg}
                       alt={currentWandHandle.name}
-                      className="w-10 h-10 object-contain bg-[#210604] p-1 rounded-lg border border-[#FFC34F]/30 shrink-0"
+                      draggable={false}
+                      className="w-12 h-12 object-contain rounded-lg bg-[#0B0202] p-1 border border-white/10 pointer-events-none"
                     />
-                  </div>
-
-                  <p><strong className="text-[#FFF0B2]">Contagem da História:</strong> {wordCount.toLocaleString()} palavras ({wordCount >= MIN_WORDS_BACKSTORY ? '✅ Aprovada' : '❌ Insuficiente'})</p>
-
-                  {/* Status do Discord */}
-                  <div className="pt-2 border-t border-white/10">
-                    {user ? (
-                      <p><strong className="text-[#FFF0B2]">Discord Vinculado:</strong> {user.username} ({user.id})</p>
-                    ) : (
-                      <div className="space-y-2">
-                        <label className="block text-[11px] font-bold text-[#FFC34F]">
-                          Vincular Discord (Usuário / Tag):
-                        </label>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            placeholder="Ex: @seunick ou seunick#0000"
-                            value={manualDiscordInput}
-                            onChange={(e) => setManualDiscordInput(e.target.value)}
-                            className="flex-1 px-3 py-1.5 rounded-lg bg-[#160504] border border-[#B83A0C]/40 text-xs text-[#FFF0B2] focus:border-[#FFC34F] outline-none"
-                          />
-                          <button
-                            type="button"
-                            onClick={handleManualLink}
-                            className="px-3 py-1.5 rounded-lg bg-[#5865F2] text-white text-xs font-bold hover:bg-[#4752C4] transition"
-                          >
-                            Vincular
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Botão de Prévia e Download do Pergaminho em PDF */}
-                <div className="p-3.5 rounded-xl bg-gradient-to-r from-[#5B1009]/40 to-[#210604] border border-[#FFC34F]/30 flex flex-col sm:flex-row items-center justify-between gap-3">
-                  <div className="flex items-center space-x-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-[#5B1009] flex items-center justify-center text-[#FFC34F] border border-[#FFC34F]/40">
-                      <FileDown className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-[#FFF0B2] block">Ficha Oficial em Pergaminho (PDF)</span>
-                      <span className="text-[10px] text-[#FFF0B2]/60 block">Documento canônico com selo de cera e suas escolhas</span>
+                    <div className="text-xs">
+                      <span className="text-[var(--house-accent)] font-bold block">Varinha Ollivanders:</span>
+                      <span className="text-[#FFF0B2]">
+                        {currentWandHandle.name} · {formData.wand_wood} com {formData.wand_core} ({formData.wand_length}, {formData.wand_flexibility})
+                      </span>
                     </div>
                   </div>
 
+                  {/* Botão de Download da Ficha em PDF */}
                   <button
                     type="button"
-                    onClick={handleDownloadPdfPreview}
+                    onClick={handleDownloadDraftPdf}
                     disabled={isGeneratingPdf}
-                    className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#FFC34F]/20 hover:bg-[#FFC34F]/30 border border-[#FFC34F]/50 text-[#FFF0B2] text-xs font-bold flex items-center justify-center space-x-1.5 transition cursor-pointer disabled:opacity-50"
+                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#2A0604] hover:bg-[#5B1009] border border-[var(--house-border)] text-xs font-bold text-[#FFF0B2] transition flex items-center justify-center space-x-2 cursor-pointer shadow-md disabled:opacity-60"
                   >
-                    <FileDown className="w-3.5 h-3.5 text-[#FFC34F]" />
-                    <span>{isGeneratingPdf ? (pdfProgress || 'Gerando PDF...') : 'Baixar Prévia em PDF'}</span>
+                    <FileDown className={`w-4 h-4 text-[var(--house-accent)] ${isGeneratingPdf ? 'animate-bounce' : ''}`} />
+                    <span>{pdfProgress || 'Baixar Prévia em PDF (Pergaminho)'}</span>
                   </button>
                 </div>
+              </div>
 
-                <label className="flex items-start space-x-3 cursor-pointer p-3 rounded-xl bg-[#210604]/50 border border-[#B83A0C]/20 text-xs text-[#FFF0B2]/80">
-                  <input
-                    type="checkbox"
-                    checked={formData.rules_accepted}
-                    onChange={(e) => setFormData({ ...formData, rules_accepted: e.target.checked })}
-                    className="mt-0.5 rounded text-[#FFC34F] focus:ring-0"
-                  />
-                  <span>
-                    Declaro que li e compreendo o estatuto de sigilo e conduta do ACCIO Roleplay. Estou ciente de que atitudes incompatíveis com o cânone do mundo bruxo nos anos 2000 resultarão na perda da vaga de pioneiro.
-                  </span>
+              {/* Vinculação do Discord se Pendente */}
+              {!user && (
+                <div className="p-4 rounded-xl bg-[#240604] border border-white/10 space-y-2">
+                  <label className="block text-xs font-semibold text-[#FFC34F]">
+                    Ou informe seu usuário do Discord manualmente:
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Ex: paulo_viccs ou Paulo#1234"
+                      value={manualDiscordInput}
+                      onChange={(e) => setManualDiscordInput(e.target.value)}
+                      className="flex-1 px-3 py-2 rounded-xl bg-[#120404] border border-white/20 text-xs text-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleManualLink}
+                      className="px-4 py-2 rounded-xl bg-[var(--house-accent)] text-[#160504] font-bold text-xs cursor-pointer hover:brightness-110"
+                    >
+                      Vincular
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Juramento Escolar de Hogwarts */}
+              <div className="flex items-start space-x-3 p-3.5 rounded-xl bg-[#0F0202] border border-white/10">
+                <input
+                  type="checkbox"
+                  id="rules-chk"
+                  checked={formData.rules_accepted}
+                  onChange={(e) => setFormData({ ...formData, rules_accepted: e.target.checked })}
+                  className="mt-1 w-4 h-4 rounded text-[#FFC34F] focus:ring-0 cursor-pointer accent-[#FFC34F]"
+                />
+                <label htmlFor="rules-chk" className="text-xs text-[#FFF0B2]/80 leading-relaxed cursor-pointer">
+                  Juro solenemente cumprir o Estatuto de Sigilo Mágico, as diretrizes do Ministério da Magia e os regulamentos de conduta de Hogwarts nos anos 2000 no servidor ACCIO Roleplay (Arcane MP).
                 </label>
               </div>
-            );
-          })()}
+            </div>
+          )}
 
         </div>
 
-        {/* Footer Navigation */}
-        <div className="px-6 py-4 border-t border-[#B83A0C]/20 bg-[#210604]/80 flex justify-between items-center">
-          {step > 1 ? (
-            <button
-              type="button"
-              onClick={() => {
-                soundManager.playQuill();
-                setStep((prev) => (prev - 1) as any);
-              }}
-              className="px-4 py-2 rounded-xl bg-[#5B1009]/40 hover:bg-[#5B1009] text-xs font-semibold text-[#FFF0B2] transition flex items-center space-x-1 cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Voltar</span>
-            </button>
-          ) : <div />}
+        {/* ─── Rodapé de Navegação do Modal (Avançar / Voltar / Submeter) ─── */}
+        <div className="px-6 py-4 border-t border-[var(--house-border)] bg-[#180504]/90 backdrop-blur-md flex items-center justify-between">
+          <div>
+            {step > 1 ? (
+              <button
+                type="button"
+                onClick={() => {
+                  soundManager.playClick();
+                  setStep((step - 1) as any);
+                }}
+                className="px-4 py-2.5 rounded-xl bg-[#240604] hover:bg-[#5B1009] border border-white/10 text-xs font-semibold text-[#FFF0B2] transition flex items-center space-x-1.5 cursor-pointer"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span>Voltar</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2.5 rounded-xl bg-[#240604] hover:bg-[#5B1009] border border-white/10 text-xs font-semibold text-[#FFF0B2]/70 hover:text-white transition cursor-pointer"
+              >
+                Cancelar
+              </button>
+            )}
+          </div>
 
-          {step < 4 ? (
-            <button
-              type="button"
-              onClick={() => {
-                soundManager.playQuill();
-                setErrorMessage(null);
-                setStep((prev) => (prev + 1) as any);
-              }}
-              className="px-5 py-2.5 rounded-xl btn-accio-gold text-xs font-bold transition flex items-center space-x-1 cursor-pointer"
-            >
-              <span>Avançar</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          ) : (
-            <button
-              type="button"
-              disabled={isSubmitting || wordCount < MIN_WORDS_BACKSTORY || !formData.rules_accepted}
-              onClick={handleSubmit}
-              className="px-6 py-2.5 rounded-xl btn-accio-gold text-xs font-bold transition flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#F47A16]/20 cursor-pointer"
-            >
-              {isSubmitting ? (
-                <span>Transmitindo ao Castelo...</span>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  <span>Enviar Submissão à Escola de Hogwarts</span>
-                </>
-              )}
-            </button>
-          )}
+          <div>
+            {step < 4 ? (
+              <button
+                type="button"
+                onClick={() => {
+                  soundManager.playClick();
+                  setStep((step + 1) as any);
+                }}
+                className="px-6 py-2.5 rounded-xl btn-accio-gold text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer shadow-lg"
+              >
+                <span>Avançar</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting || !formData.rules_accepted}
+                className="px-6 py-3 rounded-xl btn-accio-gold text-xs font-black transition flex items-center space-x-2 cursor-pointer shadow-xl disabled:opacity-50"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>{isSubmitting ? 'Lavrando no Livro da Admissão...' : 'Lavrar Candidatura no Livro da Admissão'}</span>
+              </button>
+            )}
+          </div>
         </div>
 
       </div>

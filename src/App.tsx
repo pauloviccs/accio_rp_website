@@ -13,7 +13,7 @@ import { EnchantedSubmissionModal } from './components/EnchantedSubmissionModal'
 import { CastleBanners3D } from './components/CastleBanners3D';
 import { AppleTimerModal } from './components/AppleTimerModal';
 import { MusicPlayerWidget } from './components/MusicPlayerWidget';
-import { CharacterApplication, DiscordUser, UserRole } from './types';
+import { CharacterApplication, DiscordUser, UserRole, HouseId } from './types';
 import { LOCAL_STORAGE_LETTER_KEY } from './lib/constants';
 import {
   supabase,
@@ -41,6 +41,24 @@ export const App: React.FC = () => {
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
   const [isSubmissionSuccessOpen, setIsSubmissionSuccessOpen] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+
+  // Motor de Tema Dinâmico das Quatro Casas de Hogwarts
+  const [activeHouseTheme, setActiveHouseTheme] = useState<HouseId>(() => {
+    return (localStorage.getItem('accio_house_theme') as HouseId) || 'gryffindor';
+  });
+
+  // Atualizar atributo data-house-theme no <html> para disparar animação universal de cores
+  useEffect(() => {
+    document.documentElement.setAttribute('data-house-theme', activeHouseTheme);
+    localStorage.setItem('accio_house_theme', activeHouseTheme);
+  }, [activeHouseTheme]);
+
+  // Se o usuário logado tiver uma candidatura lavrada, manter o tema da sua Casa
+  useEffect(() => {
+    if (application?.preferred_house) {
+      setActiveHouseTheme(application.preferred_house);
+    }
+  }, [application]);
 
   // Inicialização e Verificação de 1ª Visita
   useEffect(() => {
@@ -204,10 +222,12 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* Navbar Superior com Proteção de Cargos RBAC */}
+      {/* Navbar Superior com Proteção de Cargos RBAC & Seletor de Casa */}
       <Navbar
         user={user}
         userRole={userRole}
+        activeHouseTheme={activeHouseTheme}
+        onSelectHouseTheme={(h) => setActiveHouseTheme(h)}
         canAccessAdmin={['super_admin', 'admin', 'mod'].includes(userRole || '')}
         onLogin={handleLogin}
         onLogout={handleLogout}
@@ -236,7 +256,11 @@ export const App: React.FC = () => {
         {/* Estandartes 3D das Quatro Casas & Exploração do Castelo */}
         <div id="castle-exploration">
           <CastleBanners3D
-            onOpenFormWithHouse={(_houseId) => {
+            onSelectHouse={(houseId) => {
+              setActiveHouseTheme(houseId);
+            }}
+            onOpenFormWithHouse={(houseId) => {
+              setActiveHouseTheme(houseId);
               setIsFormOpen(true);
             }}
           />
@@ -280,6 +304,8 @@ export const App: React.FC = () => {
             setUserRole(roleRec.role);
           });
         }}
+        activeHouseTheme={activeHouseTheme}
+        onSelectHouseTheme={(h) => setActiveHouseTheme(h)}
       />
 
       {/* Transição Mágica da Carta Selada e Enviada à Escola */}

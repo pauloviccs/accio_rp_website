@@ -1,21 +1,146 @@
 @import "tailwindcss";
 
 @layer base {
+  /* Paleta Canônica Padrão de Hogwarts (Grifinória / Neutro) */
   :root {
-    --accio-bg-deep: #160504;
-    --accio-burgundy: #5B1009;
-    --accio-amber: #B83A0C;
-    --accio-orange: #F47A16;
-    --accio-gold: #FFC34F;
-    --accio-ivory: #FFF0B2;
+    --house-primary: #7A0A0A;
+    --house-secondary: #5B1009;
+    --house-accent: #FFC34F;
+    --house-accent-secondary: #EEBA30;
+    --house-accent-bright: #FFF0B2;
+    --house-glow: rgba(255, 195, 79, 0.4);
+    --house-glow-lg: rgba(244, 122, 22, 0.45);
+    --house-bg-deep: #160504;
+    --house-bg-radial: #3D0B07;
+    --house-card-bg: rgba(33, 6, 4, 0.78);
+    --house-modal-bg: rgba(22, 5, 4, 0.95);
+    --house-border: rgba(255, 195, 79, 0.28);
+    --house-border-strong: rgba(255, 195, 79, 0.55);
+    --house-grad-start: #FFF0B2;
+    --house-grad-mid: #FFC34F;
+    --house-grad-end: #F47A16;
+    --house-btn-start: #FFC34F;
+    --house-btn-end: #F47A16;
+    --house-btn-text: #160504;
+    --house-pill-bg: #210604;
+    --house-pill-border: rgba(184, 58, 12, 0.4);
+  }
+
+  /* 🦁 GRIFINÓRIA: Escarlate Imperial & Ouro Solar */
+  [data-house-theme="gryffindor"] {
+    --house-primary: #7A0A0A;
+    --house-secondary: #5B1009;
+    --house-accent: #FFC34F;
+    --house-accent-secondary: #EEBA30;
+    --house-accent-bright: #FFF0B2;
+    --house-glow: rgba(255, 195, 79, 0.45);
+    --house-glow-lg: rgba(244, 122, 22, 0.5);
+    --house-bg-deep: #160504;
+    --house-bg-radial: #420A07;
+    --house-card-bg: rgba(33, 6, 4, 0.82);
+    --house-modal-bg: rgba(22, 5, 4, 0.96);
+    --house-border: rgba(255, 195, 79, 0.32);
+    --house-border-strong: rgba(255, 195, 79, 0.65);
+    --house-grad-start: #FFF0B2;
+    --house-grad-mid: #FFC34F;
+    --house-grad-end: #F47A16;
+    --house-btn-start: #FFC34F;
+    --house-btn-end: #F47A16;
+    --house-btn-text: #160504;
+    --house-pill-bg: #210604;
+    --house-pill-border: rgba(184, 58, 12, 0.45);
+  }
+
+  /* 🐍 SONSERINA: Verde Esmeralda Profundo & Prata Mithril */
+  [data-house-theme="slytherin"] {
+    --house-primary: #124E2B;
+    --house-secondary: #0A2E19;
+    --house-accent: #2ECC71;
+    --house-accent-secondary: #10B981;
+    --house-accent-bright: #E2E8F0;
+    --house-glow: rgba(46, 204, 113, 0.45);
+    --house-glow-lg: rgba(16, 185, 129, 0.5);
+    --house-bg-deep: #05190E;
+    --house-bg-radial: #08331A;
+    --house-card-bg: rgba(7, 36, 19, 0.84);
+    --house-modal-bg: rgba(5, 25, 14, 0.96);
+    --house-border: rgba(46, 204, 113, 0.35);
+    --house-border-strong: rgba(46, 204, 113, 0.7);
+    --house-grad-start: #F1F5F9;
+    --house-grad-mid: #34D399;
+    --house-grad-end: #059669;
+    --house-btn-start: #34D399;
+    --house-btn-end: #059669;
+    --house-btn-text: #021F10;
+    --house-pill-bg: #072615;
+    --house-pill-border: rgba(46, 204, 113, 0.4);
+  }
+
+  /* 🦅 CORVINAL: Azul Safira Abissal & Bronze Antigo */
+  [data-house-theme="ravenclaw"] {
+    --house-primary: #0E2954;
+    --house-secondary: #06152C;
+    --house-accent: #60A5FA;
+    --house-accent-secondary: #C59A4E;
+    --house-accent-bright: #DBEAFE;
+    --house-glow: rgba(96, 165, 250, 0.45);
+    --house-glow-lg: rgba(37, 99, 235, 0.5);
+    --house-bg-deep: #030D1C;
+    --house-bg-radial: #0A1E3D;
+    --house-card-bg: rgba(6, 23, 49, 0.84);
+    --house-modal-bg: rgba(4, 15, 33, 0.96);
+    --house-border: rgba(96, 165, 250, 0.35);
+    --house-border-strong: rgba(96, 165, 250, 0.7);
+    --house-grad-start: #EFF6FF;
+    --house-grad-mid: #60A5FA;
+    --house-grad-end: #C59A4E;
+    --house-btn-start: #60A5FA;
+    --house-btn-end: #2563EB;
+    --house-btn-text: #041026;
+    --house-pill-bg: #061A36;
+    --house-pill-border: rgba(96, 165, 250, 0.4);
+  }
+
+  /* 🦡 LUFA-LUFA: Âmbar Dourado Solar & Preto Ônix */
+  [data-house-theme="hufflepuff"] {
+    --house-primary: #B88200;
+    --house-secondary: #261A08;
+    --house-accent: #F59E0B;
+    --house-accent-secondary: #FFD13B;
+    --house-accent-bright: #FEF08A;
+    --house-glow: rgba(245, 158, 11, 0.45);
+    --house-glow-lg: rgba(217, 119, 6, 0.5);
+    --house-bg-deep: #140E04;
+    --house-bg-radial: #362306;
+    --house-card-bg: rgba(33, 23, 7, 0.84);
+    --house-modal-bg: rgba(22, 15, 4, 0.96);
+    --house-border: rgba(245, 158, 11, 0.35);
+    --house-border-strong: rgba(245, 158, 11, 0.7);
+    --house-grad-start: #FEF08A;
+    --house-grad-mid: #F59E0B;
+    --house-grad-end: #D97706;
+    --house-btn-start: #FBBF24;
+    --house-btn-end: #D97706;
+    --house-btn-text: #190F02;
+    --house-pill-bg: #241806;
+    --house-pill-border: rgba(245, 158, 11, 0.4);
   }
 
   body {
-    background-color: #100303;
-    color: #FFF0B2;
+    background-color: var(--house-bg-deep);
+    color: var(--house-accent-bright);
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     overflow-x: hidden;
+    transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
+}
+
+/* ─── Transições Universais Suaves de Tema ───────────────────── */
+header, section, footer, div, h1, h2, h3, h4, p, span, button {
+  transition-property: background-color, border-color, box-shadow;
+  transition-duration: 0.7s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ─── Tipografia ────────────────────────────────────────────── */
@@ -52,57 +177,64 @@
   transform-origin: top center;
 }
 
-/* ─── Gradientes e Estéticas Mágicas ────────────────────────── */
+/* ─── Gradientes e Estéticas Mágicas Dinâmicas por Casa ───────── */
 .bg-accio-deep {
-  background: radial-gradient(ellipse at 50% 0%, #401008 0%, #210604 55%, #100303 100%);
+  background: radial-gradient(ellipse at 50% 0%, var(--house-bg-radial) 0%, var(--house-bg-deep) 60%, #030101 100%);
+  transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bg-accio-card {
-  background: rgba(33, 6, 4, 0.72);
+  background: var(--house-card-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 195, 79, 0.2);
+  border: 1px solid var(--house-border);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bg-accio-modal {
-  background: rgba(22, 5, 4, 0.94);
+  background: var(--house-modal-bg);
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
-  border: 1px solid rgba(255, 195, 79, 0.25);
+  border: 1px solid var(--house-border);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .text-gold-gradient {
-  background: linear-gradient(135deg, #FFF0B2 0%, #FFC34F 40%, #F47A16 75%, #FFE28A 100%);
+  background: linear-gradient(135deg, var(--house-grad-start) 0%, var(--house-grad-mid) 45%, var(--house-grad-end) 85%, var(--house-accent-bright) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .border-gold-glow {
-  border-color: rgba(255, 195, 79, 0.35);
-  box-shadow: 0 0 20px rgba(244, 122, 22, 0.2), inset 0 1px 0 rgba(255, 240, 178, 0.25);
+  border-color: var(--house-border);
+  box-shadow: 0 0 20px var(--house-glow), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gold-glow {
-  box-shadow: 0 0 25px rgba(255, 195, 79, 0.25);
+  box-shadow: 0 0 25px var(--house-glow);
+  transition: box-shadow 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gold-glow-lg {
-  box-shadow: 0 0 45px rgba(244, 122, 22, 0.35);
+  box-shadow: 0 0 45px var(--house-glow-lg);
+  transition: box-shadow 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ─── Botão Dourado Nobre ───────────────────────────────────── */
+/* ─── Botão Mágico Adaptativo da Casa ───────────────────────── */
 .btn-accio-gold {
-  background: linear-gradient(135deg, #FFC34F 0%, #F47A16 100%);
-  color: #160504;
+  background: linear-gradient(135deg, var(--house-btn-start) 0%, var(--house-btn-end) 100%);
+  color: var(--house-btn-text);
   font-weight: 700;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 20px rgba(244, 122, 22, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px var(--house-glow);
 }
 
 .btn-accio-gold:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(255, 195, 79, 0.5);
-  filter: brightness(1.08);
+  box-shadow: 0 8px 30px var(--house-glow);
+  filter: brightness(1.1);
 }
 
 .btn-accio-gold:active {
@@ -147,15 +279,15 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #160504;
+  background: var(--house-bg-deep);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #5B1009;
+  background: var(--house-secondary);
   border-radius: 4px;
-  border: 1px solid rgba(255, 195, 79, 0.2);
+  border: 1px solid var(--house-border);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #B83A0C;
+  background: var(--house-primary);
 }
