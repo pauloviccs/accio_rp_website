@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, Clock, AlertTriangle, ExternalLink, Ticket, BookOpen, Wand2, Shield, Calendar, MapPin } from 'lucide-react';
+import { X, CheckCircle2, Clock, AlertTriangle, ExternalLink, Ticket, BookOpen, Wand2, Shield, Calendar, MapPin, FileDown } from 'lucide-react';
 import { CharacterApplication } from '../types';
 import { HOUSES } from '../lib/constants';
+import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
+import { soundManager } from '../lib/audio';
 
 interface ValidationModalProps {
   isOpen: boolean;
@@ -17,6 +19,8 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
   onViewTicket,
 }) => {
   const [isReadingStory, setIsReadingStory] = useState(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState<string | null>(null);
 
   if (!isOpen || !application) return null;
 
@@ -223,19 +227,37 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
 
         {/* Ações Inferiores */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-          <button
-            onClick={onViewTicket}
-            className="w-full sm:w-auto btn-accio-gold px-5 py-2.5 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 font-bold cursor-pointer"
-          >
-            <Ticket className="w-4 h-4" />
-            <span>Ver Bilhete do Expresso</span>
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+            <button
+              onClick={onViewTicket}
+              className="w-full sm:w-auto btn-accio-gold px-4 py-2.5 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 font-bold cursor-pointer"
+            >
+              <Ticket className="w-4 h-4" />
+              <span>Ver Bilhete do Expresso</span>
+            </button>
+
+            <button
+              onClick={async () => {
+                setIsDownloadingPdf(true);
+                soundManager.playSparkle();
+                await generateAndDownloadCharacterPdf(application, (msg) => setPdfProgress(msg));
+                setIsDownloadingPdf(false);
+                setPdfProgress(null);
+              }}
+              disabled={isDownloadingPdf}
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#5B1009]/60 hover:bg-[#5B1009] border border-[#FFC34F]/50 text-[#FFF0B2] text-xs sm:text-sm flex items-center justify-center space-x-2 font-semibold transition cursor-pointer disabled:opacity-50"
+              title="Baixar a Ficha Oficial do Aluno em Pergaminho com Selo de Cera (PDF)"
+            >
+              <FileDown className="w-4 h-4 text-[#FFC34F]" />
+              <span>{isDownloadingPdf ? (pdfProgress || 'Gerando PDF...') : 'Baixar Ficha (PDF)'}</span>
+            </button>
+          </div>
 
           <a
             href="https://discord.gg"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs sm:text-sm font-semibold flex items-center justify-center space-x-2 transition"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs sm:text-sm font-semibold flex items-center justify-center space-x-2 transition"
           >
             <span>Comunidade Discord</span>
             <ExternalLink className="w-4 h-4" />

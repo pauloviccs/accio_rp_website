@@ -12,6 +12,7 @@ import { AdminPanelModal } from './components/AdminPanelModal';
 import { EnchantedSubmissionModal } from './components/EnchantedSubmissionModal';
 import { CastleBanners3D } from './components/CastleBanners3D';
 import { AppleTimerModal } from './components/AppleTimerModal';
+import { MusicPlayerWidget } from './components/MusicPlayerWidget';
 import { CharacterApplication, DiscordUser, UserRole } from './types';
 import { LOCAL_STORAGE_LETTER_KEY } from './lib/constants';
 import {
@@ -127,7 +128,13 @@ export const App: React.FC = () => {
       }
     });
 
+    // Expor métodos globais de depuração e inspeção visual
+    (window as any).__openTimerModal = () => setIsTimerModalOpen(true);
+    (window as any).__openAdminModal = () => setIsAdminOpen(true);
+
     return () => {
+      delete (window as any).__openTimerModal;
+      delete (window as any).__openAdminModal;
       subscription.unsubscribe();
       unsubTimer();
     };
@@ -320,6 +327,9 @@ export const App: React.FC = () => {
           }
         }}
       />
+
+      {/* Reprodutor de Trilha Sonora Orquestral de Hogwarts (Contínua & Shuffle) */}
+      <MusicPlayerWidget />
     </div>
   );
 };

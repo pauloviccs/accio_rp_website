@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Sparkles, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { DiscordUser } from '../types';
-import { soundManager } from '../lib/audio';
+import { soundManager, musicPlayer } from '../lib/audio';
 
 interface HogwartsLetterModalProps {
   isOpen: boolean;
@@ -21,6 +21,12 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
   onExploreCastle,
 }) => {
   const [isBroken, setIsBroken] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      musicPlayer.setContextTheme('letter');
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

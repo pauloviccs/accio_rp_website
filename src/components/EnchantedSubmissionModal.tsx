@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle2, Ticket, ShieldCheck, ArrowRight, X, Clock, Wand2 } from 'lucide-react';
+import { CheckCircle2, Ticket, ShieldCheck, ArrowRight, X, Clock, Wand2, FileDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CharacterApplication } from '../types';
 import { HOUSES } from '../lib/constants';
-import { soundManager } from '../lib/audio';
+import { soundManager, musicPlayer } from '../lib/audio';
+import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
 
 interface EnchantedSubmissionModalProps {
   isOpen: boolean;
@@ -25,6 +26,8 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
   // 2. 'flying' (carta levitando e voando com feitiço rumo a Hogwarts)
   // 3. 'confirmed' (mensagem ministerial de recebimento no banco de dados e dados do aluno)
   const [stage, setStage] = useState<'sealing' | 'flying' | 'confirmed'>('sealing');
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) {
@@ -59,6 +62,7 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
         colors: ['#FFC34F', '#F47A16', '#FFF0B2', '#4CAF7C'],
       });
       soundManager.playSparkle();
+      musicPlayer.setContextTheme('triumph');
       setStage('confirmed');
     }, 3200);
 
@@ -248,27 +252,44 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
             {/* Ações Finais */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
               <button
-                onClick={() => {
-                  onClose();
-                  onOpenValidation();
+                onClick={async () => {
+                  setIsDownloadingPdf(true);
+                  soundManager.playSparkle();
+                  await generateAndDownloadCharacterPdf(application, (msg) => setPdfProgress(msg));
+                  setIsDownloadingPdf(false);
+                  setPdfProgress(null);
                 }}
-                className="w-full sm:w-auto btn-accio-gold px-5 py-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center space-x-2 shadow-lg shadow-[#F47A16]/20 cursor-pointer"
+                disabled={isDownloadingPdf}
+                className="w-full sm:w-auto px-4 py-3 rounded-xl bg-[#5B1009]/60 hover:bg-[#5B1009] border border-[#FFC34F]/50 text-[#FFF0B2] text-xs sm:text-sm font-semibold flex items-center justify-center space-x-2 transition cursor-pointer disabled:opacity-50"
               >
-                <ShieldCheck className="w-4 h-4 text-[#160504]" />
-                <span>Ver Dossiê de Validação</span>
-                <ArrowRight className="w-4 h-4 text-[#160504]" />
+                <FileDown className="w-4 h-4 text-[#FFC34F]" />
+                <span>{isDownloadingPdf ? (pdfProgress || 'Gerando PDF...') : 'Baixar Ficha em PDF'}</span>
               </button>
 
-              <button
-                onClick={() => {
-                  onClose();
-                  onViewTicket();
-                }}
-                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-[#210604] hover:bg-[#5B1009] border border-[#FFC34F]/40 text-[#FFF0B2] text-xs sm:text-sm font-semibold flex items-center justify-center space-x-2 transition cursor-pointer"
-              >
-                <Ticket className="w-4 h-4 text-[#FFC34F]" />
-                <span>Visualizar Bilhete do Expresso</span>
-              </button>
+              <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+                <button
+                  onClick={() => {
+                    onClose();
+                    onOpenValidation();
+                  }}
+                  className="w-full sm:w-auto btn-accio-gold px-4 py-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center space-x-2 shadow-lg shadow-[#F47A16]/20 cursor-pointer"
+                >
+                  <ShieldCheck className="w-4 h-4 text-[#160504]" />
+                  <span>Dossiê</span>
+                  <ArrowRight className="w-4 h-4 text-[#160504]" />
+                </button>
+
+                <button
+                  onClick={() => {
+                    onClose();
+                    onViewTicket();
+                  }}
+                  className="w-full sm:w-auto px-4 py-3 rounded-xl bg-[#210604] hover:bg-[#5B1009] border border-[#FFC34F]/40 text-[#FFF0B2] text-xs sm:text-sm font-semibold flex items-center justify-center space-x-2 transition cursor-pointer"
+                >
+                  <Ticket className="w-4 h-4 text-[#FFC34F]" />
+                  <span>Bilhete</span>
+                </button>
+              </div>
             </div>
 
           </div>

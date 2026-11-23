@@ -21,6 +21,8 @@ export interface CharacterApplication {
   wand_core: string;
   wand_length: string;
   wand_flexibility: string;
+  wand_handle?: string;
+  pdf_url?: string;
   patronus?: string;
   character_backstory: string;
   word_count: number;
@@ -52,5 +54,16 @@ export interface UserRoleRecord {
   assigned_by?: string;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface WandHandleOption {
+  id: string;
+  name: string;
+  family: string;
+  colorName: string;
+  iconImg: string;
+  handleImg: string;
+  sketchImg: string;
+  description: string;
 }
 

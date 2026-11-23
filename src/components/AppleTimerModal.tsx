@@ -32,7 +32,7 @@ const WheelColumn: React.FC<WheelColumnProps> = ({
   const startVal = useRef(value);
   const lastSoundVal = useRef(value);
 
-  const ITEM_HEIGHT = 36; // Altura precisa e compacta para encaixe perfeito em qualquer tela
+  const ITEM_HEIGHT = 34; // Altura ergonômica ideal para mobile e desktop
 
   const step = (delta: number) => {
     let next = value + delta;
@@ -85,16 +85,16 @@ const WheelColumn: React.FC<WheelColumnProps> = ({
   });
 
   return (
-    <div className="flex flex-col items-center select-none flex-1">
+    <div className="flex flex-col items-center select-none flex-1 min-w-[50px] max-w-[70px]">
       <button
         onClick={() => step(-1)}
-        className="p-1 text-[#FFF0B2]/40 hover:text-[#FFC34F] hover:bg-white/5 rounded-full transition mb-0.5"
+        className="p-1 text-[#FFF0B2]/40 hover:text-[#FFC34F] hover:bg-white/5 rounded-full transition mb-0.5 cursor-pointer"
         title={`Diminuir ${label}`}
       >
-        <ChevronUp className="w-3.5 h-3.5" />
+        <ChevronUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
       </button>
 
-      {/* Roda Cilíndrica Apple com Altura Controlada */}
+      {/* Roda Cilíndrica Apple com Altura Controlada e Lente de Aumento */}
       <div
         ref={containerRef}
         onWheel={handleWheel}
@@ -102,21 +102,21 @@ const WheelColumn: React.FC<WheelColumnProps> = ({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        className="relative w-full max-w-[72px] h-[160px] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden rounded-2xl bg-[#0D0202] border border-[#B83A0C]/30 shadow-inner"
+        className="relative w-full h-[135px] sm:h-[155px] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden rounded-xl sm:rounded-2xl bg-[#0D0202] border border-[#B83A0C]/30 shadow-inner"
         style={{ perspective: '500px' }}
       >
         {/* Lente Central Apple com Vidro Fosco */}
-        <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 h-[38px] bg-[#FFC34F]/10 border-y border-[#FFC34F]/40 pointer-events-none z-10 backdrop-blur-[1px]" />
+        <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 h-[34px] sm:h-[38px] bg-[#FFC34F]/10 border-y border-[#FFC34F]/40 pointer-events-none z-10 backdrop-blur-[1px]" />
 
-        {/* Gradientes Superior e Inferior para Efeito 3D */}
-        <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-[#0D0202] via-[#0D0202]/85 to-transparent pointer-events-none z-20" />
-        <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#0D0202] via-[#0D0202]/85 to-transparent pointer-events-none z-20" />
+        {/* Gradientes Superior e Inferior para Efeito 3D de Cilindro */}
+        <div className="absolute inset-x-0 top-0 h-10 sm:h-12 bg-gradient-to-b from-[#0D0202] via-[#0D0202]/90 to-transparent pointer-events-none z-20" />
+        <div className="absolute inset-x-0 bottom-0 h-10 sm:h-12 bg-gradient-to-t from-[#0D0202] via-[#0D0202]/90 to-transparent pointer-events-none z-20" />
 
         <div className="relative w-full h-full flex flex-col items-center justify-center pointer-events-none">
           {visibleItems.map(({ val, offset }) => {
             const isCenter = offset === 0;
             const rotateX = offset * 26;
-            const translateY = offset * 34;
+            const translateY = offset * 30;
             const scale = isCenter ? 1.15 : 1 - Math.abs(offset) * 0.2;
             const opacity = isCenter ? 1 : 1 - Math.abs(offset) * 0.45;
 
@@ -125,8 +125,8 @@ const WheelColumn: React.FC<WheelColumnProps> = ({
                 key={offset}
                 className={`absolute font-mono transition-transform duration-75 flex items-center justify-center ${
                   isCenter
-                    ? 'text-xl sm:text-2xl font-black text-gold-gradient drop-shadow-[0_0_10px_rgba(255,195,79,0.5)]'
-                    : 'text-base sm:text-lg font-medium text-[#FFF0B2]/40'
+                    ? 'text-lg sm:text-2xl font-black text-gold-gradient drop-shadow-[0_0_10px_rgba(255,195,79,0.5)]'
+                    : 'text-sm sm:text-base font-medium text-[#FFF0B2]/40'
                 }`}
                 style={{
                   transform: `translateY(${translateY}px) rotateX(${rotateX}deg) scale(${scale})`,
@@ -142,13 +142,13 @@ const WheelColumn: React.FC<WheelColumnProps> = ({
 
       <button
         onClick={() => step(1)}
-        className="p-1 text-[#FFF0B2]/40 hover:text-[#FFC34F] hover:bg-white/5 rounded-full transition mt-0.5"
+        className="p-1 text-[#FFF0B2]/40 hover:text-[#FFC34F] hover:bg-white/5 rounded-full transition mt-0.5 cursor-pointer"
         title={`Aumentar ${label}`}
       >
-        <ChevronDown className="w-3.5 h-3.5" />
+        <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
       </button>
 
-      <span className="text-[10px] sm:text-xs font-bold tracking-widest uppercase text-[#FFC34F] mt-0.5">
+      <span className="text-[9px] sm:text-[11px] font-bold tracking-widest uppercase text-[#FFC34F] mt-0.5">
         {label}
       </span>
     </div>
@@ -233,7 +233,7 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-2xl overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-[#160504] border border-[#B83A0C]/50 rounded-3xl p-5 sm:p-6 shadow-2xl my-auto animate-apple-modal">
+      <div className="relative w-full max-w-lg max-h-[92vh] flex flex-col bg-[#160504] border border-[#B83A0C]/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl overflow-y-auto my-auto animate-apple-modal">
         
         {/* Glow de fundo */}
         <div className="absolute top-0 right-1/4 w-60 h-60 bg-[#FFC34F]/10 rounded-full blur-[80px] pointer-events-none" />
@@ -241,7 +241,7 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
         {/* Topo do Modal */}
         <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
           <div className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FFC34F] to-[#5B1009] p-0.5 shadow-md">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-[#FFC34F] to-[#5B1009] p-0.5 shadow-md">
               <div className="w-full h-full rounded-[10px] bg-[#160504] flex items-center justify-center">
                 <Clock className="w-4 h-4 text-[#FFC34F] animate-pulse" />
               </div>
@@ -259,12 +259,13 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
           <button
             onClick={onClose}
             className="p-1.5 rounded-full hover:bg-white/10 text-[#FFF0B2]/60 hover:text-white transition cursor-pointer"
+            title="Fechar"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
-        {/* Atalhos Rápidos */}
+        {/* Atalhos Rápidos com Quebra Suave */}
         <div className="mb-4">
           <span className="text-[10px] uppercase tracking-wider text-[#FFF0B2]/60 font-semibold block mb-1.5 text-center">
             Prazos Canônicos Predefinidos:
@@ -280,7 +281,7 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
               <button
                 key={preset.label}
                 onClick={() => applyPreset(preset.d)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition cursor-pointer ${
+                className={`px-2 sm:px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-semibold border transition cursor-pointer ${
                   days === preset.d && hours === 0
                     ? 'bg-[#FFC34F] text-[#160504] border-[#FFC34F] font-bold shadow-md shadow-[#FFC34F]/20'
                     : 'bg-[#210604] text-[#FFF0B2]/80 border-[#B83A0C]/30 hover:border-[#FFC34F]/50 hover:text-white'
@@ -292,9 +293,9 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
           </div>
         </div>
 
-        {/* ROLETA APPLE DE 4 COLUNAS: DIAS, HORAS, MINUTOS, SEGUNDOS */}
-        <div className="bg-[#100303] border border-[#B83A0C]/40 rounded-2xl p-3 sm:p-4 mb-4 shadow-2xl">
-          <div className="flex items-center justify-between space-x-1 sm:space-x-3">
+        {/* ROLETA APPLE DE 4 COLUNAS: DIAS, HORAS, MINUTOS, SEGUNDOS (100% RESPONSIVA) */}
+        <div className="bg-[#100303] border border-[#B83A0C]/40 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 mb-4 shadow-2xl">
+          <div className="flex items-center justify-center space-x-1 sm:space-x-2 md:space-x-3">
             <WheelColumn
               label="Dias"
               value={days}
@@ -304,7 +305,7 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
               padZero={false}
             />
 
-            <span className="text-lg font-mono text-[#FFC34F]/40 font-bold -mt-5">:</span>
+            <span className="text-base sm:text-xl font-mono text-[#FFC34F]/40 font-bold -mt-4">:</span>
 
             <WheelColumn
               label="Horas"
@@ -314,7 +315,7 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
               onChange={setHours}
             />
 
-            <span className="text-lg font-mono text-[#FFC34F]/40 font-bold -mt-5">:</span>
+            <span className="text-base sm:text-xl font-mono text-[#FFC34F]/40 font-bold -mt-4">:</span>
 
             <WheelColumn
               label="Minutos"
@@ -324,7 +325,7 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
               onChange={setMinutes}
             />
 
-            <span className="text-lg font-mono text-[#FFC34F]/40 font-bold -mt-5">:</span>
+            <span className="text-base sm:text-xl font-mono text-[#FFC34F]/40 font-bold -mt-4">:</span>
 
             <WheelColumn
               label="Segundos"
@@ -356,7 +357,7 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
         </div>
 
         {/* Ações */}
-        <div className="flex items-center justify-end space-x-2.5">
+        <div className="flex items-center justify-end space-x-2.5 pt-1 border-t border-white/5">
           <button
             onClick={onClose}
             className="px-3.5 py-2 rounded-xl bg-[#210604] border border-[#B83A0C]/30 text-xs text-[#FFF0B2]/70 hover:text-white hover:bg-[#5B1009] transition cursor-pointer"
@@ -367,7 +368,7 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
           <button
             onClick={handleSave}
             disabled={isSaving || saveSuccess}
-            className="px-5 py-2 rounded-xl btn-accio-gold text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer disabled:opacity-60"
+            className="px-4 sm:px-5 py-2 rounded-xl btn-accio-gold text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer disabled:opacity-60 shadow-lg"
           >
             {isSaving ? (
               <>

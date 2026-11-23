@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
-import { X, MessageSquare, Check } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { X, MessageSquare, Check, FileDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CharacterApplication } from '../types';
 import { HOUSES } from '../lib/constants';
+import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
+import { soundManager } from '../lib/audio';
 
 interface TicketModalProps {
   isOpen: boolean;
@@ -15,6 +17,9 @@ export const TicketModal: React.FC<TicketModalProps> = ({
   onClose,
   application,
 }) => {
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState<string | null>(null);
+
   useEffect(() => {
     if (isOpen) {
       // Efeito de confetes dourados celebrando a admissão
@@ -118,6 +123,21 @@ export const TicketModal: React.FC<TicketModalProps> = ({
 
           {/* Call to Actions */}
           <div className="space-y-3 pt-2">
+            <button
+              onClick={async () => {
+                setIsDownloadingPdf(true);
+                soundManager.playSparkle();
+                await generateAndDownloadCharacterPdf(application, (msg) => setPdfProgress(msg));
+                setIsDownloadingPdf(false);
+                setPdfProgress(null);
+              }}
+              disabled={isDownloadingPdf}
+              className="w-full py-3 rounded-xl btn-accio-gold text-xs sm:text-sm font-bold flex items-center justify-center space-x-2 transition shadow-lg shadow-[#FFC34F]/20 cursor-pointer disabled:opacity-50"
+            >
+              <FileDown className="w-4 h-4 text-[#160504]" />
+              <span>{isDownloadingPdf ? (pdfProgress || 'Gerando Pergaminho...') : 'Baixar Ficha Oficial de Hogwarts (PDF)'}</span>
+            </button>
+
             <a
               href="https://discord.gg"
               target="_blank"

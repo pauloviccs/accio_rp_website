@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   X, Shield, Clock, 
-  Search, RefreshCw, BookOpen, Check, Ban, UserCheck, Lock
+  Search, RefreshCw, BookOpen, Check, Ban, UserCheck, Lock, FileDown
 } from 'lucide-react';
 import { CharacterApplication, UserRole, UserRoleRecord } from '../types';
 import { 
@@ -11,7 +11,8 @@ import {
   updateUserRole 
 } from '../lib/supabase';
 import { HOUSES } from '../lib/constants';
-import { soundManager } from '../lib/audio';
+import { soundManager, musicPlayer } from '../lib/audio';
+import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
 
 interface AdminPanelModalProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
+      musicPlayer.setContextTheme('dungeon');
       loadApplications();
       loadRoles();
     }
@@ -383,16 +385,28 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                             {appStatus === 'pending' && <span className="text-[#FFC34F] font-semibold">Pendente</span>}
                           </td>
                           <td className="py-3 px-3 text-right">
-                            <button
-                              onClick={() => {
-                                soundManager.playClick();
-                                setSelectedApp(app);
-                                setReviewerNotes(app.reviewer_notes || '');
-                              }}
-                              className="px-2.5 py-1 rounded-lg bg-[#5B1009] hover:bg-[#8B1A0E] text-[#FFF0B2] font-semibold text-xs transition cursor-pointer"
-                            >
-                              Julgar
-                            </button>
+                            <div className="flex items-center justify-end space-x-1.5">
+                              <button
+                                onClick={async () => {
+                                  soundManager.playSparkle();
+                                  await generateAndDownloadCharacterPdf(app);
+                                }}
+                                className="p-1.5 rounded-lg bg-[#210604] hover:bg-[#5B1009] border border-[#FFC34F]/30 text-[#FFC34F] text-xs transition cursor-pointer"
+                                title="Baixar Ficha Oficial em Pergaminho (PDF)"
+                              >
+                                <FileDown className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  soundManager.playClick();
+                                  setSelectedApp(app);
+                                  setReviewerNotes(app.reviewer_notes || '');
+                                }}
+                                className="px-2.5 py-1 rounded-lg bg-[#5B1009] hover:bg-[#8B1A0E] text-[#FFF0B2] font-semibold text-xs transition cursor-pointer"
+                              >
+                                Julgar
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -524,24 +538,39 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                 />
               </div>
 
-              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-white/10">
+              <div className="flex items-center justify-between pt-2 border-t border-white/10">
                 <button
-                  onClick={() => handleUpdateStatus('rejected')}
-                  disabled={isUpdating}
-                  className="px-3.5 py-2 rounded-xl bg-[#CF4A4A]/20 hover:bg-[#CF4A4A]/40 border border-[#CF4A4A]/40 text-[#CF4A4A] text-xs font-bold transition flex items-center space-x-1"
+                  type="button"
+                  onClick={async () => {
+                    soundManager.playSparkle();
+                    await generateAndDownloadCharacterPdf(selectedApp);
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-[#210604] hover:bg-[#5B1009] border border-[#FFC34F]/40 text-[#FFF0B2] text-xs font-semibold transition flex items-center space-x-1.5 cursor-pointer"
+                  title="Baixar a Ficha Oficial do Aluno em PDF"
                 >
-                  <Ban className="w-3.5 h-3.5" />
-                  <span>Rejeitar</span>
+                  <FileDown className="w-3.5 h-3.5 text-[#FFC34F]" />
+                  <span>Baixar Ficha em PDF</span>
                 </button>
 
-                <button
-                  onClick={() => handleUpdateStatus('approved')}
-                  disabled={isUpdating}
-                  className="px-4 py-2 rounded-xl bg-[#1A6B3C] hover:bg-[#1A6B3C]/80 text-white text-xs font-bold transition flex items-center space-x-1 shadow-lg shadow-[#1A6B3C]/30"
-                >
-                  <Check className="w-3.5 h-3.5" />
-                  <span>Aprovar Inscrição</span>
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => handleUpdateStatus('rejected')}
+                    disabled={isUpdating}
+                    className="px-3.5 py-2 rounded-xl bg-[#CF4A4A]/20 hover:bg-[#CF4A4A]/40 border border-[#CF4A4A]/40 text-[#CF4A4A] text-xs font-bold transition flex items-center space-x-1"
+                  >
+                    <Ban className="w-3.5 h-3.5" />
+                    <span>Rejeitar</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleUpdateStatus('approved')}
+                    disabled={isUpdating}
+                    className="px-4 py-2 rounded-xl bg-[#1A6B3C] hover:bg-[#1A6B3C]/80 text-white text-xs font-bold transition flex items-center space-x-1 shadow-lg shadow-[#1A6B3C]/30"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Aprovar Inscrição</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

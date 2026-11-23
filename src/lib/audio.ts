@@ -296,3 +296,321 @@ class SoundManager {
 
 export const soundManager = new SoundManager();
 
+// =============================================================
+// REPRODUTOR DE TRILHA SONORA MÁGICA CONTÍNUA (BACKGROUND MUSIC)
+// Trilha orquestral composta por Jeremy Soule para a saga Harry Potter
+// =============================================================
+
+export type MusicTheme = 'mystical' | 'letter' | 'creation' | 'dungeon' | 'express' | 'triumph';
+
+export interface MusicTrack {
+  id: string;
+  title: string;
+  subtitle: string;
+  composer: string;
+  url: string;
+  theme: MusicTheme;
+  duration: string;
+}
+
+export const HOGWARTS_SOUNDTRACK_PLAYLIST: MusicTrack[] = [
+  {
+    id: 'twilight-magic',
+    title: 'Twilight Magic',
+    subtitle: 'Noite nos Arcos do Castelo',
+    composer: 'Jeremy Soule',
+    url: '/audio/twilight-magic.mp3',
+    theme: 'mystical',
+    duration: '01:18',
+  },
+  {
+    id: 'secret-garden',
+    title: 'Secret Garden',
+    subtitle: 'A Carta de Convocação & Jardins',
+    composer: 'Jeremy Soule',
+    url: '/audio/secret-garden.mp3',
+    theme: 'letter',
+    duration: '02:10',
+  },
+  {
+    id: 'casting-spells',
+    title: 'Casting Spells',
+    subtitle: 'Oficina de Varinhas de Ollivanders',
+    composer: 'Jeremy Soule',
+    url: '/audio/casting-spells.mp3',
+    theme: 'creation',
+    duration: '01:07',
+  },
+  {
+    id: 'dark-tale',
+    title: 'Dark Tale',
+    subtitle: 'Masmorras & Gabinete Ministerial',
+    composer: 'Jeremy Soule',
+    url: '/audio/dark-tale.mp3',
+    theme: 'dungeon',
+    duration: '01:21',
+  },
+  {
+    id: 'train-leaving',
+    title: "Train's Leaving",
+    subtitle: 'Plataforma 9¾ & Expresso de Hogwarts',
+    composer: 'Jeremy Soule',
+    url: '/audio/train-leaving.mp3',
+    theme: 'express',
+    duration: '01:01',
+  },
+  {
+    id: 'triumphant-arrival',
+    title: 'Triumphant Arrival',
+    subtitle: 'Chegada ao Salão Principal',
+    composer: 'Jeremy Soule',
+    url: '/audio/triumphant-arrival.mp3',
+    theme: 'triumph',
+    duration: '00:59',
+  },
+];
+
+export interface MusicPlayerState {
+  isPlaying: boolean;
+  currentTrack: MusicTrack;
+  volume: number;
+  isMuted: boolean;
+  shuffle: boolean;
+  currentTheme: MusicTheme;
+}
+
+class MusicPlayer {
+  private audio: HTMLAudioElement | null = null;
+  private playlist: MusicTrack[] = HOGWARTS_SOUNDTRACK_PLAYLIST;
+  private currentIndex: number = 0;
+  private isPlaying: boolean = false;
+  private volume: number = 0.35;
+  private isMuted: boolean = false;
+  private shuffle: boolean = true;
+  private currentTheme: MusicTheme = 'mystical';
+  private listeners: Set<(state: MusicPlayerState) => void> = new Set();
+  private userInteracted: boolean = false;
+  private fadeInterval: any = null;
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedMuted = localStorage.getItem('accio_sound_muted');
+        if (savedMuted !== null) {
+          this.isMuted = savedMuted === 'true';
+        }
+        const savedVol = localStorage.getItem('accio_music_volume');
+        if (savedVol !== null) {
+          this.volume = parseFloat(savedVol);
+        }
+      } catch {}
+
+      // Sincroniza com mutação global de soundManager
+      soundManager.subscribe((muted) => {
+        this.setMuted(muted);
+      });
+
+      // Ouvinte de primeiro clique para contornar restrições de autoplay dos navegadores
+      const handleFirstInteraction = () => {
+        if (!this.userInteracted) {
+          this.userInteracted = true;
+          this.initAudio();
+          if (!this.isMuted && !this.isPlaying) {
+            this.play();
+          }
+        }
+        window.removeEventListener('click', handleFirstInteraction);
+        window.removeEventListener('keydown', handleFirstInteraction);
+        window.removeEventListener('touchstart', handleFirstInteraction);
+      };
+
+      window.addEventListener('click', handleFirstInteraction, { passive: true });
+      window.addEventListener('keydown', handleFirstInteraction, { passive: true });
+      window.addEventListener('touchstart', handleFirstInteraction, { passive: true });
+    }
+  }
+
+  private initAudio() {
+    if (this.audio) return;
+    this.audio = new Audio();
+    this.audio.preload = 'auto';
+    this.audio.volume = this.isMuted ? 0 : this.volume;
+    this.loadTrack(this.currentIndex);
+
+    this.audio.addEventListener('ended', () => {
+      this.handleTrackEnded();
+    });
+
+    this.audio.addEventListener('error', (e) => {
+      console.warn('Erro ao reproduzir áudio ambiente de Hogwarts:', e);
+    });
+  }
+
+  private loadTrack(index: number) {
+    if (!this.audio) return;
+    this.currentIndex = index;
+    const track = this.playlist[this.currentIndex];
+    this.audio.src = track.url;
+    this.notify();
+  }
+
+  private handleTrackEnded() {
+    if (this.shuffle) {
+      let nextIdx = Math.floor(Math.random() * this.playlist.length);
+      if (nextIdx === this.currentIndex && this.playlist.length > 1) {
+        nextIdx = (this.currentIndex + 1) % this.playlist.length;
+      }
+      this.playTrackIndex(nextIdx);
+    } else {
+      this.next();
+    }
+  }
+
+  public getState(): MusicPlayerState {
+    return {
+      isPlaying: this.isPlaying,
+      currentTrack: this.playlist[this.currentIndex] || this.playlist[0],
+      volume: this.volume,
+      isMuted: this.isMuted,
+      shuffle: this.shuffle,
+      currentTheme: this.currentTheme,
+    };
+  }
+
+  public subscribe(listener: (state: MusicPlayerState) => void): () => void {
+    this.listeners.add(listener);
+    listener(this.getState());
+    return () => this.listeners.delete(listener);
+  }
+
+  private notify() {
+    const st = this.getState();
+    this.listeners.forEach((fn) => fn(st));
+  }
+
+  public async play(): Promise<void> {
+    this.initAudio();
+    if (!this.audio) return;
+    try {
+      this.audio.volume = this.isMuted ? 0 : this.volume;
+      await this.audio.play();
+      this.isPlaying = true;
+      this.notify();
+    } catch (err) {
+      console.warn('Autoplay bloqueado pelo navegador aguardando interação do usuário.');
+    }
+  }
+
+  public pause() {
+    if (this.audio) {
+      this.audio.pause();
+    }
+    this.isPlaying = false;
+    this.notify();
+  }
+
+  public togglePlay() {
+    if (this.isPlaying) {
+      this.pause();
+    } else {
+      this.play();
+    }
+  }
+
+  public playTrackIndex(index: number) {
+    this.initAudio();
+    if (!this.audio) return;
+    this.currentIndex = (index + this.playlist.length) % this.playlist.length;
+    this.loadTrack(this.currentIndex);
+    this.play();
+  }
+
+  public next() {
+    this.playTrackIndex(this.currentIndex + 1);
+  }
+
+  public prev() {
+    this.playTrackIndex(this.currentIndex - 1);
+  }
+
+  public toggleShuffle() {
+    this.shuffle = !this.shuffle;
+    this.notify();
+  }
+
+  public setVolume(vol: number) {
+    this.volume = Math.max(0, Math.min(1, vol));
+    if (this.audio && !this.isMuted) {
+      this.audio.volume = this.volume;
+    }
+    try {
+      localStorage.setItem('accio_music_volume', String(this.volume));
+    } catch {}
+    this.notify();
+  }
+
+  public setMuted(muted: boolean) {
+    this.isMuted = muted;
+    if (this.audio) {
+      this.audio.volume = muted ? 0 : this.volume;
+    }
+    this.notify();
+  }
+
+  public toggleMute(): boolean {
+    const next = !this.isMuted;
+    soundManager.setMuted(next);
+    this.setMuted(next);
+    return next;
+  }
+
+  /**
+   * Transiciona suavemente para a faixa com o teor/tema desejado
+   * (ex: 'creation' ao abrir formulário de varinhas, 'letter' ao abrir a carta, 'dungeon' no admin)
+   */
+  public setContextTheme(theme: MusicTheme) {
+    this.currentTheme = theme;
+    const targetIdx = this.playlist.findIndex((t) => t.theme === theme);
+    if (targetIdx !== -1 && targetIdx !== this.currentIndex) {
+      this.fadeToTrack(targetIdx);
+    }
+  }
+
+  private fadeToTrack(targetIndex: number) {
+    if (!this.audio || !this.isPlaying) {
+      this.currentIndex = targetIndex;
+      this.loadTrack(targetIndex);
+      return;
+    }
+
+    if (this.fadeInterval) clearInterval(this.fadeInterval);
+
+    let currentVol = this.audio.volume;
+    const step = 0.05;
+
+    // Fade Out rápido
+    this.fadeInterval = setInterval(() => {
+      currentVol = Math.max(0, currentVol - step);
+      if (this.audio) this.audio.volume = currentVol;
+
+      if (currentVol <= 0.02) {
+        clearInterval(this.fadeInterval);
+        this.loadTrack(targetIndex);
+        this.play().then(() => {
+          // Fade In
+          let inVol = 0.02;
+          this.fadeInterval = setInterval(() => {
+            inVol = Math.min(this.volume, inVol + step);
+            if (this.audio && !this.isMuted) this.audio.volume = inVol;
+            if (inVol >= this.volume) {
+              clearInterval(this.fadeInterval);
+            }
+          }, 60);
+        });
+      }
+    }, 50);
+  }
+}
+
+export const musicPlayer = new MusicPlayer();
+
