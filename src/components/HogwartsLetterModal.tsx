@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sparkles, LogIn, ArrowRight } from 'lucide-react';
+import { X, Sparkles, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { DiscordUser } from '../types';
 
@@ -15,7 +15,6 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
   isOpen,
   onClose,
   user,
-  onLogin,
   onProceedToForm,
 }) => {
   const [isBroken, setIsBroken] = useState(false);
@@ -35,12 +34,9 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
     });
   };
 
-  const handleAction = () => {
-    if (!user) {
-      onLogin();
-    } else {
-      onProceedToForm();
-    }
+  const handleAcceptLetter = () => {
+    onClose();
+    onProceedToForm();
   };
 
   return (
@@ -90,19 +86,19 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
               
               {/* Carimbo Postal Coruja */}
               <div className="flex justify-between items-start text-[10px] sm:text-xs text-[#6B4E3D] font-mono tracking-widest uppercase border-b border-[#8C6D58]/30 pb-3">
-                <span>EXPEDIÇÃO CORUJA · 1890</span>
-                <span>HOGSMEADE POST</span>
+                <span>CORUJA EXPRESSA · ANO 2000</span>
+                <span>AGÊNCIA CORREIOS DE HOGSMEADE</span>
               </div>
 
               {/* Endereço em Caligrafia de Tinta */}
               <div className="py-4 space-y-1.5 font-crimson text-[#2E1A11] text-base sm:text-lg italic leading-snug">
                 <p className="font-bold text-lg sm:text-xl not-italic font-cinzel text-[#160504]">
-                  {user ? `Ao(À) Sr(a). ${user.global_name || user.username}` : 'Ao(À) Futuro(a) Bruxo(a)'}
+                  {user ? `Ao(À) Sr(a). ${user.global_name || user.username}` : 'Ao(À) Destinatário(a) Convocado(a)'}
                 </p>
-                <p>O Quarto Debaixo das Escadas</p>
-                <p>Rua dos Alfeneiros, Nº 4</p>
+                <p>O Quarto Superior da Residência</p>
+                <p>Rua dos Alfeneiros, Nº 4, Little Whinging</p>
                 <p className="font-semibold text-xs tracking-wider not-italic uppercase text-[#8C2E16] pt-1">
-                  ACCIO Roleplay · Servidor Hogwarts Legacy
+                  Surrey · Grã-Bretanha
                 </p>
               </div>
 
@@ -141,60 +137,62 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
               
               {/* Cabeçalho da Carta */}
               <div className="text-center space-y-1.5 border-b-2 border-[#8C6D58]/30 pb-4">
-                <div className="w-10 h-10 rounded-full bg-[#160504] border border-[#FFC34F]/50 mx-auto flex items-center justify-center shadow">
-                  <span className="font-cinzel text-lg font-bold text-gold-gradient">A</span>
+                <div className="w-11 h-11 rounded-full bg-[#160504] border border-[#FFC34F]/50 mx-auto flex items-center justify-center shadow-lg">
+                  <span className="font-cinzel text-xl font-bold text-gold-gradient">A</span>
                 </div>
                 <h3 className="font-cinzel text-base sm:text-lg font-black tracking-wider text-[#160504] uppercase">
                   Escola de Magia e Bruxaria de Hogwarts
                 </h3>
                 <p className="text-[10px] text-[#6B4E3D] font-mono tracking-widest uppercase">
-                  Carta Oficial de Admissão · 1º Lote de Pioneiros
+                  Gabinete da Diretoria · Ano Letivo 2000-2001
+                </p>
+                <p className="text-[9px] text-[#8C2E16] italic font-crimson">
+                  Diretora: Minerva McGonagall · Ordem de Merlim, Primeira Classe
                 </p>
               </div>
 
               {/* Corpo da Carta */}
-              <div className="font-crimson text-sm sm:text-base text-[#2E1A11] space-y-3 leading-relaxed">
+              <div className="font-crimson text-sm sm:text-base text-[#2E1A11] space-y-3 leading-relaxed text-left">
                 <p className="font-bold text-[#160504]">
                   Prezado(a) Bruxo(a),
                 </p>
                 <p>
-                  Temos o prazer de informar que V. Sa. tem uma vaga reservada para a turma inaugural do servidor <strong className="text-[#8C2E16]">ACCIO Roleplay</strong>.
+                  Temos o imenso prazer de informar que V. Sa. possui uma vaga reservada na seleta convocação de pioneiros para o despertar de uma nova era nos salões do Castelo de Hogwarts.
                 </p>
                 <p>
-                  Antes de cruzar os portões do castelo e embarcar no Expresso de Hogwarts, é obrigatório registrar sua linhagem, escolher suas aspirações de Casa e relatar a crônica completa do seu personagem (mínimo de 3.000 palavras).
+                  Após a restauração da harmonia em nosso mundo no despontar deste novo milênio, as nobres torres escocesas voltam a acolher os herdeiros do dom arcano. Antes de cruzar os portões de ferro forjado e ocupar seu assento no Expresso de Hogwarts, faz-se imperativo lavrar em nossos registros a crônica detalhada de sua linhagem, aspirações de Casa e as virtudes de sua varinha mágica.
                 </p>
-                <p className="text-xs text-[#6B4E3D] italic pt-1 border-t border-[#8C6D58]/20">
-                  "O Expresso de Hogwarts parte pontualmente da Plataforma 9¾."
+                <p>
+                  Aguardamos sua resposta oficial por coruja com brevidade. O Expresso de Hogwarts partirá rigorosamente às onze horas da manhã da Plataforma 9¾ na Estação de King's Cross.
                 </p>
+                
+                <div className="pt-2 border-t border-[#8C6D58]/20 flex justify-between items-end text-xs text-[#6B4E3D]">
+                  <span className="italic">"Draco Dormiens Nunquam Titillandus"</span>
+                  <div className="text-right font-serif not-italic">
+                    <span className="block font-bold text-[#160504]">Minerva McGonagall</span>
+                    <span className="text-[10px]">Diretora de Hogwarts</span>
+                  </div>
+                </div>
               </div>
 
               {/* Ação Primária da Carta */}
               <div className="pt-3 space-y-2.5">
                 <button
                   type="button"
-                  onClick={handleAction}
+                  onClick={handleAcceptLetter}
                   className="w-full py-3.5 px-6 rounded-xl btn-accio-gold text-xs sm:text-sm font-bold flex items-center justify-center space-x-2 shadow-xl shadow-[#F47A16]/30 cursor-pointer"
                 >
-                  {!user ? (
-                    <>
-                      <LogIn className="w-4 h-4 text-[#160504]" />
-                      <span>Aceitar Convocação com Discord</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 text-[#160504]" />
-                      <span>Iniciar Ficha de Matrícula (Bruxo Conectado)</span>
-                      <ArrowRight className="w-4 h-4 text-[#160504]" />
-                    </>
-                  )}
+                  <Sparkles className="w-4 h-4 text-[#160504]" />
+                  <span>Aceitar Convocação & Redigir Ficha Oficial</span>
+                  <ArrowRight className="w-4 h-4 text-[#160504]" />
                 </button>
 
                 <button
                   type="button"
                   onClick={onClose}
-                  className="w-full py-2 text-xs text-[#6B4E3D] hover:text-[#160504] font-semibold transition"
+                  className="w-full py-2 text-xs text-[#6B4E3D] hover:text-[#160504] font-semibold transition cursor-pointer"
                 >
-                  Explorar o portal primeiro
+                  Explorar os terrenos de Hogwarts primeiro
                 </button>
               </div>
 
@@ -208,4 +206,3 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
     </div>
   );
 };
-

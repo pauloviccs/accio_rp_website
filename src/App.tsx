@@ -9,6 +9,7 @@ import { TicketModal } from './components/TicketModal';
 import { HogwartsLetterModal } from './components/HogwartsLetterModal';
 import { ValidationModal } from './components/ValidationModal';
 import { AdminPanelModal } from './components/AdminPanelModal';
+import { EnchantedSubmissionModal } from './components/EnchantedSubmissionModal';
 import { CharacterApplication, DiscordUser } from './types';
 import { LOCAL_STORAGE_LETTER_KEY } from './lib/constants';
 import {
@@ -29,6 +30,7 @@ export const App: React.FC = () => {
   const [isLetterOpen, setIsLetterOpen] = useState(false);
   const [isValidationOpen, setIsValidationOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isSubmissionSuccessOpen, setIsSubmissionSuccessOpen] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
   // Inicialização e Verificação de 1ª Visita
@@ -42,7 +44,7 @@ export const App: React.FC = () => {
     if (error || errorDesc) {
       const rawMsg = errorDesc || error || '';
       if (rawMsg.includes('exchange external code')) {
-        setAuthError('O Discord não autorizou a troca de credenciais (Unable to exchange external code). É necessário sincronizar o Client Secret e a Redirect URL no painel do Supabase Auth e Discord Developer Portal.');
+        setAuthError('O Discord não autorizou a troca de credenciais (Unable to exchange external code). É necessário sincronizar o Client Secret e a Redirect URL no painel do Supabase Auth e Discord Developer Portal. Você também pode vincular seu Discord diretamente na Ficha de Matrícula.');
       } else {
         setAuthError(decodeURIComponent(rawMsg));
       }
@@ -130,8 +132,8 @@ export const App: React.FC = () => {
     setApplication(created);
     setTotalRegistered((prev) => prev + 1);
     setIsFormOpen(false);
-    // Abre a página de validação de pré-registro com todos os detalhes
-    setIsValidationOpen(true);
+    // Abre a transição mágica da carta sendo selada e enviada com comprovante do Supabase
+    setIsSubmissionSuccessOpen(true);
   };
 
   const handleCloseLetter = () => {
@@ -181,11 +183,7 @@ export const App: React.FC = () => {
       <main className="relative z-10 flex-1">
         <Hero
           onOpenForm={() => {
-            if (!user) {
-              handleLogin();
-            } else {
-              setIsFormOpen(true);
-            }
+            setIsFormOpen(true);
           }}
           totalRegistered={totalRegistered}
           hasApplication={!!application}
@@ -219,6 +217,18 @@ export const App: React.FC = () => {
         user={user}
         onLogin={handleLogin}
         onSubmit={handleSubmitApplication}
+        onManualUserSet={(manualUser) => {
+          setUser(manualUser);
+        }}
+      />
+
+      {/* Transição Mágica da Carta Selada e Enviada à Escola */}
+      <EnchantedSubmissionModal
+        isOpen={isSubmissionSuccessOpen}
+        onClose={() => setIsSubmissionSuccessOpen(false)}
+        application={application}
+        onOpenValidation={() => setIsValidationOpen(true)}
+        onViewTicket={() => setIsTicketOpen(true)}
       />
 
       {/* Página / Modal de Validação de Pré-Registro */}

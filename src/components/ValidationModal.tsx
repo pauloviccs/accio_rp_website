@@ -32,15 +32,15 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-xl transition-all duration-300 overflow-y-auto">
-      
+
       {/* Luz ambiente de feitiço */}
-      <div 
+      <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[650px] h-[350px] sm:h-[650px] rounded-full blur-[120px] pointer-events-none opacity-30"
         style={{ backgroundColor: house.color }}
       />
 
       <div className="relative w-full max-w-2xl bg-[#160504]/95 border border-[#B83A0C]/40 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-2xl text-left my-auto max-h-[92vh] overflow-y-auto">
-        
+
         {/* Botão de Fechar */}
         <button
           onClick={onClose}

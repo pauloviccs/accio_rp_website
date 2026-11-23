@@ -109,3 +109,4 @@ export const sendRegistrationToDiscord = async (app: CharacterApplication): Prom
     return false;
   }
 };
+
