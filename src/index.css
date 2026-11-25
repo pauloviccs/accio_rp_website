@@ -349,13 +349,15 @@
 }
 
 /* ─── Moldura Ornamental ArcaneMP (.frame + .frame-corner) ────── */
-.frame {
-  isolation: isolate;
-  border: 1px solid var(--house-border);
-  background: var(--color-surface);
-  padding: 10px;
-  position: relative;
-  transition: border-color 0.5s ease, background-color 0.5s ease, box-shadow 0.4s ease;
+@layer components {
+  .frame {
+    isolation: isolate;
+    border: 1px solid var(--house-border);
+    background: var(--color-surface);
+    padding: 1.75rem;
+    position: relative;
+    transition: border-color 0.5s ease, background-color 0.5s ease, box-shadow 0.4s ease;
+  }
 }
 
 .frame::before {

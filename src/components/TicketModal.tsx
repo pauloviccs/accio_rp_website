@@ -83,8 +83,14 @@ export const TicketModal: React.FC<TicketModalProps> = ({
 
             <div className="bg-[#0d1422] p-3 border border-[var(--hair-soft)]">
               <span className="text-[10px] text-[#8b93a1] uppercase tracking-wider block">Casa Selecionada</span>
-              <span className="font-display text-sm block" style={{ color: house.secondaryColor }}>
-                {house.name}
+              <span className="font-display text-sm flex items-center gap-1.5 mt-0.5" style={{ color: house.secondaryColor }}>
+                <img
+                  src={house.emblemImg}
+                  alt={house.name}
+                  draggable={false}
+                  className="w-5 h-5 object-contain select-none pointer-events-none"
+                />
+                <span>{house.name}</span>
               </span>
             </div>
 

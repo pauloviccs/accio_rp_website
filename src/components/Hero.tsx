@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Sparkles, ArrowRight, ShieldCheck, Ticket, AlertTriangle, Compass } from 'lucide-react';
 import { TOTAL_PIONEER_SLOTS, TARGET_PHASE_END_DATE } from '../lib/constants';
 import { ArcaneFrame } from './ArcaneOrnaments';
@@ -49,6 +49,80 @@ export const Hero: React.FC<HeroProps> = ({
     return () => clearInterval(interval);
   }, [targetEndDate]);
 
+  const heroRef = useRef<HTMLElement | null>(null);
+  const bgDepthRef = useRef<HTMLDivElement | null>(null);
+  const castleDepthRef = useRef<SVGSVGElement | null>(null);
+
+  useEffect(() => {
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let rafId: number | null = null;
+
+    const animate = () => {
+      currentX += (targetX - currentX) * 0.06;
+      currentY += (targetY - currentY) * 0.06;
+
+      if (bgDepthRef.current) {
+        const tx = (-currentX * 20).toFixed(2);
+        const ty = (-currentY * 14).toFixed(2);
+        const rx = (currentY * 1.4).toFixed(3);
+        const ry = (-currentX * 1.8).toFixed(3);
+        bgDepthRef.current.style.transform = `perspective(1200px) translate3d(${tx}px, ${ty}px, 0) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.14)`;
+      }
+
+      if (castleDepthRef.current) {
+        const cx = (-currentX * 32).toFixed(2);
+        const cy = (-currentY * 18).toFixed(2);
+        castleDepthRef.current.style.transform = `translate3d(${cx}px, ${cy}px, 0) scale(1.06)`;
+      }
+
+      if (Math.abs(targetX - currentX) > 0.001 || Math.abs(targetY - currentY) > 0.001) {
+        rafId = requestAnimationFrame(animate);
+      } else {
+        rafId = null;
+      }
+    };
+
+    const schedule = () => {
+      if (rafId === null) {
+        rafId = requestAnimationFrame(animate);
+      }
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      const rect = heroRef.current?.getBoundingClientRect();
+      if (!rect || rect.width === 0 || rect.height === 0) return;
+      // Normaliza entre -1 e +1 relativo ao centro do viewport/hero
+      const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+      const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+      targetX = Math.max(-1, Math.min(1, nx));
+      targetY = Math.max(-1, Math.min(1, ny));
+      schedule();
+    };
+
+    const handlePointerLeave = () => {
+      targetX = 0;
+      targetY = 0;
+      schedule();
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    document.addEventListener('pointerleave', handlePointerLeave);
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('pointerleave', handlePointerLeave);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   const percentage = Math.min(Math.round((totalRegistered / TOTAL_PIONEER_SLOTS) * 100), 100);
 
   const scrollToBanners = () => {
@@ -57,20 +131,30 @@ export const Hero: React.FC<HeroProps> = ({
   };
 
   return (
-    <header id="top" className="hero">
-      {/* Camadas Atmosféricas ArcaneMP + Silhueta Gótica do Castelo + Emblema ACCIO */}
+    <header id="top" ref={heroRef} className="hero">
+      {/* Camadas Atmosféricas ArcaneMP + Emblema Full-Bleed + Silhueta com Profundidade por Pointer */}
       <div
         className="hero-image pointer-events-none select-none overflow-hidden"
         aria-hidden="true"
       >
         <div
-          className="absolute inset-0 opacity-20 mix-blend-screen bg-center bg-no-repeat bg-contain scale-110 blur-[1px]"
-          style={{ backgroundImage: 'url(/assets/logohigh_4x.jpg)' }}
-        />
+          ref={bgDepthRef}
+          className="absolute -inset-10 opacity-28 mix-blend-screen will-change-transform"
+          style={{ transform: 'perspective(1200px) translate3d(0px, 0px, 0) scale(1.14)' }}
+        >
+          <img
+            src="/assets/logohigh_4x.jpg"
+            alt=""
+            draggable={false}
+            className="w-full h-full object-cover object-center blur-[0.6px]"
+          />
+        </div>
         <svg
+          ref={castleDepthRef}
           viewBox="0 0 1440 720"
           preserveAspectRatio="xMidYMax slice"
-          className="absolute inset-x-0 bottom-0 w-full h-full opacity-55"
+          className="absolute inset-x-0 bottom-0 w-full h-full opacity-55 will-change-transform"
+          style={{ transform: 'translate3d(0px, 0px, 0) scale(1.06)' }}
           fill="#05080f"
         >
           <path d="M0 720V540l95-35 75 20 85-55 70 18 65-95 16-78 14 78 24 12 18-130 14 130 32-28 22-165 10-48 10 48 22 165 28 24 18-108 14 108 40 16 28-64 26 64 55-22 65 40 95-45 120 35 110-50 130 35 125-42 84 22V720H0z" />
@@ -147,11 +231,11 @@ export const Hero: React.FC<HeroProps> = ({
             </div>
 
             {/* Barra de Progresso Emoldurada do Livro da Admissão */}
-            <div className="mt-7 mx-auto max-w-md text-left">
-              <ArcaneFrame className="p-6 sm:p-7 bg-[#0a0f19]/90 backdrop-blur-md">
-                <div className="flex justify-between items-center text-xs font-semibold mb-2.5">
+            <div className="mt-7 mx-auto max-w-lg text-left">
+              <ArcaneFrame className="px-7 py-6 sm:px-8 sm:py-7 bg-[#0a0f19]/90 backdrop-blur-md">
+                <div className="flex justify-between items-center gap-4 text-xs font-semibold mb-3">
                   <span className="eyebrow text-[10px]">Livro da Admissão · 1º Lote</span>
-                  <span className="text-[var(--house-accent)] font-mono text-xs font-bold">
+                  <span className="text-[var(--house-accent)] font-mono text-xs font-bold shrink-0">
                     {totalRegistered} / {TOTAL_PIONEER_SLOTS} ({percentage}%)
                   </span>
                 </div>
@@ -167,7 +251,7 @@ export const Hero: React.FC<HeroProps> = ({
                   </div>
                 </div>
 
-                <p className="text-[11px] text-[#8b93a1] mt-2.5 flex items-start gap-1.5 leading-snug">
+                <p className="text-[11px] text-[#8b93a1] mt-3 flex items-start gap-2 leading-snug">
                   <AlertTriangle className="w-3.5 h-3.5 text-[var(--house-accent)] flex-shrink-0 mt-0.5" />
                   <span>Pré-Registro limitado por prazo estipulado ou até 100 vagas no Livro da Admissão.</span>
                 </p>

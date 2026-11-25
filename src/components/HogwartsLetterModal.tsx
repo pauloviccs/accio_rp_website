@@ -106,10 +106,10 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
                 <p className="font-bold text-lg sm:text-xl not-italic font-cinzel text-[#160504]">
                   {user ? `Ao(À) Sr(a). ${user.global_name || user.username}` : 'Ao(À) Destinatário(a) Convocado(a)'}
                 </p>
-                <p>O Quarto Superior da Residência</p>
-                <p>Rua dos Alfeneiros, Nº 4, Little Whinging</p>
+                <p>Aposentos da Nova Geração</p>
+                <p>Alameda do Vale Dourado, Nº 14, Godric's Hollow</p>
                 <p className="font-semibold text-xs tracking-wider not-italic uppercase text-[#8C2E16] pt-1">
-                  Surrey · Grã-Bretanha
+                  Grã-Bretanha · Era Pós-Batalha de Hogwarts
                 </p>
               </div>
 
@@ -159,7 +159,7 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
                   Gabinete da Diretoria · Ano Letivo 2000-2001
                 </p>
                 <p className="text-[9px] text-[#8C2E16] italic font-crimson">
-                  Diretora: Minerva McGonagall · Ordem de Merlim, Primeira Classe
+                  Diretor: Aurelian Vale Diggory · Ordem de Merlim, Primeira Classe
                 </p>
               </div>
 
@@ -172,7 +172,7 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
                   Temos o imenso prazer de informar que V. Sa. possui uma vaga reservada na seleta convocação de pioneiros para o despertar de uma nova era nos salões do Castelo de Hogwarts.
                 </p>
                 <p>
-                  Após a restauração da harmonia em nosso mundo no despontar deste novo milênio, as nobres torres escocesas voltam a acolher os herdeiros do dom arcano. Antes de cruzar os portões de ferro forjado e ocupar seu assento no Expresso de Hogwarts, faz-se imperativo lavrar em nossos registros a crônica detalhada de sua linhagem, aspirações de Casa e as virtudes de sua varinha mágica.
+                  Poucos anos após os acontecimentos decisivos da Batalha de Hogwarts, com as antigas muralhas restauradas e a paz novamente firmada no despontar dos anos 2000, as nobres torres escocesas voltam a acolher uma nova geração do dom arcano. Antes de cruzar os portões de ferro forjado e ocupar seu assento no Expresso de Hogwarts, faz-se imperativo lavrar em nossos registros a crônica detalhada de sua linhagem, aspirações de Casa e as virtudes de sua varinha mágica.
                 </p>
                 <p>
                   Aguardamos sua resposta oficial por coruja com brevidade. O Expresso de Hogwarts partirá rigorosamente às onze horas da manhã da Plataforma 9¾ na Estação de King's Cross.
@@ -181,8 +181,8 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
                 <div className="pt-2 border-t border-[#8C6D58]/20 flex justify-between items-end text-xs text-[#6B4E3D]">
                   <span className="italic">"Draco Dormiens Nunquam Titillandus"</span>
                   <div className="text-right font-serif not-italic">
-                    <span className="block font-bold text-[#160504]">Minerva McGonagall</span>
-                    <span className="text-[10px]">Diretora de Hogwarts</span>
+                    <span className="block font-bold text-[#160504]">Aurelian Vale Diggory</span>
+                    <span className="text-[10px]">Diretor de Hogwarts</span>
                   </div>
                 </div>
               </div>

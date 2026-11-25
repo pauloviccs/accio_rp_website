@@ -138,7 +138,9 @@ export async function generateAndDownloadCharacterPdf(
               <svg style="width: 14px; height: 14px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="#733E10" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               <span>Casa Designada</span>
             </div>
-            
+
+            <img src="${houseInfo.emblemImg}" alt="${houseInfo.name}" style="width: 56px; height: 56px; object-fit: contain; margin: 0 auto 6px auto; display: block;" />
+
             <div style="font-size: 20px; font-weight: 900; color: ${houseInfo.color}; margin-bottom: 2px;">
               ${houseInfo.name}
             </div>
@@ -239,19 +241,19 @@ export async function generateAndDownloadCharacterPdf(
           <div style="display: flex; gap: 24px; text-align: center;">
             <div>
               <div style="font-family: 'Brush Script MT', cursive, Georgia; font-size: 18px; color: #3B1207; margin-bottom: -4px;">
-                Albus Dumbledore
+                Aurelian Vale Diggory
               </div>
-              <div style="border-top: 1px solid #8A5A1B; width: 140px; font-size: 9px; text-transform: uppercase; color: #733E10; padding-top: 2px;">
+              <div style="border-top: 1px solid #8A5A1B; width: 150px; font-size: 9px; text-transform: uppercase; color: #733E10; padding-top: 2px;">
                 Diretor de Hogwarts
               </div>
             </div>
 
             <div>
               <div style="font-family: 'Brush Script MT', cursive, Georgia; font-size: 18px; color: #3B1207; margin-bottom: -4px;">
-                Minerva McGonagall
+                Conselho de Matrículas
               </div>
-              <div style="border-top: 1px solid #8A5A1B; width: 140px; font-size: 9px; text-transform: uppercase; color: #733E10; padding-top: 2px;">
-                Vice-Diretora
+              <div style="border-top: 1px solid #8A5A1B; width: 150px; font-size: 9px; text-transform: uppercase; color: #733E10; padding-top: 2px;">
+                Secretaria de Hogwarts
               </div>
             </div>
           </div>

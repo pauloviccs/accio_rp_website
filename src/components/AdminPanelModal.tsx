@@ -372,8 +372,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                           </td>
                           <td className="py-3 px-3 font-medium">{app.first_name} {app.last_name}</td>
                           <td className="py-3 px-3">
-                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold text-white" style={{ backgroundColor: house.color }}>
-                              {house.name}
+                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold text-white" style={{ backgroundColor: house.color }}>
+                              <img
+                                src={house.emblemImg}
+                                alt={house.name}
+                                draggable={false}
+                                className="w-3.5 h-3.5 object-contain select-none pointer-events-none"
+                              />
+                              <span>{house.name}</span>
                             </span>
                           </td>
                           <td className="py-3 px-3 text-[11px] text-[#FFF0B2]/70">{app.wand_wood} • {app.wand_core}</td>

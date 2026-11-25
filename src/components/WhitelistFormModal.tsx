@@ -18,6 +18,7 @@ import {
 } from '../lib/constants';
 import { soundManager, musicPlayer } from '../lib/audio';
 import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
+import { resolveDiscordAvatarUrl } from '../lib/supabase';
 
 interface WhitelistFormModalProps {
   isOpen: boolean;
@@ -242,7 +243,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
       const applicationPayload: CharacterApplication = {
         discord_id: activeUser.id,
         discord_username: activeUser.username,
-        discord_avatar: activeUser.avatar ? `https://cdn.discordapp.com/avatars/${activeUser.id}/${activeUser.avatar}.png` : undefined,
+        discord_avatar: resolveDiscordAvatarUrl(activeUser.id, activeUser.avatar) || undefined,
         first_name: formData.first_name.trim(),
         last_name: formData.last_name.trim(),
         birth_date: formData.birth_date,
@@ -874,12 +875,18 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                         className={`p-3.5 rounded-2xl border text-left transition-all duration-500 relative overflow-hidden cursor-pointer group ${
                           isSelected
                             ? 'border-[var(--house-accent)] ring-2 ring-[var(--house-accent)] shadow-xl scale-105'
-                            : 'border-white/10 hover:border-white/30 bg-[#160404]'
+                            : 'border-white/10 hover:border-white/30 bg-[#0d1422]'
                         }`}
                         style={{
                           background: isSelected ? house.bgGradient : undefined,
                         }}
                       >
+                        <img
+                          src={house.emblemImg}
+                          alt={house.name}
+                          draggable={false}
+                          className="w-11 h-11 object-contain mb-2 drop-shadow-[0_4px_10px_rgba(0,0,0,0.65)] select-none pointer-events-none"
+                        />
                         <span className="font-cinzel text-sm sm:text-base font-extrabold block text-white">
                           {house.name}
                         </span>
@@ -973,8 +980,14 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                   </div>
                   <div>
                     <span className="text-[var(--house-accent)] block font-semibold">Casa Solicitada:</span>
-                    <span className="text-sm font-cinzel font-bold text-[#FFF0B2]">
-                      {HOUSES[formData.preferred_house]?.name || formData.preferred_house}
+                    <span className="text-sm font-cinzel font-bold text-[#FFF0B2] inline-flex items-center gap-1.5 mt-0.5">
+                      <img
+                        src={HOUSES[formData.preferred_house]?.emblemImg}
+                        alt={HOUSES[formData.preferred_house]?.name}
+                        draggable={false}
+                        className="w-5 h-5 object-contain select-none pointer-events-none"
+                      />
+                      <span>{HOUSES[formData.preferred_house]?.name || formData.preferred_house}</span>
                     </span>
                   </div>
                   <div>

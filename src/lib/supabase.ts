@@ -225,6 +225,14 @@ export async function getUserRole(discordId: string): Promise<UserRoleRecord | n
   }
 }
 
+export function resolveDiscordAvatarUrl(discordId: string, avatar?: string | null): string | null {
+  if (!avatar) return null;
+  if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+    return avatar;
+  }
+  return `https://cdn.discordapp.com/avatars/${discordId}/${avatar}.png`;
+}
+
 export async function syncUserRole(user: DiscordUser): Promise<UserRoleRecord> {
   // Se for o fundador (PauloViccs) ou ID cadastrado, concede super_admin
   const isFounder =
@@ -248,7 +256,7 @@ export async function syncUserRole(user: DiscordUser): Promise<UserRoleRecord> {
     const newRecord: UserRoleRecord = {
       discord_id: user.id,
       discord_username: user.global_name || user.username,
-      discord_avatar: user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : null,
+      discord_avatar: resolveDiscordAvatarUrl(user.id, user.avatar),
       role: defaultRole,
       assigned_by: isFounder ? 'Fundador' : 'Primeiro Login Discord',
     };

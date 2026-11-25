@@ -10,16 +10,13 @@ import {
   Volume2,
   VolumeX,
   ChevronDown,
-  Flame,
-  Crown,
-  Feather,
   Plus,
   ArrowUpRight,
   MessagesSquare,
 } from 'lucide-react';
 import { soundManager } from '../lib/audio';
-import { DISCORD_INVITE_URL } from '../lib/constants';
-import { AccioEmblem } from './ArcaneOrnaments';
+import { DISCORD_INVITE_URL, HOUSES } from '../lib/constants';
+import { resolveDiscordAvatarUrl } from '../lib/supabase';
 
 interface NavbarProps {
   user: DiscordUser | null;
@@ -37,11 +34,11 @@ interface NavbarProps {
   onOpenAdmin: () => void;
 }
 
-const HOUSE_THEME_INFO: Record<HouseId, { name: string; icon: React.ComponentType<{ className?: string }>; color: string }> = {
-  gryffindor: { name: 'Grifinória', icon: Flame, color: '#b5675e' },
-  slytherin: { name: 'Sonserina', icon: Crown, color: '#6e9e81' },
-  ravenclaw: { name: 'Corvinal', icon: Feather, color: '#7e98bd' },
-  hufflepuff: { name: 'Lufa-Lufa', icon: Shield, color: '#c7ac63' },
+const HOUSE_THEME_INFO: Record<HouseId, { name: string; emblemImg: string; color: string }> = {
+  gryffindor: { name: 'Grifinória', emblemImg: HOUSES.gryffindor.emblemImg, color: '#b5675e' },
+  slytherin: { name: 'Sonserina', emblemImg: HOUSES.slytherin.emblemImg, color: '#6e9e81' },
+  ravenclaw: { name: 'Corvinal', emblemImg: HOUSES.ravenclaw.emblemImg, color: '#7e98bd' },
+  hufflepuff: { name: 'Lufa-Lufa', emblemImg: HOUSES.hufflepuff.emblemImg, color: '#c7ac63' },
 };
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -61,6 +58,13 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [isMuted, setIsMuted] = useState(soundManager.isMuted());
   const [isHouseDropdownOpen, setIsHouseDropdownOpen] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
+
+  const userAvatarUrl = user ? resolveDiscordAvatarUrl(user.id, user.avatar) : null;
+
+  useEffect(() => {
+    setAvatarFailed(false);
+  }, [user?.id, user?.avatar]);
 
   useEffect(() => {
     const unsubscribe = soundManager.subscribe((muted) => {
@@ -82,7 +86,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const currentTheme = HOUSE_THEME_INFO[activeHouseTheme] || HOUSE_THEME_INFO.gryffindor;
-  const CurrentHouseIcon = currentTheme.icon;
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -95,17 +98,16 @@ export const Navbar: React.FC<NavbarProps> = ({
     <nav aria-label="Navegação principal" className="site-nav">
       <div className="relative flex h-16 sm:h-18 items-center justify-between gap-3 px-4 sm:px-5 xl:h-20 xl:px-7">
 
-        {/* Logo & Brand (IDV ACCIO + Tipografia ArcaneMP) */}
+        {/* Brand Tipográfico (Sem Isotipo no Header) */}
         <a
           href="#top"
           onClick={(e) => {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className="flex shrink-0 items-center gap-3 text-white"
+          className="flex shrink-0 items-center text-white"
           aria-label="Início ACCIO Roleplay"
         >
-          <AccioEmblem className="size-9 shrink-0 drop-shadow-[0_0_12px_rgba(244,122,22,0.45)]" />
           <span className="nav-brand-name">
             ACCIO RP
             <small className="max-xl:hidden">A magia é melhor junta</small>
@@ -171,7 +173,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-[#0d1422] border border-[var(--house-border)] text-xs text-[#ece7da] hover:border-[var(--house-accent)] transition cursor-pointer"
               title="Trocar o tema da Casa de Hogwarts"
             >
-              <CurrentHouseIcon className="w-3.5 h-3.5 text-[var(--house-accent)]" />
+              <img
+                src={currentTheme.emblemImg}
+                alt={currentTheme.name}
+                draggable={false}
+                className="w-4 h-4 object-contain select-none pointer-events-none"
+              />
               <span className="font-display text-[11px] uppercase tracking-wider hidden xl:inline text-[var(--house-accent)]">
                 {currentTheme.name}
               </span>
@@ -185,7 +192,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </span>
                 {(Object.keys(HOUSE_THEME_INFO) as HouseId[]).map((hId) => {
                   const h = HOUSE_THEME_INFO[hId];
-                  const HouseIcon = h.icon;
                   const isCur = activeHouseTheme === hId;
                   return (
                     <button
@@ -198,7 +204,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                           : 'text-[#b6bbc5] hover:bg-white/5 hover:text-[#ece7da]'
                       }`}
                     >
-                      <HouseIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                      <img
+                        src={h.emblemImg}
+                        alt={h.name}
+                        draggable={false}
+                        className="w-4 h-4 object-contain flex-shrink-0 select-none pointer-events-none"
+                      />
                       <span>{h.name}</span>
                     </button>
                   );
@@ -258,11 +269,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
 
               <div className="flex items-center gap-2 bg-[#0d1422] border border-[var(--house-border)] px-2 py-1">
-                {user.avatar ? (
+                {userAvatarUrl && !avatarFailed ? (
                   <img
-                    src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`}
+                    src={userAvatarUrl}
                     alt={user.username}
-                    className="w-6 h-6 rounded-full border border-[var(--house-accent)] select-none pointer-events-none"
+                    onError={() => setAvatarFailed(true)}
+                    className="w-6 h-6 rounded-full border border-[var(--house-accent)] object-cover select-none pointer-events-none"
                     draggable={false}
                   />
                 ) : (

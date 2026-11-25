@@ -204,10 +204,16 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
                     Casa Solicitada
                   </span>
                   <span 
-                    className="inline-block px-2.5 py-0.5 rounded text-xs font-bold text-white shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-bold text-white shadow-sm"
                     style={{ backgroundColor: house.color }}
                   >
-                    {house.name}
+                    <img
+                      src={house.emblemImg}
+                      alt={house.name}
+                      draggable={false}
+                      className="w-4 h-4 object-contain select-none pointer-events-none"
+                    />
+                    <span>{house.name}</span>
                   </span>
                 </div>
               </div>

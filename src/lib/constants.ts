@@ -6,6 +6,7 @@ export const HOUSES: Record<HouseId, {
   secondaryColor: string;
   borderColor: string;
   bgGradient: string;
+  emblemImg: string;
   motto: string;
   traits: string[];
   description: string;
@@ -16,6 +17,7 @@ export const HOUSES: Record<HouseId, {
     secondaryColor: '#D4A844',
     borderColor: 'rgba(212, 168, 68, 0.4)',
     bgGradient: 'linear-gradient(135deg, rgba(156, 27, 40, 0.3) 0%, rgba(22, 5, 4, 0.8) 100%)',
+    emblemImg: '/assets/emblemas/gryffindor.png',
     motto: 'Onde habitam os corações indômitos',
     traits: ['Coragem', 'Determinação', 'Audácia'],
     description: 'Famosa por acolher os mais audaciosos e cavalheirescos bruxos de Hogwarts.'
@@ -26,6 +28,7 @@ export const HOUSES: Record<HouseId, {
     secondaryColor: '#A0A0A0',
     borderColor: 'rgba(160, 160, 160, 0.4)',
     bgGradient: 'linear-gradient(135deg, rgba(26, 107, 60, 0.3) 0%, rgba(22, 5, 4, 0.8) 100%)',
+    emblemImg: '/assets/emblemas/slytherin.png',
     motto: 'Aqueles de grande ambição e astúcia',
     traits: ['Astúcia', 'Engenhosidade', 'Liderança'],
     description: 'O lar dos que usam todos os meios para alcançar os cumes da grandeza mágica.'
@@ -36,6 +39,7 @@ export const HOUSES: Record<HouseId, {
     secondaryColor: '#946B2D',
     borderColor: 'rgba(148, 107, 45, 0.4)',
     bgGradient: 'linear-gradient(135deg, rgba(11, 79, 138, 0.3) 0%, rgba(22, 5, 4, 0.8) 100%)',
+    emblemImg: '/assets/emblemas/ravenclaw.png',
     motto: 'O espírito sem limites é o maior tesouro',
     traits: ['Sabedoria', 'Intelecto', 'Criatividade'],
     description: 'Onde o intelecto refinado e a curiosidade incessante desvendam os arcanos do mundo.'
@@ -46,6 +50,7 @@ export const HOUSES: Record<HouseId, {
     secondaryColor: '#2D2D2D',
     borderColor: 'rgba(212, 168, 68, 0.4)',
     bgGradient: 'linear-gradient(135deg, rgba(212, 168, 68, 0.3) 0%, rgba(22, 5, 4, 0.8) 100%)',
+    emblemImg: '/assets/emblemas/hufflepuff.png',
     motto: 'Onde a lealdade e o esforço imperam',
     traits: ['Lealdade', 'Paciência', 'Justiça'],
     description: 'Dedicados ao trabalho duro, à verdade e à honra fraternal entre todos os bruxos.'
@@ -53,8 +58,8 @@ export const HOUSES: Record<HouseId, {
 };
 
 export const WAND_WOODS = [
-  'Azevinho', 'Carvalho Inglês', 'Sabugueiro', 'Pereira', 'Teixo', 
-  'Jacarandá', 'Ébano', 'Cerejeira', 'Cedro', 'Freixo', 
+  'Azevinho', 'Carvalho Inglês', 'Sabugueiro', 'Pereira', 'Teixo',
+  'Jacarandá', 'Ébano', 'Cerejeira', 'Cedro', 'Freixo',
   'Videira', 'Salgueiro', 'Castanheira', 'Nogueira Negra', 'Espinheiro-Negro'
 ];
 
@@ -64,13 +69,13 @@ export const WAND_CORES = [
 ];
 
 export const WAND_LENGTHS = [
-  '9½ polegadas', '10 polegadas', '10¾ polegadas', '11 polegadas', 
-  '11½ polegadas', '12 polegadas', '12¼ polegadas', '13 polegadas', 
+  '9½ polegadas', '10 polegadas', '10¾ polegadas', '11 polegadas',
+  '11½ polegadas', '12 polegadas', '12¼ polegadas', '13 polegadas',
   '13½ polegadas', '14 polegadas'
 ];
 
 export const WAND_FLEXIBILITIES = [
-  'Inflexível', 'Rígida', 'Firme', 'Sólida', 
+  'Inflexível', 'Rígida', 'Firme', 'Sólida',
   'Levemente Elástica', 'Maleável', 'Surpreendentemente Flexível', 'Dócil'
 ];
 
@@ -209,7 +214,7 @@ export const OLLIVANDERS_CORE_LORE: Record<string, string> = {
 };
 
 // Link oficial de convite para o servidor Discord da comunidade
-export const DISCORD_INVITE_URL = 'https://discord.gg/Nr7Tfrbmg';
+export const DISCORD_INVITE_URL = 'https://discord.gg/bpp4ZhjBT';
 
 // Webhook oficial do Discord para notificações formatadas de inscrições
 export const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1573768137713651712/11WwWCSYtxX6X19_rwJZOK6fD-Vy3pMtCo1VBzS-fD1pa9eVel4AQccBJgbmsxbof6EP';

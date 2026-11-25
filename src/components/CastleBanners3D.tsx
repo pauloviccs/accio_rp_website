@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { Compass, Wand2, Sparkles, ChevronLeft, ChevronRight, Shield, Swords } from 'lucide-react';
+import { Compass, Wand2, Sparkles, ChevronLeft, ChevronRight, Swords } from 'lucide-react';
 import { soundManager } from '../lib/audio';
+import { HOUSES } from '../lib/constants';
 import { HouseId } from '../types';
 import { ArcaneFrame, ArcaneDivider } from './ArcaneOrnaments';
 
@@ -94,437 +95,330 @@ const HOUSES_DATA: HouseInfo[] = [
   },
 ];
 
-// Desenha a silhueta heráldica detalhada de cada animal sagrado de Hogwarts
-function drawHeraldicAnimal(
+interface BannerPalette {
+  top: string;
+  mid: string;
+  bottom: string;
+  border: string;
+  text: string;
+  glow: string;
+}
+
+const BANNER_CLOTH_PALETTES: Record<HouseId, BannerPalette> = {
+  gryffindor: {
+    top: '#64090C',
+    mid: '#841014',
+    bottom: '#440507',
+    border: '#E2B44B',
+    text: '#F7E9C8',
+    glow: 'rgba(255, 224, 140, 0.16)',
+  },
+  slytherin: {
+    top: '#0B351E',
+    mid: '#155833',
+    bottom: '#072213',
+    border: '#CDD5DC',
+    text: '#EFF4F7',
+    glow: 'rgba(210, 238, 225, 0.14)',
+  },
+  ravenclaw: {
+    top: '#0B2750',
+    mid: '#143D74',
+    bottom: '#071936',
+    border: '#CCA25B',
+    text: '#F5E7CE',
+    glow: 'rgba(170, 210, 255, 0.15)',
+  },
+  hufflepuff: {
+    top: '#966B0B',
+    mid: '#B68612',
+    bottom: '#694905',
+    border: '#F2DA8E',
+    text: '#FFF4D2',
+    glow: 'rgba(255, 236, 175, 0.18)',
+  },
+};
+
+const BANNER_TEX_W = 1024;
+const BANNER_TEX_H = 2048;
+const BANNER_NOTCH_DEPTH = 244;
+
+// Traça a silhueta em cauda de andorinha (ou borda paralela recuada por `inset`)
+function traceSwallowtailPath(
   ctx: CanvasRenderingContext2D,
-  houseId: HouseId,
-  cx: number,
-  cy: number,
-  scale: number,
-  fillColor: string,
-  strokeColor: string
+  w: number,
+  h: number,
+  notchDepth: number,
+  inset: number
 ) {
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.scale(scale, scale);
+  const halfW = w / 2;
+  const slope = notchDepth / halfW;
+  const normalFactor = Math.hypot(halfW, notchDepth) / halfW;
+  const verticalShift = inset * normalFactor;
 
-  ctx.fillStyle = fillColor;
-  ctx.strokeStyle = strokeColor;
-  ctx.lineWidth = 3.5;
-  ctx.lineJoin = 'round';
-  ctx.lineCap = 'round';
+  const left = inset;
+  const right = w - inset;
+  const top = inset;
+  const tipY = h - verticalShift - slope * inset;
+  const apexY = h - notchDepth - verticalShift;
 
-  ctx.shadowColor = strokeColor;
-  ctx.shadowBlur = 16;
+  ctx.beginPath();
+  ctx.moveTo(left, top);
+  ctx.lineTo(right, top);
+  ctx.lineTo(right, tipY);
+  ctx.lineTo(halfW, apexY);
+  ctx.lineTo(left, tipY);
+  ctx.closePath();
+}
 
-  if (houseId === 'gryffindor') {
-    // LEÃO RAMPANTE HERÁLDICO DE GRIFINÓRIA (CORAGEM & NOBREZA)
-    ctx.beginPath();
-    // Cabeça altiva coroada
-    ctx.moveTo(0, -95);
-    ctx.bezierCurveTo(20, -115, 50, -105, 55, -85);
-    ctx.bezierCurveTo(70, -80, 80, -65, 65, -50); // Focinho
-    ctx.lineTo(82, -45); // Nariz
-    ctx.lineTo(76, -30); // Boca aberta rugindo
-    ctx.lineTo(55, -34);
-    ctx.lineTo(58, -18); // Mandíbula inferior
-    // Juba abundante
-    ctx.bezierCurveTo(75, -5, 82, 20, 60, 40);
-    ctx.bezierCurveTo(75, 60, 55, 80, 35, 85);
-    // Pata dianteira direita erguida com garras
-    ctx.lineTo(45, -20);
-    ctx.lineTo(80, -35);
-    ctx.lineTo(95, -25);
-    ctx.lineTo(78, -10);
-    ctx.lineTo(45, 0);
-    // Pata dianteira esquerda
-    ctx.lineTo(60, 20);
-    ctx.lineTo(92, 35);
-    ctx.lineTo(105, 45);
-    ctx.lineTo(85, 55);
-    ctx.lineTo(40, 45);
-    // Tronco e flanco muscular
-    ctx.bezierCurveTo(30, 70, 25, 95, 10, 115);
-    // Pata traseira direita
-    ctx.bezierCurveTo(25, 135, 50, 150, 75, 155);
-    ctx.lineTo(88, 172);
-    ctx.lineTo(60, 175);
-    ctx.bezierCurveTo(35, 168, 18, 148, 5, 128);
-    // Pata traseira esquerda
-    ctx.bezierCurveTo(-15, 145, -30, 168, -38, 182);
-    ctx.lineTo(-55, 186);
-    ctx.lineTo(-32, 160);
-    ctx.bezierCurveTo(-22, 138, -10, 118, -4, 98);
-    // Cauda arqueada com laço heráldico duplo e tufo flamejante
-    ctx.bezierCurveTo(-25, 75, -60, 55, -75, 15);
-    ctx.bezierCurveTo(-85, -25, -70, -70, -42, -90);
-    ctx.bezierCurveTo(-30, -108, -50, -125, -72, -118); // Tufo da cauda
-    ctx.bezierCurveTo(-88, -112, -82, -90, -70, -80);
-    ctx.bezierCurveTo(-55, -65, -50, -30, -55, 5);
-    ctx.bezierCurveTo(-50, 45, -28, 80, -10, 100);
-    // Dorso
-    ctx.bezierCurveTo(-20, 60, -22, 18, -12, -22);
-    ctx.bezierCurveTo(-8, -55, -4, -80, 0, -95);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+// Gera mapa de relevo (bump) sutil simulando fios de veludo e linho trançado
+function createFabricBumpTexture(): THREE.CanvasTexture {
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    ctx.fillStyle = '#808080';
+    ctx.fillRect(0, 0, size, size);
 
-    // Coroa real dourada
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#FFE27A';
-    ctx.beginPath();
-    ctx.moveTo(10, -98);
-    ctx.lineTo(20, -116);
-    ctx.lineTo(30, -102);
-    ctx.lineTo(40, -120);
-    ctx.lineTo(50, -102);
-    ctx.lineTo(60, -116);
-    ctx.lineTo(55, -92);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-  } else if (houseId === 'slytherin') {
-    // SERPENTE HERÁLDICA DE SONSERINA (ASTÚCIA & PODER)
-    ctx.beginPath();
-    // Cabeça da cobra naja majestosa
-    ctx.moveTo(35, -100);
-    ctx.bezierCurveTo(60, -115, 88, -95, 88, -75);
-    ctx.bezierCurveTo(88, -55, 60, -48, 48, -55);
-    // Curvas sinuosas do corpo
-    ctx.bezierCurveTo(80, -25, 95, 15, 68, 50);
-    ctx.bezierCurveTo(40, 85, -25, 75, -40, 115);
-    ctx.bezierCurveTo(-50, 145, -28, 180, 18, 185);
-    ctx.bezierCurveTo(60, 190, 92, 158, 85, 125);
-    ctx.bezierCurveTo(78, 102, 54, 98, 46, 115);
-    ctx.bezierCurveTo(40, 132, 58, 148, 45, 158);
-    ctx.bezierCurveTo(32, 165, 8, 160, -2, 142);
-    ctx.bezierCurveTo(-12, 125, -10, 98, 15, 78);
-    ctx.bezierCurveTo(48, 55, 62, 25, 50, -8);
-    ctx.bezierCurveTo(38, -38, 12, -42, 2, -15);
-    ctx.bezierCurveTo(-12, 18, -38, 12, -48, -15);
-    ctx.bezierCurveTo(-58, -48, -35, -82, 2, -92);
-    ctx.bezierCurveTo(15, -98, 25, -98, 35, -100);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Língua bífida em rubi
-    ctx.strokeStyle = '#FF3B30';
-    ctx.lineWidth = 3.5;
-    ctx.beginPath();
-    ctx.moveTo(85, -72);
-    ctx.lineTo(110, -70);
-    ctx.lineTo(122, -80);
-    ctx.moveTo(110, -70);
-    ctx.lineTo(122, -62);
-    ctx.stroke();
-
-    // Olho esmeralda brilhante
-    ctx.fillStyle = '#00FF66';
-    ctx.shadowColor = '#00FF66';
-    ctx.shadowBlur = 12;
-    ctx.beginPath();
-    ctx.arc(68, -82, 5, 0, Math.PI * 2);
-    ctx.fill();
-
-  } else if (houseId === 'ravenclaw') {
-    // ÁGUIA DE CORVINAL (SABEDORIA & VISÃO)
-    ctx.beginPath();
-    ctx.moveTo(0, -100);
-    ctx.bezierCurveTo(18, -112, 40, -100, 40, -82);
-    ctx.lineTo(62, -76); // Bico adunco
-    ctx.lineTo(42, -64);
-    ctx.lineTo(26, -66);
-    // Asa Direita imponente
-    ctx.bezierCurveTo(50, -78, 88, -96, 125, -90);
-    ctx.bezierCurveTo(135, -72, 112, -50, 102, -38);
-    ctx.bezierCurveTo(124, -32, 128, -10, 112, 0);
-    ctx.bezierCurveTo(122, 18, 112, 38, 90, 42);
-    ctx.bezierCurveTo(72, 45, 52, 32, 42, 20);
-    // Corpo e garras
-    ctx.bezierCurveTo(36, 48, 36, 80, 25, 112);
-    ctx.lineTo(40, 132);
-    ctx.lineTo(20, 126);
-    // Cauda em leque heráldico
-    ctx.bezierCurveTo(15, 148, 22, 175, 34, 195);
-    ctx.lineTo(0, 184);
-    ctx.lineTo(-34, 195);
-    ctx.bezierCurveTo(-22, 175, -15, 148, -20, 126);
-    // Garra esquerda
-    ctx.lineTo(-40, 132);
-    ctx.lineTo(-25, 112);
-    // Asa Esquerda majestosa
-    ctx.bezierCurveTo(-36, 80, -36, 48, -42, 20);
-    ctx.bezierCurveTo(-52, 32, -72, 45, -90, 42);
-    ctx.bezierCurveTo(-112, 38, -122, 18, -112, 0);
-    ctx.bezierCurveTo(-128, -10, -124, -32, -102, -38);
-    ctx.bezierCurveTo(-112, -50, -135, -72, -125, -90);
-    ctx.bezierCurveTo(-88, -96, -50, -78, -26, -66);
-    ctx.bezierCurveTo(-20, -88, -15, -100, 0, -100);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Olho dourado reluzente
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#FFE27A';
-    ctx.beginPath();
-    ctx.arc(16, -84, 4, 0, Math.PI * 2);
-    ctx.fill();
-
-  } else {
-    // TEXUGO DE LUFA-LUFA (LEALDADE & FORÇA)
-    ctx.beginPath();
-    ctx.moveTo(-45, -35);
-    ctx.lineTo(-80, -20);
-    ctx.lineTo(-68, -2);
-    ctx.bezierCurveTo(-52, 4, -42, 14, -36, 30);
-    // Pata dianteira forte
-    ctx.lineTo(-48, 72);
-    ctx.lineTo(-70, 102);
-    ctx.lineTo(-48, 96);
-    ctx.lineTo(-26, 60);
-    // Peito e dorso musculoso
-    ctx.bezierCurveTo(-10, 70, 18, 74, 40, 68);
-    // Pata traseira
-    ctx.lineTo(52, 102);
-    ctx.lineTo(68, 126);
-    ctx.lineTo(82, 120);
-    ctx.bezierCurveTo(72, 88, 66, 62, 70, 42);
-    // Cauda
-    ctx.bezierCurveTo(86, 48, 102, 42, 114, 26);
-    ctx.bezierCurveTo(124, 10, 112, -6, 90, -12);
-    // Dorso largo
-    ctx.bezierCurveTo(75, -28, 48, -44, 22, -50);
-    ctx.bezierCurveTo(-6, -55, -28, -48, -45, -35);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Faixa branca sagrada do texugo
-    ctx.fillStyle = '#FFFFFF';
-    ctx.beginPath();
-    ctx.moveTo(-74, -22);
-    ctx.bezierCurveTo(-52, -36, -26, -36, 2, -28);
-    ctx.lineTo(-4, -16);
-    ctx.bezierCurveTo(-30, -23, -52, -18, -72, -10);
-    ctx.closePath();
-    ctx.fill();
-
-    // Olho vivo
-    ctx.fillStyle = '#0D0202';
-    ctx.beginPath();
-    ctx.arc(-42, -22, 4, 0, Math.PI * 2);
-    ctx.fill();
+    for (let y = 0; y < size; y += 4) {
+      ctx.fillStyle = y % 8 === 0 ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.14)';
+      ctx.fillRect(0, y, size, 2);
+    }
+    for (let x = 0; x < size; x += 4) {
+      ctx.fillStyle = x % 8 === 0 ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)';
+      ctx.fillRect(x, 0, 2, size);
+    }
   }
+  const bump = new THREE.CanvasTexture(canvas);
+  bump.wrapS = THREE.RepeatWrapping;
+  bump.wrapT = THREE.RepeatWrapping;
+  bump.repeat.set(8, 16);
+  return bump;
+}
+
+// Desenha a tapeçaria completa do estandarte 3D com o emblema oficial da casa em proporção 1:1
+function paintBannerCanvas(
+  ctx: CanvasRenderingContext2D,
+  house: HouseInfo,
+  emblemImg: HTMLImageElement | null
+) {
+  const W = BANNER_TEX_W;
+  const H = BANNER_TEX_H;
+  const centerX = W / 2;
+  const palette = BANNER_CLOTH_PALETTES[house.id];
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.save();
+
+  // Recorte real da cauda em V com transparência fora da tapeçaria
+  traceSwallowtailPath(ctx, W, H, BANNER_NOTCH_DEPTH, 0);
+  ctx.clip();
+
+  // 1. Base de veludo rico sem escurecimento artificial no recorte
+  const baseGrad = ctx.createLinearGradient(0, 0, 0, H);
+  baseGrad.addColorStop(0, palette.top);
+  baseGrad.addColorStop(0.45, palette.mid);
+  baseGrad.addColorStop(1, palette.bottom);
+  ctx.fillStyle = baseGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Profundidade cilíndrica nas laterais e sombra projetada pela vara superior
+  const sideShade = ctx.createLinearGradient(0, 0, W, 0);
+  sideShade.addColorStop(0, 'rgba(0, 0, 0, 0.34)');
+  sideShade.addColorStop(0.14, 'rgba(0, 0, 0, 0.06)');
+  sideShade.addColorStop(0.5, 'rgba(255, 255, 255, 0.04)');
+  sideShade.addColorStop(0.86, 'rgba(0, 0, 0, 0.06)');
+  sideShade.addColorStop(1, 'rgba(0, 0, 0, 0.34)');
+  ctx.fillStyle = sideShade;
+  ctx.fillRect(0, 0, W, H);
+
+  const rodShadow = ctx.createLinearGradient(0, 0, 0, 120);
+  rodShadow.addColorStop(0, 'rgba(0, 0, 0, 0.55)');
+  rodShadow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = rodShadow;
+  ctx.fillRect(0, 0, W, 120);
+
+  // 2. Padronagem sutil de losangos em damasco medieval
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.032)';
+  ctx.lineWidth = 2;
+  const step = 64;
+  for (let x = -W; x < H + W; x += step) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x + H, H);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x + H, 0);
+    ctx.lineTo(x, H);
+    ctx.stroke();
+  }
+
+  // 3. Borda Ornamental Dupla acompanhando perfeitamente o recorte em V
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetY = 3;
+
+  traceSwallowtailPath(ctx, W, H, BANNER_NOTCH_DEPTH, 32);
+  ctx.strokeStyle = palette.border;
+  ctx.lineWidth = 11;
+  ctx.lineJoin = 'miter';
+  ctx.stroke();
+
+  traceSwallowtailPath(ctx, W, H, BANNER_NOTCH_DEPTH, 58);
+  ctx.strokeStyle = palette.border;
+  ctx.lineWidth = 3.5;
+  ctx.stroke();
+  ctx.restore();
+
+  // Cantoneiras ornamentais nos cantos superiores
+  const cornerIn = 58;
+  const cornerLen = 42;
+  ctx.fillStyle = palette.border;
+  ctx.fillRect(cornerIn, cornerIn, cornerLen, 8);
+  ctx.fillRect(cornerIn, cornerIn, 8, cornerLen);
+  ctx.fillRect(W - cornerIn - cornerLen, cornerIn, cornerLen, 8);
+  ctx.fillRect(W - cornerIn - 8, cornerIn, 8, cornerLen);
+
+  // 4. Tipografia Real da Casa no Topo
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.font = '700 84px "Cinzel", Georgia, serif';
+  ctx.fillStyle = palette.text;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetY = 4;
+  ctx.fillText(house.name, centerX, 245, 820);
+
+  // Fio divisor e losango central
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+  ctx.strokeStyle = palette.border;
+  ctx.globalAlpha = 0.72;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(centerX - 180, 308);
+  ctx.lineTo(centerX - 18, 308);
+  ctx.moveTo(centerX + 18, 308);
+  ctx.lineTo(centerX + 180, 308);
+  ctx.stroke();
+
+  ctx.fillStyle = palette.border;
+  ctx.beginPath();
+  ctx.moveTo(centerX, 300);
+  ctx.lineTo(centerX + 8, 308);
+  ctx.lineTo(centerX, 316);
+  ctx.lineTo(centerX - 8, 308);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.globalAlpha = 0.88;
+  ctx.font = '600 22px "Cinzel", Georgia, serif';
+  ctx.fillStyle = palette.text;
+  ctx.fillText(house.colors.toUpperCase(), centerX, 354, 780);
+  ctx.restore();
+
+  // 5. Halo suave atrás do brasão para leitura impecável na tapeçaria
+  const emblemCenterY = 985;
+  const halo = ctx.createRadialGradient(centerX, emblemCenterY, 40, centerX, emblemCenterY, 430);
+  halo.addColorStop(0, palette.glow);
+  halo.addColorStop(0.65, 'rgba(0, 0, 0, 0.10)');
+  halo.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = halo;
+  ctx.fillRect(centerX - 440, emblemCenterY - 460, 880, 920);
+
+  // 6. Emblema Oficial da Casa (sem distorção, centralizado e integrado ao tecido)
+  if (emblemImg && emblemImg.naturalWidth > 0 && emblemImg.naturalHeight > 0) {
+    const maxEmblemW = 780;
+    const maxEmblemH = 980;
+    const scale = Math.min(maxEmblemW / emblemImg.naturalWidth, maxEmblemH / emblemImg.naturalHeight);
+    const drawW = emblemImg.naturalWidth * scale;
+    const drawH = emblemImg.naturalHeight * scale;
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.72)';
+    ctx.shadowBlur = 24;
+    ctx.shadowOffsetY = 10;
+    ctx.drawImage(
+      emblemImg,
+      centerX - drawW / 2,
+      emblemCenterY - drawH / 2,
+      drawW,
+      drawH
+    );
+    ctx.restore();
+  }
+
+  // 7. Lema Latino Canônico abaixo do brasão
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'italic 600 34px "Crimson Text", Georgia, serif';
+  ctx.fillStyle = palette.text;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetY = 3;
+  ctx.globalAlpha = 0.92;
+  ctx.fillText(`"${house.latinMotto}"`, centerX, 1605, 760);
+  ctx.restore();
+
+  // 8. Sobreposição sutil de trama têxtil e vinheta para unificar emblema e pano
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+  for (let i = 0; i < W; i += 6) {
+    ctx.fillRect(i, 0, 2, H);
+  }
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
+  for (let j = 0; j < H; j += 6) {
+    ctx.fillRect(0, j, W, 2);
+  }
+  ctx.restore();
 
   ctx.restore();
 }
 
-// Gerador de textura cinematográfica 1024x2048 com tecelagem damasco e brasão heráldico
-function createBannerTexture(house: HouseInfo): THREE.CanvasTexture {
+// Cria CanvasTexture 1024x2048 sRGB e re-renderiza quando o emblema oficial e as fontes carregam
+function createBannerTexture(
+  house: HouseInfo,
+  isDisposed: () => boolean
+): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
-  canvas.width = 1024;
-  canvas.height = 2048;
+  canvas.width = BANNER_TEX_W;
+  canvas.height = BANNER_TEX_H;
   const ctx = canvas.getContext('2d');
-  if (!ctx) return new THREE.CanvasTexture(canvas);
-
-  // 1. Base do tecido com rico degradê de veludo e damasco
-  const grad = ctx.createLinearGradient(0, 0, 1024, 2048);
-  grad.addColorStop(0, house.primaryColor);
-  grad.addColorStop(0.3, house.primaryColor);
-  grad.addColorStop(0.65, house.secondaryColor);
-  grad.addColorStop(1, '#080101');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 1024, 2048);
-
-  // 2. Textura sutil de losangos medievais bordados (Damasco)
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
-  ctx.lineWidth = 2;
-  const step = 64;
-  for (let x = -1024; x < 2048; x += step) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x + 2048, 2048);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(x + 2048, 0);
-    ctx.lineTo(x, 2048);
-    ctx.stroke();
-  }
-
-  // Trama vertical de fios de seda
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
-  for (let i = 0; i < 1024; i += 8) {
-    ctx.fillRect(i, 0, 3, 2048);
-  }
-
-  // 3. Moldura Ornamental Real Dupla
-  ctx.strokeStyle = house.accentColor;
-  ctx.lineWidth = 28;
-  ctx.strokeRect(40, 40, 944, 1968);
-
-  ctx.lineWidth = 8;
-  ctx.strokeRect(80, 80, 864, 1888);
-
-  // Cantoneiras góticas medievais
-  const cornerSize = 90;
-  [[40, 40], [984 - cornerSize, 40]].forEach(([cx, cy]) => {
-    ctx.fillStyle = house.accentColor;
-    ctx.fillRect(cx, cy, cornerSize, 16);
-    ctx.fillRect(cx, cy, 16, cornerSize);
-  });
-
-  // 4. Recorte triangular na cauda inferior (V-shape canônico)
-  ctx.fillStyle = '#0A0202';
-  ctx.beginPath();
-  ctx.moveTo(0, 2048);
-  ctx.lineTo(512, 1840);
-  ctx.lineTo(1024, 2048);
-  ctx.closePath();
-  ctx.fill();
-
-  // Borda na cauda recortada
-  ctx.strokeStyle = house.accentColor;
-  ctx.lineWidth = 22;
-  ctx.beginPath();
-  ctx.moveTo(40, 2010);
-  ctx.lineTo(512, 1830);
-  ctx.lineTo(984, 2010);
-  ctx.stroke();
-
-  // Franjas douradas na base
-  ctx.strokeStyle = house.accentColor;
-  ctx.lineWidth = 4;
-  for (let fx = 50; fx < 974; fx += 16) {
-    const fy = fx <= 512 
-      ? 2010 - ((fx - 40) / 472) * 180 
-      : 1830 + ((fx - 512) / 472) * 180;
-    ctx.beginPath();
-    ctx.moveTo(fx, fy);
-    ctx.lineTo(fx, fy + 24);
-    ctx.stroke();
-  }
-
-  const centerX = 512;
-
-  // 5. Cabeçalho Majestoso com Nome da Casa
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-
-  // Fita de topo
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
-  ctx.fillRect(110, 210, 804, 130);
-  ctx.strokeStyle = house.accentColor;
-  ctx.lineWidth = 4;
-  ctx.strokeRect(110, 210, 804, 130);
-
-  // Nome da Casa em Cinzel Dourado
-  ctx.font = '900 86px "Cinzel", Georgia, serif';
-  ctx.fillStyle = house.accentColor;
-  ctx.shadowColor = house.accentColor;
-  ctx.shadowBlur = 24;
-  ctx.fillText(house.name.toUpperCase(), centerX, 275);
-
-  ctx.shadowBlur = 0;
-  ctx.font = 'bold 30px "Cinzel", sans-serif';
-  ctx.fillStyle = '#FFF0B2';
-  ctx.letterSpacing = '6px';
-  ctx.fillText(`• ${house.colors.toUpperCase()} •`, centerX, 385);
-  ctx.restore();
-
-  // 6. Grande Escudo Heráldico Central
-  const centerY = 960;
-  ctx.save();
-
-  // Halo de luz mágico ao redor do escudo
-  const halo = ctx.createRadialGradient(centerX, centerY, 80, centerX, centerY, 420);
-  halo.addColorStop(0, 'rgba(255, 235, 160, 0.22)');
-  halo.addColorStop(1, 'rgba(0, 0, 0, 0)');
-  ctx.fillStyle = halo;
-  ctx.fillRect(centerX - 420, centerY - 420, 840, 840);
-
-  // Forma do Escudo Gótico Medieval
-  const sw = 330;
-  const sh = 420;
-  ctx.beginPath();
-  ctx.moveTo(centerX - sw, centerY - sh);
-  ctx.lineTo(centerX + sw, centerY - sh);
-  ctx.lineTo(centerX + sw, centerY + sh * 0.3);
-  ctx.bezierCurveTo(centerX + sw, centerY + sh * 0.85, centerX + sw * 0.35, centerY + sh * 1.1, centerX, centerY + sh * 1.25);
-  ctx.bezierCurveTo(centerX - sw * 0.35, centerY + sh * 1.1, centerX - sw, centerY + sh * 0.85, centerX - sw, centerY + sh * 0.3);
-  ctx.closePath();
-
-  // Fundo do escudo
-  const shieldGrad = ctx.createLinearGradient(centerX - sw, centerY - sh, centerX + sw, centerY + sh);
-  shieldGrad.addColorStop(0, '#160504');
-  shieldGrad.addColorStop(1, '#080101');
-  ctx.fillStyle = shieldGrad;
-  ctx.fill();
-
-  // Borda espessa ornamental do escudo
-  ctx.lineWidth = 18;
-  ctx.strokeStyle = house.accentColor;
-  ctx.shadowColor = house.accentColor;
-  ctx.shadowBlur = 18;
-  ctx.stroke();
-
-  // Borda interna fina
-  ctx.lineWidth = 4;
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-  ctx.shadowBlur = 0;
-  ctx.stroke();
-
-  // 7. Desenhar o Animal Heráldico Sagrado dentro do escudo
-  drawHeraldicAnimal(
-    ctx,
-    house.id,
-    centerX,
-    centerY + 10,
-    1.65,
-    house.accentColor,
-    '#FFFFFF'
-  );
-
-  // Letra Monograma clássica no rodapé do escudo
-  ctx.font = '900 68px "Cinzel", serif';
-  ctx.fillStyle = '#FFF0B2';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.shadowColor = house.accentColor;
-  ctx.shadowBlur = 15;
-  ctx.fillText(house.name.charAt(0), centerX, centerY + 380);
-
-  ctx.restore();
-
-  // 8. Faixa em Pergaminho com Lema Latino Canônico
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-
-  // Fita de lema
-  const mottoY = 1660;
-  ctx.fillStyle = 'rgba(12, 3, 3, 0.85)';
-  ctx.beginPath();
-  ctx.roundRect(140, mottoY - 45, 744, 90, 16);
-  ctx.fill();
-  ctx.strokeStyle = house.accentColor;
-  ctx.lineWidth = 3.5;
-  ctx.stroke();
-
-  ctx.font = 'italic bold 44px "Crimson Text", Georgia, serif';
-  ctx.fillStyle = house.accentColor;
-  ctx.shadowColor = house.accentColor;
-  ctx.shadowBlur = 12;
-  ctx.fillText(`"${house.latinMotto}"`, centerX, mottoY);
-
-  ctx.restore();
-
   const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = 16;
+
+  if (!ctx) return texture;
+
+  let loadedImg: HTMLImageElement | null = null;
+  const redraw = () => {
+    if (isDisposed()) return;
+    paintBannerCanvas(ctx, house, loadedImg);
+    texture.needsUpdate = true;
+  };
+
+  redraw();
+
+  const img = new Image();
+  img.onload = () => {
+    loadedImg = img;
+    redraw();
+  };
+  img.src = HOUSES[house.id].emblemImg;
+
+  if (typeof document !== 'undefined' && document.fonts?.ready) {
+    document.fonts.ready.then(() => {
+      redraw();
+    });
+  }
+
   return texture;
 }
 
@@ -536,13 +430,21 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
   const [selectedHouse, setSelectedHouse] = useState<HouseInfo>(HOUSES_DATA[0]);
   const [activeHouseIndex, setActiveHouseIndex] = useState<number>(0);
   const targetCamX = useRef<number>(0);
+  const selectedHouseIdRef = useRef<HouseId>(selectedHouse.id);
+  const activeHouseIndexRef = useRef<number>(activeHouseIndex);
+  const onSelectHouseRef = useRef(onSelectHouse);
+
+  selectedHouseIdRef.current = selectedHouse.id;
+  activeHouseIndexRef.current = activeHouseIndex;
+  onSelectHouseRef.current = onSelectHouse;
 
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
 
+    let isDisposed = false;
     const width = container.clientWidth;
-    const isMobile = width < 768;
+    let isMobile = width < 768;
     const isTablet = width >= 768 && width < 1100;
     const height = isMobile ? 540 : isTablet ? 620 : 720;
 
@@ -551,16 +453,16 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
 
     // 2. Câmera com FOV e distância perfeitos para proporção majestosa
     const camera = new THREE.PerspectiveCamera(44, width / height, 0.1, 100);
-    
+
     // Cálculo trigonométrico exato para enquadrar perfeitamente os 4 estandartes com margem nobre
     const computeOptimalZ = (w: number, h: number, mobile: boolean) => {
-      if (mobile) return 7.8;
+      if (mobile) return 7.6;
       const aspect = w / h;
       const fovRad = (44 * Math.PI) / 180;
-      const totalSpanWithMargins = 13.0;
+      const totalSpanWithMargins = 12.8;
       const hFov = 2 * Math.atan(Math.tan(fovRad / 2) * aspect);
       const zByWidth = (totalSpanWithMargins / 2) / Math.tan(hFov / 2);
-      return Math.max(8.8, zByWidth);
+      return Math.max(8.5, zByWidth);
     };
 
     const cameraZ = computeOptimalZ(width, height, isMobile);
@@ -575,29 +477,29 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.25;
+    renderer.toneMappingExposure = 1.22;
     container.appendChild(renderer.domElement);
 
     // 4. Sistema de Iluminação Medieval de Hogwarts
-    const ambientLight = new THREE.AmbientLight(0xfff1cf, 0.9);
+    const ambientLight = new THREE.AmbientLight(0xfff3d8, 1.05);
     scene.add(ambientLight);
 
     // Grande tocha dourada principal
-    const mainTorch = new THREE.DirectionalLight(0xffd885, 2.5);
+    const mainTorch = new THREE.DirectionalLight(0xffdca0, 2.2);
     mainTorch.position.set(0, 6, 7);
     scene.add(mainTorch);
 
     // Fogueira quente no piso do salão
-    const hearthLight = new THREE.PointLight(0xff7722, 2.0, 30);
+    const hearthLight = new THREE.PointLight(0xff8433, 1.7, 30);
     hearthLight.position.set(0, -5, 5);
     scene.add(hearthLight);
 
     // Luzes pontuais coloridas suaves nas extremidades
-    const blueGlow = new THREE.PointLight(0x4a90e2, 1.2, 18);
+    const blueGlow = new THREE.PointLight(0x4a90e2, 1.1, 18);
     blueGlow.position.set(-8, 3, 3);
     scene.add(blueGlow);
 
-    const greenGlow = new THREE.PointLight(0x2ecc71, 1.2, 18);
+    const greenGlow = new THREE.PointLight(0x2ecc71, 1.1, 18);
     greenGlow.position.set(8, 3, 3);
     scene.add(greenGlow);
 
@@ -621,92 +523,105 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
     const dustParticles = new THREE.Points(particleGeom, particleMat);
     scene.add(dustParticles);
 
-    // 6. Construção dos 4 Estandartes com Proporções Amplas e Espaçamento Nobre
+    // 6. Construção dos 4 Estandartes com Proporção Exata 1:2 (Zero Distorção)
     const bannerMeshes: {
+      group: THREE.Group;
       mesh: THREE.Mesh;
       initialPos: THREE.Vector3;
       house: HouseInfo;
       geom: THREE.PlaneGeometry;
+      mat: THREE.MeshStandardMaterial;
+      texture: THREE.CanvasTexture;
       origPos: Float32Array;
       index: number;
     }[] = [];
 
-    // Dimensões majestosas com aspecto medieval autêntico
-    const bannerWidth = 2.15;
-    const bannerHeight = 4.85;
+    const fabricBumpTexture = createFabricBumpTexture();
+
+    // Aspect ratio exatamente 1:2 igual ao canvas 1024x2048
+    const bannerWidth = 2.2;
+    const bannerHeight = 4.4;
+    const poleRadius = 0.052;
+    const poleLength = bannerWidth + 0.34;
+    const ropeLength = 1.4;
+
+    const poleGeom = new THREE.CylinderGeometry(poleRadius, poleRadius, poleLength, 20);
+    poleGeom.rotateZ(Math.PI / 2);
+    const poleMat = new THREE.MeshStandardMaterial({
+      color: 0xe5b84c,
+      metalness: 0.85,
+      roughness: 0.25,
+    });
+    const finialGeom = new THREE.SphereGeometry(0.12, 16, 16);
+    const ropeGeom = new THREE.CylinderGeometry(0.018, 0.018, ropeLength, 8);
+    const ropeMat = new THREE.MeshStandardMaterial({
+      color: 0xc8963e,
+      roughness: 0.6,
+    });
+
     // Espaçamento amplo garantindo respiração visual (nunca colados)
     const spacing = isMobile ? 3.2 : isTablet ? 2.85 : 2.95;
     const startX = -((HOUSES_DATA.length - 1) * spacing) / 2;
 
     HOUSES_DATA.forEach((house, idx) => {
       const posX = startX + idx * spacing;
-      const posY = 0.2;
+      const posY = 0.08;
+
+      const bannerGroup = new THREE.Group();
+      bannerGroup.position.set(posX, posY, 0);
 
       // Malha de tecido denso para ondulações realistas
       const geom = new THREE.PlaneGeometry(bannerWidth, bannerHeight, 24, 38);
       const origPos = geom.attributes.position.array.slice() as Float32Array;
 
-      const texture = createBannerTexture(house);
+      const texture = createBannerTexture(house, () => isDisposed);
       const mat = new THREE.MeshStandardMaterial({
         map: texture,
+        bumpMap: fabricBumpTexture,
+        bumpScale: 0.016,
         side: THREE.DoubleSide,
-        roughness: 0.35,
-        metalness: 0.2,
+        roughness: 0.68,
+        metalness: 0.06,
+        alphaTest: 0.42,
       });
 
       const mesh = new THREE.Mesh(geom, mat);
-      mesh.position.set(posX, posY, 0);
-      scene.add(mesh);
+      bannerGroup.add(mesh);
 
       // Vara de Latão Maciço Individual com Pontas em Pinha Medieval
-      const poleRadius = 0.055;
-      const poleLength = bannerWidth + 0.35;
-      const poleGeom = new THREE.CylinderGeometry(poleRadius, poleRadius, poleLength, 20);
-      poleGeom.rotateZ(Math.PI / 2);
-      const poleMat = new THREE.MeshStandardMaterial({
-        color: 0xe5b84c,
-        metalness: 0.85,
-        roughness: 0.25,
-      });
       const poleMesh = new THREE.Mesh(poleGeom, poleMat);
-      poleMesh.position.set(posX, posY + bannerHeight / 2 + 0.06, 0.04);
-      scene.add(poleMesh);
+      poleMesh.position.set(0, bannerHeight / 2 + 0.05, 0.04);
+      bannerGroup.add(poleMesh);
 
       // Pontas ornamentais esféricas douradas nas extremidades de cada vara
       [-1, 1].forEach((dir) => {
-        const finialGeom = new THREE.SphereGeometry(0.13, 16, 16);
         const finialMesh = new THREE.Mesh(finialGeom, poleMat);
-        finialMesh.position.set(
-          posX + (dir * poleLength) / 2,
-          posY + bannerHeight / 2 + 0.06,
-          0.04
-        );
-        scene.add(finialMesh);
+        finialMesh.position.set((dir * poleLength) / 2, bannerHeight / 2 + 0.05, 0.04);
+        bannerGroup.add(finialMesh);
       });
 
       // Cordas / Cabos de sustentação dourados subindo ao teto abobadado
-      const ropeMat = new THREE.MeshStandardMaterial({
-        color: 0xc8963e,
-        roughness: 0.6,
-      });
       [-1, 1].forEach((dir) => {
-        const ropeLength = 1.4;
-        const ropeGeom = new THREE.CylinderGeometry(0.018, 0.018, ropeLength, 8);
-        ropeGeom.rotateZ(dir * 0.12);
         const ropeMesh = new THREE.Mesh(ropeGeom, ropeMat);
+        ropeMesh.rotation.z = dir * 0.12;
         ropeMesh.position.set(
-          posX + dir * (bannerWidth * 0.36),
-          posY + bannerHeight / 2 + 0.06 + ropeLength / 2,
+          dir * (bannerWidth * 0.36),
+          bannerHeight / 2 + 0.05 + ropeLength / 2,
           0.02
         );
-        scene.add(ropeMesh);
+        bannerGroup.add(ropeMesh);
       });
 
+      scene.add(bannerGroup);
+
       bannerMeshes.push({
+        group: bannerGroup,
         mesh,
-        initialPos: mesh.position.clone(),
+        initialPos: bannerGroup.position.clone(),
         house,
         geom,
+        mat,
+        texture,
         origPos,
         index: idx,
       });
@@ -730,7 +645,7 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
           soundManager.playSparkle();
           setSelectedHouse(hit.house);
           setActiveHouseIndex(hit.index);
-          if (onSelectHouse) onSelectHouse(hit.house.id);
+          if (onSelectHouseRef.current) onSelectHouseRef.current(hit.house.id);
         }
       }
     };
@@ -739,7 +654,7 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
 
     // 8. Loop de Animação com Física de Tecido e Câmera Deslizante
     let animationFrameId: number;
-    let clock = new THREE.Clock();
+    const clock = new THREE.Clock();
     let isVisible = true;
 
     const observer = new IntersectionObserver(([entry]) => {
@@ -759,7 +674,7 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
 
       // Movimento suave da câmera para focar no estandarte selecionado em telas menores
       if (isMobile) {
-        const selectedBanner = bannerMeshes[activeHouseIndex];
+        const selectedBanner = bannerMeshes[activeHouseIndexRef.current];
         if (selectedBanner) {
           targetCamX.current = selectedBanner.initialPos.x;
         }
@@ -769,11 +684,11 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
       camera.position.x += (targetCamX.current - camera.position.x) * 0.08;
 
       // Ondulação física do tecido ao vento de Hogwarts
-      bannerMeshes.forEach(({ mesh, geom, origPos, initialPos, house }, bIndex) => {
-        const isCurrentSelected = house.id === selectedHouse.id;
-        // Estandarte ativo se projeta sutilmente para frente
-        const targetZ = isCurrentSelected ? initialPos.z + 0.6 : initialPos.z;
-        mesh.position.z += (targetZ - mesh.position.z) * 0.08;
+      bannerMeshes.forEach(({ group, geom, origPos, initialPos, house }, bIndex) => {
+        const isCurrentSelected = house.id === selectedHouseIdRef.current;
+        // Estandarte ativo e sua haste se projetam juntos para frente
+        const targetZ = isCurrentSelected ? initialPos.z + 0.55 : initialPos.z;
+        group.position.z += (targetZ - group.position.z) * 0.08;
 
         const posAttr = geom.attributes.position;
         const count = posAttr.count;
@@ -783,13 +698,16 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
           const origY = origPos[i * 3 + 1];
 
           // Topo preso à vara, base livre para flutuar
-          const freedom = Math.pow((bannerHeight / 2 - origY) / bannerHeight, 1.35);
+          const freedom = Math.pow(
+            Math.max(0, (bannerHeight / 2 - origY) / bannerHeight),
+            1.35
+          );
 
           // Equações de vento ondulatório suave
           const waveZ =
-            Math.sin(origY * 1.6 + time * 3.2 + bIndex * 1.2) * 0.24 * freedom +
-            Math.cos(origX * 2.5 + time * 2.4) * 0.08 * freedom +
-            Math.sin(time * 1.6 + bIndex) * 0.05 * freedom;
+            Math.sin(origY * 1.6 + time * 3.2 + bIndex * 1.2) * 0.22 * freedom +
+            Math.cos(origX * 2.5 + time * 2.4) * 0.07 * freedom +
+            Math.sin(time * 1.6 + bIndex) * 0.04 * freedom;
 
           posAttr.setZ(i, waveZ);
         }
@@ -807,6 +725,7 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
       if (!container) return;
       const newWidth = container.clientWidth;
       const newIsMobile = newWidth < 768;
+      isMobile = newIsMobile;
       const newIsTablet = newWidth >= 768 && newWidth < 1100;
       const newHeight = newIsMobile ? 540 : newIsTablet ? 620 : 720;
       const newCameraZ = computeOptimalZ(newWidth, newHeight, newIsMobile);
@@ -820,16 +739,32 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
     window.addEventListener('resize', handleResize);
 
     return () => {
+      isDisposed = true;
       observer.disconnect();
       window.removeEventListener('resize', handleResize);
       renderer.domElement.removeEventListener('click', handlePointerDown);
       cancelAnimationFrame(animationFrameId);
+
+      bannerMeshes.forEach(({ geom, mat, texture }) => {
+        geom.dispose();
+        mat.dispose();
+        texture.dispose();
+      });
+      fabricBumpTexture.dispose();
+      poleGeom.dispose();
+      poleMat.dispose();
+      finialGeom.dispose();
+      ropeGeom.dispose();
+      ropeMat.dispose();
+      particleGeom.dispose();
+      particleMat.dispose();
+
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
       renderer.dispose();
     };
-  }, [selectedHouse, activeHouseIndex]);
+  }, []);
 
   const selectHouseByIndex = (index: number) => {
     const wrapped = (index + HOUSES_DATA.length) % HOUSES_DATA.length;
@@ -871,9 +806,11 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
                   : 'bg-[#0a0f19]/90 text-[#b6bbc5] border-[var(--house-border)] hover:border-[var(--house-accent)]/70 hover:text-[#ece7da]'
               }`}
             >
-              <span
-                className="w-2.5 h-2.5 rotate-45"
-                style={{ backgroundColor: h.accentColor }}
+              <img
+                src={HOUSES[h.id].emblemImg}
+                alt={h.name}
+                draggable={false}
+                className="w-4 h-4 object-contain select-none pointer-events-none"
               />
               <span>{h.name}</span>
             </button>
@@ -983,10 +920,18 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
 
           <div className="flex flex-col items-center justify-center p-6 sm:p-7 bg-[#0d1422]/90 border border-[var(--house-border)] text-center space-y-4">
             <div
-              className="w-20 h-20 arch flex items-center justify-center border border-[var(--house-border)] shadow-xl"
-              style={{ backgroundColor: selectedHouse.primaryColor }}
+              className="w-28 h-28 flex items-center justify-center p-2 relative select-none"
             >
-              <Shield className="w-9 h-9" style={{ color: selectedHouse.accentColor }} />
+              <div
+                className="absolute inset-2 rounded-full blur-xl opacity-35 pointer-events-none"
+                style={{ backgroundColor: selectedHouse.primaryColor }}
+              />
+              <img
+                src={HOUSES[selectedHouse.id].emblemImg}
+                alt={`Emblema da Casa ${selectedHouse.name}`}
+                draggable={false}
+                className="relative z-10 w-full h-full object-contain drop-shadow-[0_10px_22px_rgba(0,0,0,0.75)] pointer-events-none"
+              />
             </div>
 
             <span className="text-xs text-[#b6bbc5] leading-relaxed">

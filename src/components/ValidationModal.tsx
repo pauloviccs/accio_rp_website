@@ -157,7 +157,13 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
 
             <div>
               <span className="text-[#FFF0B2]/60 block mb-0.5">Casa Designada:</span>
-              <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-md font-bold text-white shadow-sm" style={{ backgroundColor: house.color }}>
+              <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md font-bold text-white shadow-sm" style={{ backgroundColor: house.color }}>
+                <img
+                  src={house.emblemImg}
+                  alt={house.name}
+                  draggable={false}
+                  className="w-4 h-4 object-contain select-none pointer-events-none"
+                />
                 <span>{house.name}</span>
               </span>
             </div>

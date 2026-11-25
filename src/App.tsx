@@ -111,7 +111,7 @@ export const App: React.FC = () => {
         const discordUser: DiscordUser = {
           id: u.user_metadata?.provider_id || u.user_metadata?.sub || u.id,
           username: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'Bruxo',
-          avatar: u.user_metadata?.avatar_url || null,
+          avatar: u.user_metadata?.avatar_url || u.user_metadata?.picture || null,
           global_name: u.user_metadata?.custom_claims?.global_name || u.user_metadata?.full_name,
           email: u.email,
         };
@@ -130,7 +130,7 @@ export const App: React.FC = () => {
         const discordUser: DiscordUser = {
           id: u.user_metadata?.provider_id || u.user_metadata?.sub || u.id,
           username: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'Bruxo',
-          avatar: u.user_metadata?.avatar_url || null,
+          avatar: u.user_metadata?.avatar_url || u.user_metadata?.picture || null,
           global_name: u.user_metadata?.custom_claims?.global_name || u.user_metadata?.full_name,
           email: u.email,
         };
