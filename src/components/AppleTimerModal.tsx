@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Clock, Check, Wand2, RefreshCw, ChevronUp, ChevronDown } from 'lucide-react';
+import { X, Clock, Check, Wand2, RefreshCw, ChevronUp, ChevronDown, Zap, Hourglass, Target, AlertTriangle } from 'lucide-react';
 import { CountdownTimerData, updateCountdownTimer, getCountdownTimer } from '../lib/supabase';
 import { soundManager } from '../lib/audio';
 
@@ -232,25 +232,23 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-2xl overflow-y-auto">
-      <div className="relative w-full max-w-lg max-h-[92vh] flex flex-col bg-[#160504] border border-[#B83A0C]/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl overflow-y-auto my-auto animate-apple-modal">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-[#05080f]/90 backdrop-blur-2xl overflow-y-auto">
+      <div className="relative w-full max-w-lg max-h-[92vh] flex flex-col bg-[#0a0f19] border border-[var(--house-border)] p-4 sm:p-6 shadow-2xl overflow-y-auto my-auto animate-apple-modal">
         
         {/* Glow de fundo */}
-        <div className="absolute top-0 right-1/4 w-60 h-60 bg-[#FFC34F]/10 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-60 h-60 bg-[var(--house-glow)] rounded-full blur-[80px] pointer-events-none opacity-25" />
 
         {/* Topo do Modal */}
         <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-[#FFC34F] to-[#5B1009] p-0.5 shadow-md">
-              <div className="w-full h-full rounded-[10px] bg-[#160504] flex items-center justify-center">
-                <Clock className="w-4 h-4 text-[#FFC34F] animate-pulse" />
-              </div>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#0d1422] border border-[var(--house-border)] flex items-center justify-center shadow-md">
+              <Clock className="w-4 h-4 text-[var(--house-accent)] animate-pulse" />
             </div>
             <div>
-              <span className="text-[10px] uppercase tracking-widest text-[#FFC34F] font-bold block">
+              <span className="eyebrow text-[10px] block">
                 Livro da Admissão · Configuração
               </span>
-              <h3 className="font-cinzel text-base sm:text-lg font-bold text-[#FFF0B2]">
+              <h3 className="font-display text-base sm:text-lg text-[#ece7da]">
                 Cronômetro de Lançamento
               </h3>
             </div>
@@ -272,29 +270,33 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
           </span>
           <div className="flex flex-wrap justify-center gap-1.5">
             {[
-              { label: '⚡ 60 Dias (Padrão)', d: 60 },
-              { label: '⏳ 30 Dias', d: 30 },
-              { label: '⌛ 15 Dias', d: 15 },
-              { label: '🎯 7 Dias', d: 7 },
-              { label: '🚨 24 Horas', d: 1 },
-            ].map((preset) => (
+              { label: '60 Dias (Padrão)', d: 60, icon: Zap },
+              { label: '30 Dias', d: 30, icon: Hourglass },
+              { label: '15 Dias', d: 15, icon: Clock },
+              { label: '7 Dias', d: 7, icon: Target },
+              { label: '24 Horas', d: 1, icon: AlertTriangle },
+            ].map((preset) => {
+              const PresetIcon = preset.icon;
+              return (
               <button
                 key={preset.label}
                 onClick={() => applyPreset(preset.d)}
-                className={`px-2 sm:px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-semibold border transition cursor-pointer ${
+                className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-semibold border transition cursor-pointer ${
                   days === preset.d && hours === 0
                     ? 'bg-[#FFC34F] text-[#160504] border-[#FFC34F] font-bold shadow-md shadow-[#FFC34F]/20'
                     : 'bg-[#210604] text-[#FFF0B2]/80 border-[#B83A0C]/30 hover:border-[#FFC34F]/50 hover:text-white'
                 }`}
               >
-                {preset.label}
+                <PresetIcon className="w-3 h-3" />
+                <span>{preset.label}</span>
               </button>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* ROLETA APPLE DE 4 COLUNAS: DIAS, HORAS, MINUTOS, SEGUNDOS (100% RESPONSIVA) */}
-        <div className="bg-[#100303] border border-[#B83A0C]/40 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 mb-4 shadow-2xl">
+        <div className="bg-[#090e17] border border-[var(--house-border)] p-2.5 sm:p-4 mb-4 shadow-2xl">
           <div className="flex items-center justify-center space-x-1 sm:space-x-2 md:space-x-3">
             <WheelColumn
               label="Dias"
@@ -338,7 +340,7 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
         </div>
 
         {/* Previsão de Encerramento */}
-        <div className="bg-[#210604]/80 border border-[#B83A0C]/30 rounded-xl p-3 mb-4 text-center text-xs">
+        <div className="bg-[#0d1422]/85 border border-[var(--house-border)] p-3 mb-4 text-center text-xs">
           <span className="text-[#FFF0B2]/60 block mb-0.5 text-[11px]">
             Data Estimada de Término no Livro da Admissão:
           </span>
@@ -351,8 +353,9 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
             })}{' '}
             às {calculatedEnd.toLocaleTimeString('pt-BR')}
           </span>
-          <span className="text-[10px] text-[#4CAF7C] block mt-1">
-            ⚡ Sincronizado instantaneamente via Supabase Realtime para todos os jogadores.
+          <span className="text-[10px] text-[#4CAF7C] flex items-center justify-center gap-1 mt-1">
+            <Zap className="w-3 h-3" />
+            <span>Sincronizado instantaneamente via Supabase Realtime para todos os jogadores.</span>
           </span>
         </div>
 

@@ -1,7 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { DiscordUser, HouseId } from '../types';
-import { LogIn, LogOut, Sparkles, Mail, ShieldCheck, Shield, Volume2, VolumeX, ChevronDown } from 'lucide-react';
+import {
+  LogIn,
+  LogOut,
+  Sparkles,
+  Mail,
+  ShieldCheck,
+  Shield,
+  Volume2,
+  VolumeX,
+  ChevronDown,
+  Flame,
+  Crown,
+  Feather,
+  Plus,
+  ArrowUpRight,
+  MessagesSquare,
+} from 'lucide-react';
 import { soundManager } from '../lib/audio';
+import { DISCORD_INVITE_URL } from '../lib/constants';
+import { AccioEmblem } from './ArcaneOrnaments';
 
 interface NavbarProps {
   user: DiscordUser | null;
@@ -19,11 +37,11 @@ interface NavbarProps {
   onOpenAdmin: () => void;
 }
 
-const HOUSE_THEME_INFO: Record<HouseId, { name: string; emoji: string; color: string }> = {
-  gryffindor: { name: 'Grifinória', emoji: '🦁', color: '#EEBA30' },
-  slytherin: { name: 'Sonserina', emoji: '🐍', color: '#2ECC71' },
-  ravenclaw: { name: 'Corvinal', emoji: '🦅', color: '#60A5FA' },
-  hufflepuff: { name: 'Lufa-Lufa', emoji: '🦡', color: '#F59E0B' },
+const HOUSE_THEME_INFO: Record<HouseId, { name: string; icon: React.ComponentType<{ className?: string }>; color: string }> = {
+  gryffindor: { name: 'Grifinória', icon: Flame, color: '#b5675e' },
+  slytherin: { name: 'Sonserina', icon: Crown, color: '#6e9e81' },
+  ravenclaw: { name: 'Corvinal', icon: Feather, color: '#7e98bd' },
+  hufflepuff: { name: 'Lufa-Lufa', icon: Shield, color: '#c7ac63' },
 };
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -64,64 +82,123 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const currentTheme = HOUSE_THEME_INFO[activeHouseTheme] || HOUSE_THEME_INFO.gryffindor;
+  const CurrentHouseIcon = currentTheme.icon;
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-[var(--house-border)] bg-[var(--house-bg-deep)]/85 backdrop-blur-xl transition-all duration-700">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <nav aria-label="Navegação principal" className="site-nav">
+      <div className="relative flex h-16 sm:h-18 items-center justify-between gap-3 px-4 sm:px-5 xl:h-20 xl:px-7">
 
-        {/* Logo & Brand */}
-        <div className="flex items-center space-x-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--house-btn-start)] to-[var(--house-primary)] p-0.5 shadow-lg shadow-[var(--house-glow)]">
-            <div className="w-full h-full rounded-[10px] bg-[#160504] flex items-center justify-center overflow-hidden">
-              <span className="font-cinzel text-xl font-black text-gold-gradient">A</span>
-            </div>
-          </div>
-          <div>
-            <span className="font-cinzel text-lg sm:text-xl font-extrabold tracking-wider text-[#FFF0B2] block leading-none">
-              ACCIO
-            </span>
-            <span className="text-[10px] tracking-[0.25em] text-[var(--house-accent)] font-semibold block mt-0.5">
-              ROLEPLAY
-            </span>
-          </div>
+        {/* Logo & Brand (IDV ACCIO + Tipografia ArcaneMP) */}
+        <a
+          href="#top"
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="flex shrink-0 items-center gap-3 text-white"
+          aria-label="Início ACCIO Roleplay"
+        >
+          <AccioEmblem className="size-9 shrink-0 drop-shadow-[0_0_12px_rgba(244,122,22,0.45)]" />
+          <span className="nav-brand-name">
+            ACCIO RP
+            <small className="max-xl:hidden">A magia é melhor junta</small>
+          </span>
+        </a>
+
+        {/* Links Centrais Estilo Capítulo ArcaneMP */}
+        <div className="hidden lg:flex items-center">
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="nav-chapter is-active"
+          >
+            Início
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollToSection('castle-exploration')}
+            className="nav-chapter"
+          >
+            Estandartes
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollToSection('features')}
+            className="nav-chapter"
+          >
+            Sistemas
+          </button>
+          <button
+            type="button"
+            onClick={onOpenLetter}
+            className="nav-chapter"
+          >
+            Carta
+          </button>
+          <button
+            type="button"
+            onClick={hasApplication ? onOpenValidation : onOpenForm}
+            className="nav-chapter"
+          >
+            {hasApplication ? 'Validação' : 'Pré-Registro'}
+          </button>
+          {canAccessAdmin && (
+            <button
+              type="button"
+              onClick={onOpenAdmin}
+              className="nav-chapter text-[var(--house-accent)]"
+            >
+              Painel ADM
+            </button>
+          )}
         </div>
 
-        {/* Status Pill & User Actions */}
-        <div className="flex items-center space-x-2 sm:space-x-3">
+        {/* Ações à Direita */}
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
 
-          {/* Seletor de Casa Dinâmico no Topo */}
+          {/* Seletor de Casa Dinâmico */}
           <div className="relative">
             <button
+              type="button"
               onClick={() => setIsHouseDropdownOpen(!isHouseDropdownOpen)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#180504] border border-[var(--house-border)] text-xs text-[#FFF0B2] hover:border-[var(--house-accent)] transition cursor-pointer shadow-sm"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-[#0d1422] border border-[var(--house-border)] text-xs text-[#ece7da] hover:border-[var(--house-accent)] transition cursor-pointer"
               title="Trocar o tema da Casa de Hogwarts"
             >
-              <span className="text-sm">{currentTheme.emoji}</span>
-              <span className="font-cinzel font-bold text-[11px] hidden md:inline text-gold-gradient">
+              <CurrentHouseIcon className="w-3.5 h-3.5 text-[var(--house-accent)]" />
+              <span className="font-display text-[11px] uppercase tracking-wider hidden xl:inline text-[var(--house-accent)]">
                 {currentTheme.name}
               </span>
-              <ChevronDown className="w-3 h-3 text-[var(--house-accent)] opacity-70" />
+              <ChevronDown className="w-3 h-3 text-[var(--house-accent)] opacity-75" />
             </button>
 
             {isHouseDropdownOpen && (
-              <div className="absolute top-full right-0 mt-2 w-44 rounded-2xl bg-[#160504] border border-[var(--house-border)] p-1.5 shadow-2xl z-50 animate-apple-modal">
-                <span className="text-[9px] uppercase tracking-wider font-bold text-[var(--house-accent)] px-2.5 py-1 block border-b border-white/10 mb-1">
-                  Mudar Tema da Casa:
+              <div className="absolute top-full right-0 mt-2 w-48 bg-[#0a0f19] border border-[var(--house-border)] p-1.5 shadow-2xl z-50 animate-apple-modal">
+                <span className="eyebrow text-[9px] px-2.5 py-1 block border-b border-white/10 mb-1">
+                  Tema da Casa
                 </span>
                 {(Object.keys(HOUSE_THEME_INFO) as HouseId[]).map((hId) => {
                   const h = HOUSE_THEME_INFO[hId];
+                  const HouseIcon = h.icon;
                   const isCur = activeHouseTheme === hId;
                   return (
                     <button
                       key={hId}
+                      type="button"
                       onClick={() => handleHouseChange(hId)}
-                      className={`w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-cinzel font-bold flex items-center space-x-2 transition cursor-pointer ${
+                      className={`w-full text-left px-2.5 py-1.5 text-xs font-display tracking-wide flex items-center gap-2 transition cursor-pointer ${
                         isCur
-                          ? 'bg-[var(--house-primary)] text-white shadow-md'
-                          : 'text-[#FFF0B2]/70 hover:bg-white/5 hover:text-white'
+                          ? 'bg-[var(--house-secondary)] text-[var(--house-accent)] border border-[var(--house-border)]'
+                          : 'text-[#b6bbc5] hover:bg-white/5 hover:text-[#ece7da]'
                       }`}
                     >
-                      <span>{h.emoji}</span>
+                      <HouseIcon className="w-3.5 h-3.5 flex-shrink-0" />
                       <span>{h.name}</span>
                     </button>
                   );
@@ -130,127 +207,149 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
 
-          {/* Botão de Acesso ao Painel ADM (Exclusivo para admin, super_admin e mod) */}
-          {canAccessAdmin && (
-            <button
-              onClick={onOpenAdmin}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#160504] border border-[var(--house-border)] text-xs text-[var(--house-accent)] hover:bg-[#5B1009]/60 transition cursor-pointer shadow-md"
-              title="Abrir Painel Administrativo do Ministério da Magia"
-            >
-              <Shield className="w-3.5 h-3.5 text-[var(--house-accent)]" />
-              <span className="hidden md:inline">Painel ADM</span>
-            </button>
-          )}
-
-          {/* Botão para Rever a Carta de Admissão */}
+          {/* Controle Global de Áudio */}
           <button
-            onClick={onOpenLetter}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-[#200504] border border-[var(--house-border)] text-xs text-[#FFF0B2] hover:bg-[#5B1009]/80 transition cursor-pointer"
-            title="Abrir Carta Oficial de Hogwarts"
-          >
-            <Mail className="w-3.5 h-3.5 text-[var(--house-accent)]" />
-            <span className="hidden sm:inline">Carta de Hogwarts</span>
-          </button>
-
-          {/* Botão Universal de Mutar / Desmutar Sons do Site */}
-          <button
+            type="button"
             onClick={handleToggleSound}
-            className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-full border text-xs transition cursor-pointer ${
+            className={`flex items-center gap-1 px-2.5 py-1.5 border text-xs transition cursor-pointer ${
               isMuted
-                ? 'bg-[#210604] border-[#CF4A4A]/50 text-[#CF4A4A] hover:bg-[#CF4A4A]/20'
-                : 'bg-[#160504] border-[#4CAF7C]/40 text-[#4CAF7C] hover:border-[#4CAF7C] hover:bg-[#4CAF7C]/10'
+                ? 'bg-[#0d1422] border-[#b5675e]/50 text-[#b5675e] hover:bg-[#b5675e]/15'
+                : 'bg-[#0d1422] border-[#6e9e81]/50 text-[#7fd29a] hover:bg-[#6e9e81]/15'
             }`}
             title={isMuted ? 'Sons Mágicos Mutados (Clique para Ativar)' : 'Sons Mágicos Ativados (Clique para Mutar)'}
             aria-label={isMuted ? 'Desmutar áudio' : 'Mutar áudio'}
           >
-            {isMuted ? (
-              <>
-                <VolumeX className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-bold hidden md:inline">Mudo</span>
-              </>
-            ) : (
-              <>
-                <Volume2 className="w-3.5 h-3.5 animate-pulse" />
-                <span className="text-[10px] font-bold hidden md:inline">Som</span>
-              </>
-            )}
+            {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+            <span className="text-[10px] font-semibold uppercase tracking-wider hidden 2xl:inline">
+              {isMuted ? 'Mudo' : 'Som'}
+            </span>
           </button>
 
           {user ? (
-            <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="flex items-center gap-2">
               {hasApplication ? (
-                <div className="flex items-center space-x-2">
+                <>
                   <button
+                    type="button"
                     onClick={onOpenValidation}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[var(--house-primary)]/40 border border-[var(--house-border)] text-[#FFF0B2] hover:bg-[var(--house-primary)]/70 text-xs font-semibold transition cursor-pointer"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0d1422] border border-[var(--house-border)] text-[#ece7da] hover:border-[var(--house-accent)] text-xs font-semibold transition cursor-pointer"
                   >
                     <ShieldCheck className="w-3.5 h-3.5 text-[var(--house-accent)]" />
-                    <span className="hidden sm:inline">Minha Validação</span>
+                    <span className="hidden md:inline">Validação</span>
                   </button>
-
                   <button
+                    type="button"
                     onClick={onViewTicket}
-                    className="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#210604] border border-[var(--house-border)] text-[#FFF0B2] hover:bg-[#5B1009] text-xs font-semibold transition cursor-pointer"
+                    className="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0d1422] border border-[var(--house-border)] text-[#ece7da] hover:border-[var(--house-accent)] text-xs font-semibold transition cursor-pointer"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-[var(--house-accent)]" />
                     <span>Bilhete</span>
                   </button>
-                </div>
+                </>
               ) : (
                 <button
+                  type="button"
                   onClick={onOpenForm}
-                  className="hidden sm:flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg btn-accio-gold text-xs font-bold transition cursor-pointer"
+                  className="hidden sm:inline-flex btn-primary btn-sm"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>Preencher Ficha</span>
+                  <span>Ficha</span>
                 </button>
               )}
 
-              {/* Perfil do Bruxo */}
-              <div className="flex items-center space-x-2 bg-[#210604] border border-[var(--house-border)] px-2.5 py-1.5 rounded-xl">
+              <div className="flex items-center gap-2 bg-[#0d1422] border border-[var(--house-border)] px-2 py-1">
                 {user.avatar ? (
                   <img
                     src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`}
                     alt={user.username}
-                    className="w-7 h-7 rounded-full border border-[var(--house-accent)] select-none pointer-events-none"
+                    className="w-6 h-6 rounded-full border border-[var(--house-accent)] select-none pointer-events-none"
                     draggable={false}
                   />
                 ) : (
-                  <div className="w-7 h-7 rounded-full bg-[var(--house-primary)] flex items-center justify-center text-xs font-bold text-white">
+                  <div className="w-6 h-6 rounded-full bg-[var(--house-secondary)] flex items-center justify-center text-[11px] font-bold text-[#ece7da]">
                     {user.username.charAt(0).toUpperCase()}
                   </div>
                 )}
                 <div className="hidden md:block text-left">
-                  <span className="text-xs font-semibold text-[#FFF0B2] block leading-tight truncate max-w-[100px]">
+                  <span className="text-[11px] font-semibold text-[#ece7da] block leading-tight truncate max-w-[95px]">
                     {user.global_name || user.username}
                   </span>
-                  <span className="text-[10px] text-[var(--house-accent)] font-mono block leading-none">
+                  <span className="text-[9px] text-[var(--house-accent)] font-mono block leading-none">
                     {userRole ? userRole.toUpperCase() : 'BRUXO'}
                   </span>
                 </div>
               </div>
 
               <button
+                type="button"
                 onClick={onLogout}
-                className="p-2 rounded-xl bg-[#210604] hover:bg-[#5B1009] text-[#FFF0B2]/60 hover:text-white transition cursor-pointer border border-white/5"
-                title="Desconectar do Expresso"
+                className="p-2 bg-[#0d1422] hover:bg-[#172033] text-[#b6bbc5] hover:text-white transition cursor-pointer border border-[var(--house-border)]"
+                title="Desconectar"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5" />
               </button>
             </div>
           ) : (
-            <button
-              onClick={onLogin}
-              className="btn-accio-gold px-4 py-2 rounded-xl text-xs flex items-center space-x-2 cursor-pointer"
-            >
-              <LogIn className="w-4 h-4" />
-              <span>Entrar com Discord</span>
+            <div className="flex items-center gap-2">
+              <a
+                href={DISCORD_INVITE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:inline-flex btn-secondary btn-sm shrink-0"
+              >
+                <MessagesSquare className="w-4 h-4" />
+                <span className="max-md:hidden">Discord</span>
+              </a>
+              <button
+                type="button"
+                onClick={onLogin}
+                className="btn-primary btn-sm shrink-0"
+              >
+                <LogIn className="w-4 h-4" />
+                <span className="max-sm:hidden">Entrar</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Menu Mobile Estilo ArcaneMP */}
+      <details className="mobile-menu relative lg:hidden">
+        <summary>
+          <span>Explorar o Portal</span>
+          <span className="menu-toggle grid size-6 place-items-center transition-[rotate]">
+            <Plus className="w-4 h-4" />
+          </span>
+        </summary>
+        <div className="mobile-links">
+          <button type="button" onClick={() => scrollToSection('castle-exploration')}>
+            <span>Estandartes 3D</span>
+            <ArrowUpRight className="w-4 h-4 text-[var(--house-accent)]" />
+          </button>
+          <button type="button" onClick={() => scrollToSection('features')}>
+            <span>Sistemas</span>
+            <ArrowUpRight className="w-4 h-4 text-[var(--house-accent)]" />
+          </button>
+          <button type="button" onClick={onOpenLetter}>
+            <span>Carta de Hogwarts</span>
+            <Mail className="w-4 h-4 text-[var(--house-accent)]" />
+          </button>
+          <button type="button" onClick={hasApplication ? onOpenValidation : onOpenForm}>
+            <span>{hasApplication ? 'Minha Validação' : 'Pré-Registro'}</span>
+            <ArrowUpRight className="w-4 h-4 text-[var(--house-accent)]" />
+          </button>
+          {canAccessAdmin && (
+            <button type="button" onClick={onOpenAdmin}>
+              <span>Painel ADM</span>
+              <Shield className="w-4 h-4 text-[var(--house-accent)]" />
             </button>
           )}
-
+          <a href={DISCORD_INVITE_URL} target="_blank" rel="noopener noreferrer">
+            <span>Discord Oficial</span>
+            <ArrowUpRight className="w-4 h-4 text-[var(--house-accent)]" />
+          </a>
         </div>
-
-      </div>
-    </header>
+      </details>
+    </nav>
   );
 };

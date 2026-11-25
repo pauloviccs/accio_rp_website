@@ -65,11 +65,11 @@ export async function generateAndDownloadCharacterPdf(
           background-position: center;
         "></div>
 
-        <!-- Bordas ornamentais douradas nos cantos -->
-        <div style="position: absolute; top: 10px; left: 10px; font-size: 24px; color: #8A5A1B;">⚜</div>
-        <div style="position: absolute; top: 10px; right: 10px; font-size: 24px; color: #8A5A1B;">⚜</div>
-        <div style="position: absolute; bottom: 10px; left: 10px; font-size: 24px; color: #8A5A1B;">⚜</div>
-        <div style="position: absolute; bottom: 10px; right: 10px; font-size: 24px; color: #8A5A1B;">⚜</div>
+        <!-- Bordas ornamentais douradas nos cantos (SVG) -->
+        <svg style="position: absolute; top: 12px; left: 12px; width: 20px; height: 20px; color: #8A5A1B;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z"/></svg>
+        <svg style="position: absolute; top: 12px; right: 12px; width: 20px; height: 20px; color: #8A5A1B;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z"/></svg>
+        <svg style="position: absolute; bottom: 12px; left: 12px; width: 20px; height: 20px; color: #8A5A1B;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z"/></svg>
+        <svg style="position: absolute; bottom: 12px; right: 12px; width: 20px; height: 20px; color: #8A5A1B;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z"/></svg>
 
         <!-- CABEÇALHO MINISTERIAL -->
         <div style="text-align: center; border-bottom: 2px solid #8A5A1B; padding-bottom: 16px; margin-bottom: 22px;">
@@ -92,8 +92,9 @@ export async function generateAndDownloadCharacterPdf(
           
           <!-- Coluna 1: Dados do Aluno -->
           <div style="flex: 1.2; background: rgba(255, 255, 255, 0.4); padding: 14px; border: 1px solid #C4973B; border-radius: 6px;">
-            <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; color: #733E10; border-bottom: 1px solid #D4BE82; padding-bottom: 4px; margin-bottom: 8px;">
-              📜 Identidade do Estudante
+            <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; color: #733E10; border-bottom: 1px solid #D4BE82; padding-bottom: 4px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <svg style="width: 14px; height: 14px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="#733E10" stroke-width="2"><path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/></svg>
+              <span>Identidade do Estudante</span>
             </div>
             
             <div style="margin-bottom: 6px;">
@@ -116,7 +117,7 @@ export async function generateAndDownloadCharacterPdf(
               <div>
                 <span style="font-size: 10px; text-transform: uppercase; color: #733E10; font-weight: bold;">Linhagem Sanguínea:</span>
                 <div style="font-size: 12px; font-weight: 600;">
-                  ${app.blood_status === 'pure-blood' ? 'Sangue-Puro 🩸' : app.blood_status === 'half-blood' ? 'Mestiço ⚖️' : 'Nascido-Trouxa 🌟'}
+                  ${app.blood_status === 'pure-blood' ? 'Sangue-Puro' : app.blood_status === 'half-blood' ? 'Mestiço' : 'Nascido-Trouxa'}
                 </div>
               </div>
               <div>
@@ -133,8 +134,9 @@ export async function generateAndDownloadCharacterPdf(
 
           <!-- Coluna 2: Casa de Hogwarts -->
           <div style="flex: 0.8; background: rgba(255, 255, 255, 0.4); padding: 14px; border: 1px solid #C4973B; border-radius: 6px; text-align: center;">
-            <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; color: #733E10; border-bottom: 1px solid #D4BE82; padding-bottom: 4px; margin-bottom: 8px;">
-              🏰 Casa Designada
+            <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; color: #733E10; border-bottom: 1px solid #D4BE82; padding-bottom: 4px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <svg style="width: 14px; height: 14px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="#733E10" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>Casa Designada</span>
             </div>
             
             <div style="font-size: 20px; font-weight: 900; color: ${houseInfo.color}; margin-bottom: 2px;">
@@ -153,8 +155,9 @@ export async function generateAndDownloadCharacterPdf(
 
         <!-- SEÇÃO DA VARINHA (OLLIVANDERS & HOGWARTS LEGACY) -->
         <div style="background: rgba(255, 255, 255, 0.5); padding: 14px; border: 1px solid #C4973B; border-radius: 6px; margin-bottom: 20px;">
-          <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; color: #733E10; border-bottom: 1px solid #D4BE82; padding-bottom: 4px; margin-bottom: 10px;">
-            🪄 Varinha do Bruxo · Fabricação de Ollivanders (Beco Diagonal)
+          <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; color: #733E10; border-bottom: 1px solid #D4BE82; padding-bottom: 4px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+            <svg style="width: 14px; height: 14px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="#733E10" stroke-width="2"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/></svg>
+            <span>Varinha do Bruxo · Fabricação de Ollivanders (Beco Diagonal)</span>
           </div>
 
           <div style="display: flex; gap: 16px; align-items: center;">
@@ -185,11 +188,13 @@ export async function generateAndDownloadCharacterPdf(
         <!-- EXTRATO DA CRÔNICA DO PERSONAGEM (HISTÓRIA DE 3.000 PALAVRAS) -->
         <div style="background: rgba(255, 255, 255, 0.4); padding: 14px; border: 1px solid #C4973B; border-radius: 6px; margin-bottom: 24px;">
           <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #D4BE82; padding-bottom: 4px; margin-bottom: 8px;">
-            <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; color: #733E10;">
-              📖 Crônica Lavrada no Livro da Admissão
+            <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.15em; color: #733E10; display: flex; align-items: center; gap: 6px;">
+              <svg style="width: 14px; height: 14px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="#733E10" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              <span>Crônica Lavrada no Livro da Admissão</span>
             </div>
-            <div style="font-size: 10px; font-weight: bold; color: #2E6B34;">
-              ✓ ${app.word_count.toLocaleString()} Palavras Aprovadas
+            <div style="font-size: 10px; font-weight: bold; color: #2E6B34; display: flex; align-items: center; gap: 4px;">
+              <svg style="width: 12px; height: 12px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="#2E6B34" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>${app.word_count.toLocaleString()} Palavras Aprovadas</span>
             </div>
           </div>
 

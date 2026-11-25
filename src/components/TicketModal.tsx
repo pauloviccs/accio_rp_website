@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { X, MessageSquare, Check, FileDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CharacterApplication } from '../types';
-import { HOUSES } from '../lib/constants';
+import { HOUSES, DISCORD_INVITE_URL } from '../lib/constants';
 import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
 import { soundManager } from '../lib/audio';
+import { ArcaneFrame } from './ArcaneOrnaments';
 
 interface TicketModalProps {
   isOpen: boolean;
@@ -40,17 +41,17 @@ export const TicketModal: React.FC<TicketModalProps> = ({
     : '#ACCIO-PIONEER';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#05080f]/85 backdrop-blur-md">
       
-      <div className="w-full max-w-lg bg-[#160504] border-2 border-[#FFC34F]/40 rounded-3xl shadow-2xl overflow-hidden animate-apple-modal relative">
+      <ArcaneFrame className="w-full max-w-lg bg-[#0a0f19] shadow-2xl overflow-hidden animate-apple-modal relative">
         
         {/* Glow Superior */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-[#FFC34F]/20 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-[var(--house-glow)] rounded-full blur-2xl pointer-events-none" />
 
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-[#5B1009]/60 hover:bg-[#5B1009] text-[#FFF0B2] flex items-center justify-center transition"
+          className="absolute top-4 right-4 z-10 w-8 h-8 bg-[#0d1422] border border-[var(--house-border)] hover:border-[var(--house-accent)] text-[#ece7da] flex items-center justify-center transition cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
@@ -59,65 +60,65 @@ export const TicketModal: React.FC<TicketModalProps> = ({
         <div className="p-6 sm:p-8 space-y-6">
           
           {/* Header do Bilhete */}
-          <div className="text-center space-y-2 border-b border-[#B83A0C]/30 pb-5">
-            <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#FFC34F]">
+          <div className="text-center space-y-2 border-b border-[var(--hair-soft)] pb-5">
+            <span className="eyebrow text-[10px]">
               Expresso de Hogwarts · 1º Lote de Admissão
             </span>
-            <h2 className="font-cinzel text-2xl sm:text-3xl font-extrabold text-[#FFF0B2]">
+            <h2 className="font-display text-2xl sm:text-3xl text-[#ece7da]">
               Passe de Embarque Oficial
             </h2>
-            <div className="inline-block px-3 py-1 rounded-full bg-[#FFC34F]/15 border border-[#FFC34F]/40 font-mono text-xs font-bold text-[#FFC34F]">
+            <div className="inline-block px-3 py-1 bg-[#0d1422] border border-[var(--house-border)] font-mono text-xs font-bold text-[var(--house-accent)]">
               {ticketCode}
             </div>
           </div>
 
           {/* Dados do Personagem */}
-          <div className="grid grid-cols-2 gap-4 text-xs">
-            <div className="bg-[#210604] p-3 rounded-xl border border-[#B83A0C]/20">
-              <span className="text-[10px] text-[#FFF0B2]/60 uppercase tracking-wider block">Bruxo(a)</span>
-              <span className="font-cinzel text-sm font-bold text-[#FFF0B2] block truncate">
+          <div className="grid grid-cols-2 gap-3.5 text-xs">
+            <div className="bg-[#0d1422] p-3 border border-[var(--hair-soft)]">
+              <span className="text-[10px] text-[#8b93a1] uppercase tracking-wider block">Bruxo(a)</span>
+              <span className="font-display text-sm text-[#ece7da] block truncate">
                 {application.first_name} {application.last_name}
               </span>
             </div>
 
-            <div className="bg-[#210604] p-3 rounded-xl border border-[#B83A0C]/20">
-              <span className="text-[10px] text-[#FFF0B2]/60 uppercase tracking-wider block">Casa Selecionada</span>
-              <span className="font-cinzel text-sm font-bold block" style={{ color: house.secondaryColor }}>
+            <div className="bg-[#0d1422] p-3 border border-[var(--hair-soft)]">
+              <span className="text-[10px] text-[#8b93a1] uppercase tracking-wider block">Casa Selecionada</span>
+              <span className="font-display text-sm block" style={{ color: house.secondaryColor }}>
                 {house.name}
               </span>
             </div>
 
-            <div className="bg-[#210604] p-3 rounded-xl border border-[#B83A0C]/20">
-              <span className="text-[10px] text-[#FFF0B2]/60 uppercase tracking-wider block">Varinha</span>
-              <span className="text-xs font-semibold text-[#FFF0B2] block truncate">
+            <div className="bg-[#0d1422] p-3 border border-[var(--hair-soft)]">
+              <span className="text-[10px] text-[#8b93a1] uppercase tracking-wider block">Varinha</span>
+              <span className="text-xs font-semibold text-[#ece7da] block truncate">
                 {application.wand_wood} ({application.wand_core})
               </span>
             </div>
 
-            <div className="bg-[#210604] p-3 rounded-xl border border-[#B83A0C]/20">
-              <span className="text-[10px] text-[#FFF0B2]/60 uppercase tracking-wider block">Status da Admissão</span>
-              <span className="text-xs font-bold text-[#4CAF7C] flex items-center space-x-1">
+            <div className="bg-[#0d1422] p-3 border border-[var(--hair-soft)]">
+              <span className="text-[10px] text-[#8b93a1] uppercase tracking-wider block">Status da Admissão</span>
+              <span className="text-xs font-bold text-[#7fd29a] flex items-center space-x-1">
                 <Check className="w-3.5 h-3.5" />
-                <span>Inscrito no Livro da Admissão</span>
+                <span>Inscrito no Livro</span>
               </span>
             </div>
           </div>
 
           {/* Código de Barras / Emblema Mágico */}
-          <div className="p-4 rounded-2xl bg-[#100303] border border-[#B83A0C]/30 flex items-center justify-between">
+          <div className="p-4 bg-[#090e17] border border-[var(--house-border)] flex items-center justify-between">
             <div>
-              <span className="text-[10px] text-[#FFF0B2]/50 block">Discord Vinculado</span>
-              <span className="text-xs font-mono font-bold text-[#FFC34F]">
+              <span className="text-[10px] text-[#8b93a1] block">Discord Vinculado</span>
+              <span className="text-xs font-mono font-bold text-[var(--house-accent)]">
                 {application.discord_username}
               </span>
             </div>
             <div className="h-8 flex items-center space-x-1 opacity-70">
-              <div className="w-1 h-6 bg-[#FFC34F]" />
-              <div className="w-0.5 h-6 bg-[#FFC34F]" />
-              <div className="w-1.5 h-6 bg-[#FFC34F]" />
-              <div className="w-0.5 h-6 bg-[#FFC34F]" />
-              <div className="w-1 h-6 bg-[#FFC34F]" />
-              <div className="w-2 h-6 bg-[#FFC34F]" />
+              <div className="w-1 h-6 bg-[var(--house-accent)]" />
+              <div className="w-0.5 h-6 bg-[var(--house-accent)]" />
+              <div className="w-1.5 h-6 bg-[var(--house-accent)]" />
+              <div className="w-0.5 h-6 bg-[var(--house-accent)]" />
+              <div className="w-1 h-6 bg-[var(--house-accent)]" />
+              <div className="w-2 h-6 bg-[var(--house-accent)]" />
             </div>
           </div>
 
@@ -132,25 +133,25 @@ export const TicketModal: React.FC<TicketModalProps> = ({
                 setPdfProgress(null);
               }}
               disabled={isDownloadingPdf}
-              className="w-full py-3 rounded-xl btn-accio-gold text-xs sm:text-sm font-bold flex items-center justify-center space-x-2 transition shadow-lg shadow-[#FFC34F]/20 cursor-pointer disabled:opacity-50"
+              className="w-full btn-primary"
             >
-              <FileDown className="w-4 h-4 text-[#160504]" />
-              <span>{isDownloadingPdf ? (pdfProgress || 'Gerando Pergaminho...') : 'Baixar Ficha Oficial de Hogwarts (PDF)'}</span>
+              <FileDown />
+              <span>{isDownloadingPdf ? (pdfProgress || 'Gerando Pergaminho...') : 'Baixar Ficha Oficial (PDF)'}</span>
             </button>
 
             <a
-              href="https://discord.gg"
+              href={DISCORD_INVITE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-3 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs sm:text-sm font-bold flex items-center justify-center space-x-2 transition shadow-lg shadow-[#5865F2]/25"
+              className="w-full btn-secondary"
             >
-              <MessageSquare className="w-4 h-4" />
-              <span>Entrar no Discord & Reivindicar Cargo de Fundador</span>
+              <MessageSquare />
+              <span>Discord Oficial &amp; Cargo de Pioneiro</span>
             </a>
 
             <button
               onClick={onClose}
-              className="w-full py-2.5 rounded-xl bg-[#210604] hover:bg-[#5B1009] text-xs font-semibold text-[#FFF0B2]/80 hover:text-[#FFF0B2] transition border border-[#B83A0C]/30"
+              className="w-full py-2.5 bg-[#0d1422] hover:bg-[#172033] text-xs font-semibold text-[#b6bbc5] hover:text-[#ece7da] transition border border-[var(--hair-soft)] cursor-pointer"
             >
               Concluir
             </button>
@@ -158,7 +159,7 @@ export const TicketModal: React.FC<TicketModalProps> = ({
 
         </div>
 
-      </div>
+      </ArcaneFrame>
 
     </div>
   );

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle2, Ticket, ShieldCheck, ArrowRight, X, Clock, Wand2, FileDown } from 'lucide-react';
+import { CheckCircle2, Ticket, ShieldCheck, ArrowRight, X, Clock, Wand2, FileDown, Sparkles, Check } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CharacterApplication } from '../types';
 import { HOUSES } from '../lib/constants';
 import { soundManager, musicPlayer } from '../lib/audio';
 import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
+import { ArcaneFrame } from './ArcaneOrnaments';
 
 interface EnchantedSubmissionModalProps {
   isOpen: boolean;
@@ -137,8 +138,10 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
                 </div>
                 
                 {/* Rastro de fumaça de cera */}
-                <span className="text-[11px] font-mono tracking-widest text-[#6B4E3D] mt-2 uppercase">
-                  {stage === 'sealing' ? '✦ Selando com Cera de Hogwarts ✦' : '✦ Partindo rumo às Terras Altas ✦'}
+                <span className="text-[11px] font-mono tracking-widest text-[#6B4E3D] mt-2 uppercase inline-flex items-center gap-1.5">
+                  <Sparkles className="w-3 h-3" />
+                  <span>{stage === 'sealing' ? 'Selando com Cera de Hogwarts' : 'Partindo rumo às Terras Altas'}</span>
+                  <Sparkles className="w-3 h-3" />
                 </span>
               </div>
 
@@ -164,29 +167,27 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
 
         {/* ESTÁGIO 3: CONFIRMAÇÃO DE RECEBIMENTO NO BACK-END (SUPABASE) */}
         {stage === 'confirmed' && (
-          <div className="bg-[#160504]/95 border border-[#B83A0C]/40 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-2xl text-left animate-apple-modal">
+          <ArcaneFrame className="bg-[#0a0f19]/95 p-6 sm:p-8 shadow-2xl backdrop-blur-2xl text-left animate-apple-modal">
             
             {/* Ícone de Sucesso Mágico */}
             <div className="text-center pb-5 border-b border-white/10">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FFC34F] via-[#F47A16] to-[#5B1009] p-0.5 mx-auto mb-4 shadow-xl shadow-[#F47A16]/20">
-                <div className="w-full h-full rounded-[14px] bg-[#160504] flex items-center justify-center">
-                  <CheckCircle2 className="w-9 h-9 text-[#4CAF7C]" />
-                </div>
+              <div className="w-16 h-16 arch bg-[#0d1422] border border-[var(--house-border)] mx-auto mb-4 flex items-center justify-center shadow-xl">
+                <CheckCircle2 className="w-8 h-8 text-[#7fd29a]" />
               </div>
 
-              <span className="text-[10px] tracking-[0.3em] text-[#FFC34F] font-bold uppercase block mb-1">
+              <span className="eyebrow text-[10px] block mb-1">
                 Gabinete de Matrículas de Hogwarts
               </span>
-              <h2 className="font-cinzel text-2xl sm:text-3xl font-extrabold text-[#FFF0B2] leading-tight mb-2">
+              <h2 className="font-display text-2xl sm:text-3xl text-[#ece7da] leading-tight mb-2">
                 Submissão enviada à Escola, aguarde retorno.
               </h2>
-              <p className="font-crimson text-sm sm:text-base text-[#FFF0B2]/80 max-w-md mx-auto leading-relaxed">
+              <p className="font-crimson text-sm sm:text-base text-[#b6bbc5] max-w-md mx-auto leading-relaxed">
                 Sua crônica e antecedentes foram lavrados no Livro da Admissão pela lendária Pena da Aceitação. O Conselho de Magizoologia iniciará a análise formal de sua admissão.
               </p>
             </div>
 
             {/* Comprovante do Aluno / Recibo Oficial do Livro da Admissão */}
-            <div className="my-5 p-4 sm:p-5 rounded-2xl bg-[#210604]/90 border border-[#B83A0C]/30 space-y-3.5">
+            <div className="my-5 p-4 sm:p-5 bg-[#0d1422]/90 border border-[var(--house-border)] space-y-3.5">
               
               <div className="flex items-center justify-between pb-3 border-b border-white/10">
                 <div>
@@ -237,8 +238,9 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
                 </div>
 
                 <div className="sm:col-span-2 flex items-center justify-between pt-2 border-t border-white/5 text-[11px]">
-                  <span className="text-[#4CAF7C] font-mono font-semibold">
-                    ✓ {application.word_count.toLocaleString('pt-BR')} palavras inscritas no Livro da Admissão
+                  <span className="text-[#4CAF7C] font-mono font-semibold inline-flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5" />
+                    <span>{application.word_count.toLocaleString('pt-BR')} palavras inscritas no Livro da Admissão</span>
                   </span>
                   <span className="text-[#FFC34F] flex items-center space-x-1">
                     <Clock className="w-3 h-3" />
@@ -260,10 +262,10 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
                   setPdfProgress(null);
                 }}
                 disabled={isDownloadingPdf}
-                className="w-full sm:w-auto px-4 py-3 rounded-xl bg-[#5B1009]/60 hover:bg-[#5B1009] border border-[#FFC34F]/50 text-[#FFF0B2] text-xs sm:text-sm font-semibold flex items-center justify-center space-x-2 transition cursor-pointer disabled:opacity-50"
+                className="w-full sm:w-auto btn-secondary btn-sm"
               >
-                <FileDown className="w-4 h-4 text-[#FFC34F]" />
-                <span>{isDownloadingPdf ? (pdfProgress || 'Gerando PDF...') : 'Baixar Ficha em PDF'}</span>
+                <FileDown />
+                <span>{isDownloadingPdf ? (pdfProgress || 'Gerando PDF...') : 'Baixar PDF'}</span>
               </button>
 
               <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
@@ -272,11 +274,11 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
                     onClose();
                     onOpenValidation();
                   }}
-                  className="w-full sm:w-auto btn-accio-gold px-4 py-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center space-x-2 shadow-lg shadow-[#F47A16]/20 cursor-pointer"
+                  className="w-full sm:w-auto btn-primary btn-sm"
                 >
-                  <ShieldCheck className="w-4 h-4 text-[#160504]" />
+                  <ShieldCheck />
                   <span>Dossiê</span>
-                  <ArrowRight className="w-4 h-4 text-[#160504]" />
+                  <ArrowRight />
                 </button>
 
                 <button
@@ -284,15 +286,15 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
                     onClose();
                     onViewTicket();
                   }}
-                  className="w-full sm:w-auto px-4 py-3 rounded-xl bg-[#210604] hover:bg-[#5B1009] border border-[#FFC34F]/40 text-[#FFF0B2] text-xs sm:text-sm font-semibold flex items-center justify-center space-x-2 transition cursor-pointer"
+                  className="w-full sm:w-auto btn-secondary btn-sm"
                 >
-                  <Ticket className="w-4 h-4 text-[#FFC34F]" />
+                  <Ticket />
                   <span>Bilhete</span>
                 </button>
               </div>
             </div>
 
-          </div>
+          </ArcaneFrame>
         )}
 
       </div>

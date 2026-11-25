@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Users, ArrowRight, CheckCircle2, Clock, ShieldCheck, Ticket } from 'lucide-react';
+import { Sparkles, ArrowRight, ShieldCheck, Ticket, AlertTriangle, Compass } from 'lucide-react';
 import { TOTAL_PIONEER_SLOTS, TARGET_PHASE_END_DATE } from '../lib/constants';
+import { ArcaneFrame } from './ArcaneOrnaments';
 
 interface HeroProps {
   onOpenForm: () => void;
@@ -21,7 +22,6 @@ export const Hero: React.FC<HeroProps> = ({
   onOpenValidation,
   targetEndDate,
 }) => {
-  // Contagem regressiva sincronizada em tempo real com o Livro da Admissão
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -51,136 +51,156 @@ export const Hero: React.FC<HeroProps> = ({
 
   const percentage = Math.min(Math.round((totalRegistered / TOTAL_PIONEER_SLOTS) * 100), 100);
 
+  const scrollToBanners = () => {
+    const el = document.getElementById('castle-exploration');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <section className="relative pt-12 pb-20 sm:pt-20 sm:pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
-      
-      {/* Glow Superior Adaptativo da Casa */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[350px] sm:w-[650px] h-[350px] bg-gradient-to-b from-[var(--house-primary)]/35 to-transparent rounded-full blur-[100px] pointer-events-none transition-all duration-700" />
-
-      {/* Badge de Urgência / FOMO */}
-      <button
-        onClick={onOpenLetter}
-        className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-[var(--house-pill-bg)] hover:brightness-125 border border-[var(--house-border)] text-xs sm:text-sm text-[#FFF0B2] mb-8 shadow-lg transition cursor-pointer"
+    <header id="top" className="hero">
+      {/* Camadas Atmosféricas ArcaneMP + Silhueta Gótica do Castelo + Emblema ACCIO */}
+      <div
+        className="hero-image pointer-events-none select-none overflow-hidden"
+        aria-hidden="true"
       >
-        <Sparkles className="w-4 h-4 text-[var(--house-accent)]" />
-        <span className="font-semibold text-[var(--house-accent)]">Carta Oficial de Convocação</span>
-        <span className="text-[#FFF0B2]/60">·</span>
-        <span>Clique para Abrir a Carta</span>
-      </button>
-
-      {/* Título Principal */}
-      <h1 className="font-cinzel text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.15] max-w-4xl text-[#FFF0B2] mb-6">
-        Sua Carta de Hogwarts <br />
-        <span className="text-gold-gradient drop-shadow-md">Finalmente Chegou.</span>
-      </h1>
-
-      {/* Subtítulo */}
-      <p className="font-crimson text-lg sm:text-2xl text-[#FFF0B2]/80 max-w-2xl mb-10 leading-relaxed">
-        O primeiro servidor de Roleplay sério em Hogwarts Legacy construído com Arcane MP. 
-        Escreva sua história, garanta seu assento no Expresso e viva o verdadeiro mundo bruxo.
-      </p>
-
-      {/* Progress Bar de Vagas (FOMO 100% Real do Livro da Admissão) */}
-      <div className="w-full max-w-md bg-[var(--house-card-bg)] border border-[var(--house-border)] rounded-2xl p-5 mb-8 shadow-2xl backdrop-blur-xl transition-all duration-700">
-        <div className="flex justify-between items-center text-xs sm:text-sm font-semibold mb-3">
-          <span className="text-[#FFF0B2] flex items-center space-x-1.5">
-            <Users className="w-4 h-4 text-[var(--house-accent)]" />
-            <span>Bruxos Inscritos no Livro da Admissão:</span>
-          </span>
-          <span className="text-[var(--house-accent)] font-mono text-base font-bold">
-            {totalRegistered} / {TOTAL_PIONEER_SLOTS} ({percentage}%)
-          </span>
-        </div>
-
-        {/* Barra de Progresso */}
-        <div className="w-full h-3 bg-[#100303] rounded-full overflow-hidden p-0.5 border border-[var(--house-border)]">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-[var(--house-primary)] via-[var(--house-btn-start)] to-[var(--house-btn-end)] transition-all duration-1000 relative"
-            style={{ width: `${Math.max(percentage, totalRegistered > 0 ? 5 : 0)}%` }}
-          >
-            {totalRegistered > 0 && (
-              <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/60 blur-[2px] animate-pulse"></div>
-            )}
-          </div>
-        </div>
-
-        <p className="text-[11px] text-[#FFF0B2]/60 mt-3 text-left">
-          ⚠️ O Pré-Registro de Pioneiros possui prazo estipulado (ou até o limite de 100 vagas no Livro da Admissão).
-        </p>
-      </div>
-
-      {/* Indicador e Cronômetro */}
-      <div className="flex flex-col items-center mb-10">
-        <div className="flex items-center space-x-1.5 text-xs text-[var(--house-accent)] font-semibold mb-3">
-          <Clock className="w-3.5 h-3.5 text-[var(--house-accent)]" />
-          <span>Contagem Regressiva para Encerramento do Pré-Registro:</span>
-        </div>
-
-        <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-xs sm:max-w-sm">
-          {[
-            { label: 'DIAS', value: timeLeft.days },
-            { label: 'HORAS', value: timeLeft.hours },
-            { label: 'MINUTOS', value: timeLeft.minutes },
-            { label: 'SEGUNDOS', value: timeLeft.seconds },
-          ].map((item, index) => (
-            <div key={index} className="bg-[var(--house-card-bg)] border border-[var(--house-border)] rounded-xl p-2 sm:p-3 text-center min-w-[65px] sm:min-w-[75px] transition-all duration-700">
-              <span className="font-mono text-xl sm:text-2xl font-bold text-gold-gradient block">
-                {String(item.value).padStart(2, '0')}
-              </span>
-              <span className="text-[9px] sm:text-[10px] text-[#FFF0B2]/60 font-semibold tracking-wider">
-                {item.label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* CTA Buttons */}
-      {hasApplication ? (
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <button
-            onClick={onOpenValidation}
-            className="btn-accio-gold px-8 sm:px-10 py-4 rounded-2xl text-base sm:text-lg flex items-center space-x-3 cursor-pointer group shadow-xl"
-          >
-            <ShieldCheck className="w-5 h-5 text-[#160504]" />
-            <span>Validação de Pré-Registro</span>
-            <ArrowRight className="w-5 h-5 text-[#160504] group-hover:translate-x-1 transition" />
-          </button>
-
-          <button
-            onClick={onViewTicket}
-            className="px-6 py-4 rounded-2xl bg-[#210604] hover:bg-[#5B1009] border border-[#FFC34F]/40 text-[#FFF0B2] text-sm sm:text-base flex items-center space-x-2 font-semibold transition"
-          >
-            <Ticket className="w-4 h-4 text-[#FFC34F]" />
-            <span>Meu Bilhete</span>
-          </button>
-        </div>
-      ) : (
-        <button
-          onClick={onOpenForm}
-          className="btn-accio-gold px-8 sm:px-10 py-4 rounded-2xl text-base sm:text-lg flex items-center space-x-3 cursor-pointer group shadow-xl"
+        <div
+          className="absolute inset-0 opacity-20 mix-blend-screen bg-center bg-no-repeat bg-contain scale-110 blur-[1px]"
+          style={{ backgroundImage: 'url(/assets/logohigh_4x.jpg)' }}
+        />
+        <svg
+          viewBox="0 0 1440 720"
+          preserveAspectRatio="xMidYMax slice"
+          className="absolute inset-x-0 bottom-0 w-full h-full opacity-55"
+          fill="#05080f"
         >
-          <Sparkles className="w-5 h-5 text-[#160504]" />
-          <span>Garantir Minha Vaga de Pioneiro</span>
-          <ArrowRight className="w-5 h-5 text-[#160504] group-hover:translate-x-1 transition" />
-        </button>
-      )}
-
-      {/* Garantias / Checklist */}
-      <div className="mt-8 flex flex-wrap justify-center gap-4 sm:gap-6 text-xs text-[#FFF0B2]/70">
-        <span className="flex items-center space-x-1.5">
-          <CheckCircle2 className="w-3.5 h-3.5 text-[#4CAF7C]" />
-          <span>Autenticação Real via Discord</span>
-        </span>
-        <span className="flex items-center space-x-1.5">
-          <CheckCircle2 className="w-3.5 h-3.5 text-[#4CAF7C]" />
-          <span>Inscrição Lavrada no Livro da Admissão</span>
-        </span>
-        <span className="flex items-center space-x-1.5">
-          <CheckCircle2 className="w-3.5 h-3.5 text-[#4CAF7C]" />
-          <span>Notificação Instantânea no Discord</span>
-        </span>
+          <path d="M0 720V540l95-35 75 20 85-55 70 18 65-95 16-78 14 78 24 12 18-130 14 130 32-28 22-165 10-48 10 48 22 165 28 24 18-108 14 108 40 16 28-64 26 64 55-22 65 40 95-45 120 35 110-50 130 35 125-42 84 22V720H0z" />
+          <g fill="#ead6a6" opacity="0.45">
+            <rect x="466" y="340" width="4" height="10" rx="2" />
+            <rect x="476" y="348" width="4" height="10" rx="2" />
+            <rect x="524" y="295" width="4" height="12" rx="2" />
+            <rect x="534" y="315" width="4" height="12" rx="2" />
+            <rect x="576" y="355" width="4" height="10" rx="2" />
+            <rect x="615" y="420" width="3" height="8" rx="1.5" />
+          </g>
+        </svg>
       </div>
-    </section>
+      <div className="hero-shade" aria-hidden="true" />
+      <div className="castle-mist" aria-hidden="true" />
+      <div className="castle-mist castle-mist-near" aria-hidden="true" />
+      <div className="castle-light" aria-hidden="true" />
+
+      <div className="relative z-10 flex flex-1 flex-col">
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-6 pt-28 sm:pt-32 pb-10">
+
+          {/* Bloco Principal Central */}
+          <div className="mx-auto max-w-3xl text-center my-auto pb-8">
+            <button
+              type="button"
+              onClick={onOpenLetter}
+              className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#0a0f19]/85 hover:bg-[#0d1422] border border-[var(--house-border)] text-xs text-[#ece7da] mb-5 shadow-lg transition cursor-pointer backdrop-blur-md"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[var(--house-accent)]" />
+              <span className="eyebrow text-[10px]">Carta Oficial de Convocação</span>
+              <span className="text-[#8b93a1]">·</span>
+              <span className="text-[#b6bbc5]">Abrir Carta</span>
+            </button>
+
+            <h1 className="hero-title">
+              ACCIO
+              <span className="hero-title-sub">Roleplay</span>
+            </h1>
+
+            <p className="font-display mt-7 text-[clamp(1.35rem,2vw,1.7rem)] text-[#f2ebde]">
+              Sua Carta de Hogwarts Finalmente Chegou.
+            </p>
+
+            <p className="mx-auto mt-3 max-w-[54ch] text-pretty text-[#cdd2da]">
+              O primeiro servidor de Roleplay sério em Hogwarts Legacy construído com Arcane MP.
+              Escreva sua história, garanta seu assento no Expresso e viva o verdadeiro mundo bruxo.
+            </p>
+
+            {/* CTAs Chanfrados Hexagonais ArcaneMP */}
+            <div className="mt-8 flex flex-wrap justify-center gap-3 max-sm:flex-col">
+              {hasApplication ? (
+                <>
+                  <button type="button" onClick={onOpenValidation} className="btn-primary">
+                    <ShieldCheck />
+                    <span>Validação de Pré-Registro</span>
+                  </button>
+                  <button type="button" onClick={onViewTicket} className="btn-secondary">
+                    <Ticket />
+                    <span>Meu Bilhete</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button type="button" onClick={onOpenForm} className="btn-primary">
+                    <Sparkles />
+                    <span>Garantir Vaga de Pioneiro</span>
+                  </button>
+                  <button type="button" onClick={scrollToBanners} className="btn-secondary">
+                    <Compass />
+                    <span>Explorar as Casas</span>
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Barra de Progresso Emoldurada do Livro da Admissão */}
+            <div className="mt-7 mx-auto max-w-md text-left">
+              <ArcaneFrame className="p-6 sm:p-7 bg-[#0a0f19]/90 backdrop-blur-md">
+                <div className="flex justify-between items-center text-xs font-semibold mb-2.5">
+                  <span className="eyebrow text-[10px]">Livro da Admissão · 1º Lote</span>
+                  <span className="text-[var(--house-accent)] font-mono text-xs font-bold">
+                    {totalRegistered} / {TOTAL_PIONEER_SLOTS} ({percentage}%)
+                  </span>
+                </div>
+
+                <div className="w-full h-2.5 bg-[#05080f] overflow-hidden p-0.5 border border-[var(--house-border)]">
+                  <div
+                    className="h-full bg-gradient-to-r from-[var(--house-secondary)] via-[var(--house-btn-mid)] to-[var(--house-btn-start)] transition-all duration-1000 relative"
+                    style={{ width: `${Math.max(percentage, totalRegistered > 0 ? 5 : 0)}%` }}
+                  >
+                    {totalRegistered > 0 && (
+                      <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/70 blur-[2px] animate-pulse" />
+                    )}
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-[#8b93a1] mt-2.5 flex items-start gap-1.5 leading-snug">
+                  <AlertTriangle className="w-3.5 h-3.5 text-[var(--house-accent)] flex-shrink-0 mt-0.5" />
+                  <span>Pré-Registro limitado por prazo estipulado ou até 100 vagas no Livro da Admissão.</span>
+                </p>
+              </ArcaneFrame>
+            </div>
+          </div>
+
+          {/* Barra Inferior 3 Colunas Estilo hero-facts do ArcaneMP */}
+          <dl className="hero-facts mx-auto mt-auto w-full max-w-4xl text-center">
+            <div>
+              <dt>
+                <span className="live-dot" aria-hidden="true" />
+                <span className="tabular-nums">{totalRegistered}</span> inscritos agora
+              </dt>
+              <dd>De {TOTAL_PIONEER_SLOTS} vagas do 1º Lote ({percentage}%)</dd>
+            </div>
+            <div>
+              <dt className="tabular-nums">
+                {String(timeLeft.days).padStart(2, '0')}d : {String(timeLeft.hours).padStart(2, '0')}h :{' '}
+                {String(timeLeft.minutes).padStart(2, '0')}m : {String(timeLeft.seconds).padStart(2, '0')}s
+              </dt>
+              <dd>Encerramento do Pré-Registro em tempo real</dd>
+            </div>
+            <div>
+              <dt className="inline-flex items-center gap-1.5">
+                <span>Anos 2000 · Arcane MP</span>
+                <ArrowRight className="w-4 h-4 text-[var(--house-accent)] hidden sm:inline" />
+              </dt>
+              <dd>Discord OAuth2, Varinha 3D &amp; Pergaminho PDF</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </header>
   );
 };

@@ -11,10 +11,10 @@ interface Particle {
 }
 
 const HOUSE_PARTICLE_PALETTES: Record<string, string[]> = {
-  gryffindor: ['#FFF0B2', '#FFC34F', '#F47A16', '#FFE28A', '#B83A0C'],
-  slytherin: ['#F1F5F9', '#34D399', '#2ECC71', '#059669', '#A7F3D0'],
-  ravenclaw: ['#EFF6FF', '#60A5FA', '#93C5FD', '#C59A4E', '#3B82F6'],
-  hufflepuff: ['#FEF08A', '#F59E0B', '#FBBF24', '#D97706', '#FDE047'],
+  gryffindor: ['#f6ead0', '#ead6a6', '#c9b07a', '#b5675e', '#dcc28d'],
+  slytherin: ['#e6f2ec', '#9fd3b4', '#6e9e81', '#c9b07a', '#7fd29a'],
+  ravenclaw: ['#edf3fc', '#b6cbe8', '#7e98bd', '#c9b07a', '#ead6a6'],
+  hufflepuff: ['#f9efd4', '#ead6a6', '#c7ac63', '#dcc28d', '#b39246'],
 };
 
 export const ParticleCanvas: React.FC = () => {

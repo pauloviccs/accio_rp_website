@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { Compass, Wand2, Sparkles, ChevronLeft, ChevronRight, Shield } from 'lucide-react';
+import { Compass, Wand2, Sparkles, ChevronLeft, ChevronRight, Shield, Swords } from 'lucide-react';
 import { soundManager } from '../lib/audio';
 import { HouseId } from '../types';
+import { ArcaneFrame, ArcaneDivider } from './ArcaneOrnaments';
 
 interface CastleBanners3DProps {
   onSelectHouse?: (house: HouseId) => void;
@@ -839,38 +840,39 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
   };
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-[#B83A0C]/20 relative">
+    <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative">
       
-      {/* Título da Seção */}
-      <div className="text-center max-w-3xl mx-auto mb-8">
-        <span className="text-xs uppercase tracking-[0.25em] text-[#FFC34F] font-bold block mb-2 flex items-center justify-center gap-2">
-          <Compass className="w-4 h-4 text-[#FFC34F] animate-spin" style={{ animationDuration: '20s' }} />
-          <span>Exploração do Castelo & As Quatro Casas</span>
-        </span>
-        <h2 className="font-cinzel text-3xl sm:text-5xl font-extrabold text-[#FFF0B2] mb-3">
+      {/* Título da Seção (Estilo ArcaneMP) */}
+      <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-10">
+        <p className="eyebrow flex items-center justify-center gap-2">
+          <Compass className="w-3.5 h-3.5 text-[var(--house-accent-secondary)] animate-spin" style={{ animationDuration: '20s' }} />
+          <span>Exploração do Castelo &amp; As Quatro Casas</span>
+        </p>
+        <h2 className="title mt-4 text-3xl sm:text-5xl">
           Os Grandes Estandartes de Hogwarts
         </h2>
-        <p className="font-crimson text-base sm:text-xl text-[#FFF0B2]/80 max-w-2xl mx-auto leading-relaxed">
+        <ArcaneDivider className="mt-6" />
+        <p className="mt-6 max-w-[58ch] text-pretty text-[#b6bbc5]">
           Estandartes monumentais tecidos em tapeçaria mágica, suspensos sob os arcos do Grande Salão. Toque em qualquer flâmula tridimensional para revelar a história e a virtude de sua Casa.
         </p>
       </div>
 
-      {/* Seletor Rápido de Casas em Pílulas (Perfeito para Mobile & Acessibilidade) */}
-      <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+      {/* Seletor Rápido de Casas */}
+      <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6">
         {HOUSES_DATA.map((h, i) => {
           const isSelected = selectedHouse.id === h.id;
           return (
             <button
               key={h.id}
               onClick={() => selectHouseByIndex(i)}
-              className={`px-4 py-2 rounded-xl text-xs font-cinzel font-bold border transition flex items-center space-x-2 cursor-pointer shadow-md ${
+              className={`px-4 py-2 text-xs font-display uppercase tracking-wider border transition flex items-center gap-2 cursor-pointer ${
                 isSelected
-                  ? 'bg-gradient-to-r from-[#FFC34F] to-[#F47A16] text-[#160504] border-[#FFC34F] scale-105 shadow-[#FFC34F]/30'
-                  : 'bg-[#160504]/90 text-[#FFF0B2]/80 border-[#B83A0C]/40 hover:border-[#FFC34F]/60 hover:text-white'
+                  ? 'bg-[#0d1422] text-[var(--house-accent)] border-[var(--house-accent)] shadow-lg'
+                  : 'bg-[#0a0f19]/90 text-[#b6bbc5] border-[var(--house-border)] hover:border-[var(--house-accent)]/70 hover:text-[#ece7da]'
               }`}
             >
               <span
-                className="w-2.5 h-2.5 rounded-full"
+                className="w-2.5 h-2.5 rotate-45"
                 style={{ backgroundColor: h.accentColor }}
               />
               <span>{h.name}</span>
@@ -882,7 +884,7 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
       {/* CONTAINER DO WEBGL THREE.JS (Altura Ampla e Confortável) */}
       <div
         ref={mountRef}
-        className="w-full h-[540px] sm:h-[620px] lg:h-[720px] relative flex items-center justify-center cursor-pointer select-none"
+        className="w-full h-[540px] sm:h-[620px] lg:h-[700px] relative flex items-center justify-center cursor-pointer select-none"
       >
         {/* Setas de Navegação Lateral para Mobile / Tablet */}
         <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none md:hidden z-20">
@@ -891,7 +893,7 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
               e.stopPropagation();
               selectHouseByIndex(activeHouseIndex - 1);
             }}
-            className="p-2.5 rounded-full bg-[#160504]/90 border border-[#FFC34F]/40 text-[#FFC34F] pointer-events-auto hover:bg-[#5B1009] shadow-xl"
+            className="p-2.5 bg-[#0a0f19]/90 border border-[var(--house-border)] text-[var(--house-accent)] pointer-events-auto hover:bg-[#0d1422] shadow-xl"
             title="Casa Anterior"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -904,7 +906,7 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
               e.stopPropagation();
               selectHouseByIndex(activeHouseIndex + 1);
             }}
-            className="p-2.5 rounded-full bg-[#160504]/90 border border-[#FFC34F]/40 text-[#FFC34F] pointer-events-auto hover:bg-[#5B1009] shadow-xl"
+            className="p-2.5 bg-[#0a0f19]/90 border border-[var(--house-border)] text-[var(--house-accent)] pointer-events-auto hover:bg-[#0d1422] shadow-xl"
             title="Próxima Casa"
           >
             <ChevronRight className="w-5 h-5" />
@@ -913,41 +915,41 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
 
         {/* Dica Flutuante Inferior */}
         <div className="absolute bottom-4 inset-x-0 flex justify-center pointer-events-none z-10">
-          <span className="text-xs font-semibold text-[#FFC34F] bg-[#160504]/90 px-4 py-1.5 rounded-full border border-[#B83A0C]/40 backdrop-blur-md shadow-xl flex items-center space-x-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-[#FFC34F] animate-pulse" />
+          <span className="text-xs font-semibold text-[var(--house-accent)] bg-[#0a0f19]/90 px-4 py-1.5 border border-[var(--house-border)] backdrop-blur-md shadow-xl flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-[var(--house-accent)] animate-pulse" />
             <span>Toque nos estandartes tridimensionais para inspecionar</span>
           </span>
         </div>
       </div>
 
-      {/* PAINEL DE DETALHES DA CASA SELECIONADA */}
-      <div 
-        className="mt-6 max-w-4xl mx-auto bg-[#1A0605] border-2 rounded-3xl p-6 sm:p-9 shadow-2xl backdrop-blur-xl transition-all duration-500 relative overflow-hidden"
+      {/* PAINEL DE DETALHES DA CASA SELECIONADA (Moldura Ornamental ArcaneMP) */}
+      <ArcaneFrame
+        className="mt-8 max-w-4xl mx-auto p-6 sm:p-10 shadow-2xl overflow-hidden"
         style={{ borderColor: selectedHouse.accentColor }}
       >
         <div
-          className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-[110px] pointer-events-none opacity-30"
+          className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-[110px] pointer-events-none opacity-25"
           style={{ backgroundColor: selectedHouse.primaryColor }}
         />
 
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
           
           <div className="md:col-span-2 space-y-4">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-3">
               <span
-                className="w-4 h-4 rounded-full shadow-sm"
+                className="w-3 h-3 rotate-45 shadow-sm"
                 style={{ backgroundColor: selectedHouse.accentColor }}
               />
-              <span className="text-xs uppercase tracking-widest font-bold text-[#FFC34F]">
+              <span className="eyebrow text-[11px]">
                 {selectedHouse.colors} · Elemento {selectedHouse.element} · {selectedHouse.crestAnimal}
               </span>
             </div>
 
-            <h3 className="font-cinzel text-2xl sm:text-4xl font-extrabold text-[#FFF0B2]">
+            <h3 className="font-display text-2xl sm:text-4xl text-[#efe4cc]">
               Casa {selectedHouse.name}
             </h3>
 
-            <p className="font-crimson italic text-lg text-[#FFF0B2]/90">
+            <p className="font-crimson italic text-lg text-[#ece7da]/90">
               "{selectedHouse.motto}"
             </p>
 
@@ -955,38 +957,39 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
               {selectedHouse.virtues.map((v) => (
                 <span
                   key={v}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#210604] border border-white/10 text-[#FFF0B2] shadow-sm"
+                  className="px-3.5 py-1.5 text-xs font-semibold bg-[#0d1422] border border-[var(--house-border)] text-[#ece7da] inline-flex items-center gap-1.5"
                 >
-                  ⚔️ {v}
+                  <Swords className="w-3.5 h-3.5 text-[var(--house-accent)]" />
+                  <span>{v}</span>
                 </span>
               ))}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs text-[#FFF0B2]/85 pt-3 border-t border-white/10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs text-[#b6bbc5] pt-4 border-t border-[var(--hair-soft)]">
               <div>
-                <span className="text-[#FFC34F] block font-semibold">Fundador(a):</span>
-                <span className="text-sm">{selectedHouse.founder}</span>
+                <span className="eyebrow text-[10px] block mb-0.5">Fundador(a)</span>
+                <span className="text-sm text-[#ece7da]">{selectedHouse.founder}</span>
               </div>
               <div>
-                <span className="text-[#FFC34F] block font-semibold">Fantasma Residente:</span>
-                <span className="text-sm">{selectedHouse.ghost}</span>
+                <span className="eyebrow text-[10px] block mb-0.5">Fantasma Residente</span>
+                <span className="text-sm text-[#ece7da]">{selectedHouse.ghost}</span>
               </div>
               <div className="sm:col-span-2">
-                <span className="text-[#FFC34F] block font-semibold">Salão Comunal:</span>
-                <span className="text-sm leading-relaxed">{selectedHouse.location}</span>
+                <span className="eyebrow text-[10px] block mb-0.5">Salão Comunal</span>
+                <span className="text-sm leading-relaxed text-[#ece7da]">{selectedHouse.location}</span>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col items-center justify-center p-6 sm:p-7 rounded-2xl bg-[#100303]/90 border border-white/10 text-center space-y-4 shadow-xl">
+          <div className="flex flex-col items-center justify-center p-6 sm:p-7 bg-[#0d1422]/90 border border-[var(--house-border)] text-center space-y-4">
             <div
-              className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-black text-white shadow-2xl border border-white/20"
+              className="w-20 h-20 arch flex items-center justify-center border border-[var(--house-border)] shadow-xl"
               style={{ backgroundColor: selectedHouse.primaryColor }}
             >
-              <Shield className="w-10 h-10" style={{ color: selectedHouse.accentColor }} />
+              <Shield className="w-9 h-9" style={{ color: selectedHouse.accentColor }} />
             </div>
 
-            <span className="text-xs text-[#FFF0B2]/70 leading-relaxed">
+            <span className="text-xs text-[#b6bbc5] leading-relaxed">
               Deseja aspirar a esta nobre casa na sua convocação oficial?
             </span>
 
@@ -996,7 +999,7 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
                   soundManager.playSparkle();
                   onOpenFormWithHouse(selectedHouse.id);
                 }}
-                className="w-full py-3 px-4 rounded-xl btn-accio-gold text-xs font-bold transition flex items-center justify-center space-x-1.5 cursor-pointer shadow-lg"
+                className="w-full btn-primary btn-sm"
               >
                 <Wand2 className="w-4 h-4" />
                 <span>Escolher {selectedHouse.name}</span>
@@ -1005,7 +1008,7 @@ export const CastleBanners3D: React.FC<CastleBanners3DProps> = ({
           </div>
 
         </div>
-      </div>
+      </ArcaneFrame>
 
     </section>
   );

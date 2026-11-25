@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { Features } from './components/Features';
@@ -207,7 +208,7 @@ export const App: React.FC = () => {
         <div className="relative z-50 bg-[#5B1009]/95 border-b border-[#F47A16]/60 px-4 py-3 text-white backdrop-blur-md shadow-2xl transition-all">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-xl">⚠️</span>
+              <AlertTriangle className="w-5 h-5 text-[#FFC34F] flex-shrink-0" />
               <div className="text-xs sm:text-sm font-medium text-[#FFF0B2]">
                 <strong className="text-[#FFC34F]">Status da Conexão:</strong> {authError}
               </div>
@@ -270,7 +271,10 @@ export const App: React.FC = () => {
       </main>
 
       {/* Rodapé */}
-      <Footer />
+      <Footer
+        onOpenLetter={() => setIsLetterOpen(true)}
+        onOpenForm={() => setIsFormOpen(true)}
+      />
 
       {/* Animação da Carta de Hogwarts 3D (Primeira Visita ou Chamada) */}
       <HogwartsLetterModal

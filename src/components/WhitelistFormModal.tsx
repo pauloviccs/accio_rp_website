@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   X, Sparkles, AlertTriangle, Save, Wand2, User, ChevronRight, ChevronLeft, 
-  LogIn, FileDown, Check, Shield, BookOpen, Scroll
+  LogIn, FileDown, Check, Shield, BookOpen, Scroll, Droplet, Scale, Zap, Lightbulb
 } from 'lucide-react';
 import { CharacterApplication, DiscordUser, HouseId, BloodStatus } from '../types';
 import { 
@@ -290,29 +290,27 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/90 backdrop-blur-xl overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-[#05080f]/90 backdrop-blur-xl overflow-y-auto">
       
-      {/* Container Principal Estilo Hogwarts Legacy Character Creation */}
-      <div className="relative w-full max-w-4xl max-h-[94vh] bg-[#120404] border-2 border-[var(--house-border-strong)] rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden animate-apple-modal my-auto">
+      {/* Container Principal Estilo ArcaneMP + Hogwarts Legacy */}
+      <div className="relative w-full max-w-4xl max-h-[94vh] bg-[#0a0f19] border border-[var(--house-border-strong)] shadow-[0_0_50px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden animate-apple-modal my-auto">
         
         {/* Glow de Ambiente da Casa Selecionada */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-[var(--house-glow)] rounded-full blur-[120px] pointer-events-none opacity-40" />
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[var(--house-primary)] rounded-full blur-[140px] pointer-events-none opacity-20" />
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-[var(--house-glow)] rounded-full blur-[120px] pointer-events-none opacity-35" />
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[var(--house-primary)] rounded-full blur-[140px] pointer-events-none opacity-15" />
 
         {/* ─── Topo: Stepper com Medalhões Inspirado em Hogwarts Legacy ─── */}
-        <div className="relative z-10 px-5 sm:px-8 pt-5 pb-4 border-b border-[var(--house-border)] bg-[#180504]/90 backdrop-blur-md">
+        <div className="relative z-10 px-5 sm:px-8 pt-5 pb-4 border-b border-[var(--house-border)] bg-[#090e17]/95 backdrop-blur-md">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--house-btn-start)] to-[var(--house-primary)] p-0.5 shadow-lg">
-                <div className="w-full h-full bg-[#120404] rounded-[10px] flex items-center justify-center">
-                  <Wand2 className="w-5 h-5 text-[var(--house-accent)]" />
-                </div>
+              <div className="w-10 h-10 bg-[#0d1422] border border-[var(--house-border)] flex items-center justify-center shadow-lg">
+                <Wand2 className="w-5 h-5 text-[var(--house-accent)]" />
               </div>
               <div>
-                <span className="text-[10px] uppercase tracking-[0.25em] text-[var(--house-accent)] font-bold block">
+                <span className="eyebrow text-[10px] block">
                   Ministério da Magia · Criação de Personagem
                 </span>
-                <h2 className="font-cinzel text-lg sm:text-2xl font-black text-[#FFF0B2] leading-tight">
+                <h2 className="font-display text-lg sm:text-2xl text-[#ece7da] leading-tight">
                   Ficha de Admissão em Hogwarts
                 </h2>
               </div>
@@ -320,14 +318,14 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
 
             <div className="flex items-center space-x-3">
               {lastSaved && (
-                <span className="text-[10px] text-[#FFF0B2]/50 items-center space-x-1 hidden sm:flex">
+                <span className="text-[10px] text-[#b6bbc5] items-center space-x-1 hidden sm:flex">
                   <Save className="w-3 h-3 text-[var(--house-accent)]" />
                   <span>Salvo {lastSaved}</span>
                 </span>
               )}
               <button
                 onClick={onClose}
-                className="p-2 rounded-full bg-[#240604] hover:bg-[#5B1009] text-[#FFF0B2]/70 hover:text-white transition cursor-pointer border border-white/10"
+                className="p-2 bg-[#0d1422] hover:bg-[#172033] text-[#b6bbc5] hover:text-white transition cursor-pointer border border-[var(--house-border)]"
                 title="Fechar formulário"
               >
                 <X className="w-4 h-4" />
@@ -335,10 +333,10 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
             </div>
           </div>
 
-          {/* Barra de Trilho com Medalhões estilo Hogwarts Legacy (Gear / Character Creation) */}
+          {/* Barra de Trilho com Medalhões estilo Hogwarts Legacy */}
           <div className="relative flex items-center justify-between max-w-2xl mx-auto pt-2 pb-1">
-            {/* Trilho Ornamental de Latão */}
-            <div className="absolute top-1/2 left-4 right-4 -translate-y-1/2 h-[2px] bg-gradient-to-r from-[#FFC34F]/20 via-[#FFC34F]/60 to-[#FFC34F]/20 z-0" />
+            {/* Trilho Ornamental */}
+            <div className="absolute top-1/2 left-4 right-4 -translate-y-1/2 h-[1px] bg-gradient-to-r from-[#c9b07a]/20 via-[#c9b07a]/60 to-[#c9b07a]/20 z-0" />
 
             {[
               { num: 1, label: 'Identidade', icon: User },
@@ -361,28 +359,28 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                   className="relative z-10 flex flex-col items-center group cursor-pointer focus:outline-none"
                 >
                   <div
-                    className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative ${
+                    className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center border transition-all duration-300 relative ${
                       isActive
-                        ? 'bg-[var(--house-primary)] border-[var(--house-accent)] ring-4 ring-[var(--house-glow)] scale-110 shadow-lg'
+                        ? 'bg-[#0d1422] border-[var(--house-accent)] ring-4 ring-[var(--house-glow)] scale-110 shadow-lg text-[var(--house-accent)]'
                         : isDone
-                        ? 'bg-[#2A0604] border-[#FFC34F]/80 text-[#FFC34F]'
-                        : 'bg-[#120404] border-[#B83A0C]/40 text-[#FFF0B2]/40 hover:border-[#FFC34F]/50'
+                        ? 'bg-[#0d1422] border-[#c9b07a]/70 text-[#ead6a6]'
+                        : 'bg-[#090e17] border-[var(--house-border)] text-[#8b93a1] hover:border-[var(--house-accent)]'
                     }`}
                   >
-                    <IconComp className={`w-4 h-4 ${isActive ? 'text-[var(--house-accent-bright)] animate-pulse' : ''}`} />
+                    <IconComp className={`w-4 h-4 ${isActive ? 'animate-pulse' : ''}`} />
                     {isDone && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#4CAF7C] flex items-center justify-center text-[10px] text-white">
+                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#6e9e81] flex items-center justify-center text-[10px] text-[#090e17]">
                         <Check className="w-2.5 h-2.5 stroke-[3]" />
                       </div>
                     )}
                   </div>
                   <span
-                    className={`text-[10px] sm:text-xs font-cinzel font-bold mt-1.5 transition ${
+                    className={`text-[10px] sm:text-xs font-display mt-1.5 transition ${
                       isActive
                         ? 'text-gold-gradient scale-105'
                         : isDone
-                        ? 'text-[#FFF0B2]/80'
-                        : 'text-[#FFF0B2]/40'
+                        ? 'text-[#ece7da]'
+                        : 'text-[#8b93a1]'
                     }`}
                   >
                     {item.label}
@@ -453,7 +451,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                     placeholder="Ex: Alastair, Lyra, Edward"
                     value={formData.first_name}
                     onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
+                    className="w-full px-4 py-3 rounded-xl bg-[#0d1422] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
                   />
                 </div>
 
@@ -466,7 +464,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                     placeholder="Ex: Blackwood, Pendelton, Vance"
                     value={formData.last_name}
                     onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
+                    className="w-full px-4 py-3 rounded-xl bg-[#0d1422] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
                   />
                 </div>
               </div>
@@ -482,7 +480,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                     max="1995-12-31"
                     value={formData.birth_date}
                     onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-[#FFF0B2] focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
+                    className="w-full px-4 py-3 rounded-xl bg-[#0d1422] border border-[var(--house-border)] text-[#FFF0B2] focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
                   />
                 </div>
 
@@ -495,7 +493,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                     placeholder="Ex: Hogsmeade, Godric's Hollow, Londres Mágica"
                     value={formData.birth_place}
                     onChange={(e) => setFormData({ ...formData, birth_place: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
+                    className="w-full px-4 py-3 rounded-xl bg-[#0d1422] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
                   />
                 </div>
               </div>
@@ -517,7 +515,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                       className={`p-3 rounded-xl border text-left transition cursor-pointer ${
                         formData.dormitory === d.id
                           ? 'bg-[var(--house-primary)] border-[var(--house-accent)] text-[#FFF0B2] shadow-lg'
-                          : 'bg-[#1C0604] border-[var(--house-border)] text-[#FFF0B2]/60 hover:border-[var(--house-accent)]/50'
+                          : 'bg-[#0d1422] border-[var(--house-border)] text-[#FFF0B2]/60 hover:border-[var(--house-accent)]/50'
                       }`}
                     >
                       <span className="font-cinzel text-xs font-bold block">{d.label}</span>
@@ -534,10 +532,12 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                 </label>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { id: 'pure-blood', label: 'Sangue-Puro 🩸', desc: 'Tradição ancestral das Sagradas 28' },
-                    { id: 'half-blood', label: 'Mestiço ⚖️', desc: 'Herança mágica e laços trouxas' },
-                    { id: 'muggle-born', label: 'Nascido-Trouxa ⚡', desc: 'A magia espontânea nascida de surpresa' },
-                  ].map((item) => (
+                    { id: 'pure-blood', label: 'Sangue-Puro', icon: Droplet, desc: 'Tradição ancestral das Sagradas 28' },
+                    { id: 'half-blood', label: 'Mestiço', icon: Scale, desc: 'Herança mágica e laços trouxas' },
+                    { id: 'muggle-born', label: 'Nascido-Trouxa', icon: Zap, desc: 'A magia espontânea nascida de surpresa' },
+                  ].map((item) => {
+                    const BloodIcon = item.icon;
+                    return (
                     <button
                       key={item.id}
                       type="button"
@@ -545,13 +545,17 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                       className={`p-3 rounded-xl border text-left transition cursor-pointer ${
                         formData.blood_status === item.id
                           ? 'bg-[var(--house-primary)] border-[var(--house-accent)] text-[#FFF0B2] shadow-lg'
-                          : 'bg-[#1C0604] border-[var(--house-border)] text-[#FFF0B2]/60 hover:border-[var(--house-accent)]/50'
+                          : 'bg-[#0d1422] border-[var(--house-border)] text-[#FFF0B2]/60 hover:border-[var(--house-accent)]/50'
                       }`}
                     >
-                      <span className="text-xs font-bold block">{item.label}</span>
+                      <span className="text-xs font-bold flex items-center gap-1.5">
+                        <span>{item.label}</span>
+                        <BloodIcon className="w-3.5 h-3.5 text-[var(--house-accent)]" />
+                      </span>
                       <span className="text-[10px] text-[#FFF0B2]/50 block mt-0.5">{item.desc}</span>
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -607,7 +611,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                         className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold border transition cursor-pointer ${
                           handleCategory === cat.id
                             ? 'bg-[var(--house-accent)] text-[#160504] border-[var(--house-accent)] font-bold shadow-md'
-                            : 'bg-[#1C0604] text-[#FFF0B2]/60 border-white/10 hover:border-[var(--house-accent)]/40 hover:text-white'
+                            : 'bg-[#0d1422] text-[#FFF0B2]/60 border-white/10 hover:border-[var(--house-accent)]/40 hover:text-white'
                         }`}
                       >
                         {cat.label}
@@ -630,7 +634,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                           className={`relative aspect-square rounded-xl p-1 border transition-all duration-200 cursor-pointer flex flex-col items-center justify-center group ${
                             isSelected
                               ? 'bg-gradient-to-b from-[var(--house-primary)] to-[#0B0202] border-[var(--house-accent)] ring-2 ring-[var(--house-accent)] shadow-[0_0_16px_var(--house-glow)] scale-105 z-10'
-                              : 'bg-[#140404] border-white/10 hover:border-[var(--house-accent)]/50 hover:bg-[#200604]'
+                              : 'bg-[#090e17] border-white/10 hover:border-[var(--house-accent)]/50 hover:bg-[#200604]'
                           }`}
                           title={`${handle.name} — ${handle.colorName}`}
                         >
@@ -654,12 +658,13 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                 </div>
 
                 {/* COLUNA DIREITA: Pedestal de Inspeção de Relíquia (5 Colunas) */}
-                <div className="lg:col-span-5 rounded-2xl bg-[#140404] border border-[var(--house-border-strong)] p-4 shadow-2xl space-y-3 relative overflow-hidden">
+                <div className="lg:col-span-5 rounded-2xl bg-[#090e17] border border-[var(--house-border-strong)] p-4 shadow-2xl space-y-3 relative overflow-hidden">
                   
                   {/* Seletor de Modo de Exibição */}
                   <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                    <span className="text-[10px] font-cinzel font-bold uppercase tracking-wider text-[var(--house-accent)]">
-                      ✦ Relíquia de Duelo 1890 ✦
+                    <span className="text-[10px] font-cinzel font-bold uppercase tracking-wider text-[var(--house-accent)] inline-flex items-center gap-1.5">
+                      <Sparkles className="w-3 h-3" />
+                      <span>Relíquia de Duelo 1890</span>
                     </span>
                     <div className="flex items-center bg-[#0B0202] p-0.5 rounded-lg border border-white/10">
                       <button
@@ -690,7 +695,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                   </div>
 
                   {/* O Mostruário Cinematográfico (Sem Imagens Arrastáveis) */}
-                  <div className="h-44 rounded-xl bg-gradient-to-b from-[#100303] to-[#080202] border border-[var(--house-border)] relative flex items-center justify-center p-3 overflow-hidden shadow-inner select-none">
+                  <div className="h-44 rounded-xl bg-gradient-to-b from-[#090e17] to-[#080202] border border-[var(--house-border)] relative flex items-center justify-center p-3 overflow-hidden shadow-inner select-none">
                     {/* Brilho radial no centro */}
                     <div className="absolute inset-0 bg-radial from-[var(--house-glow)]/25 via-transparent to-transparent pointer-events-none" />
 
@@ -716,8 +721,18 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                       </div>
                     )}
 
-                    <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/60 border border-white/10 text-[8px] font-mono uppercase tracking-widest text-[#FFF0B2]/60 pointer-events-none">
-                      {wandViewMode === '3d' ? '✦ Fuste e Empunhadura' : '📜 Guia de Campo'}
+                    <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/60 border border-white/10 text-[8px] font-mono uppercase tracking-widest text-[#FFF0B2]/60 pointer-events-none inline-flex items-center gap-1">
+                      {wandViewMode === '3d' ? (
+                        <>
+                          <Sparkles className="w-2.5 h-2.5 text-[var(--house-accent)]" />
+                          <span>Fuste e Empunhadura</span>
+                        </>
+                      ) : (
+                        <>
+                          <Scroll className="w-2.5 h-2.5 text-[var(--house-accent)]" />
+                          <span>Guia de Campo</span>
+                        </>
+                      )}
                     </span>
                   </div>
 
@@ -762,7 +777,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                           className={`p-3 rounded-xl border text-left transition cursor-pointer relative ${
                             isCoreSelected
                               ? 'bg-[var(--house-primary)] border-[var(--house-accent)] text-[#FFF0B2] shadow-lg ring-1 ring-[var(--house-accent)]'
-                              : 'bg-[#1C0604] border-white/10 text-[#FFF0B2]/70 hover:border-[var(--house-accent)]/40'
+                              : 'bg-[#0d1422] border-white/10 text-[#FFF0B2]/70 hover:border-[var(--house-accent)]/40'
                           }`}
                         >
                           <span className="font-cinzel text-xs font-bold block">{core}</span>
@@ -784,7 +799,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                     <select
                       value={formData.wand_wood}
                       onChange={(e) => setFormData({ ...formData, wand_wood: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-xs text-[#FFF0B2] focus:border-[var(--house-accent)] outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#0d1422] border border-[var(--house-border)] text-xs text-[#FFF0B2] focus:border-[var(--house-accent)] outline-none"
                     >
                       {WAND_WOODS.map((wood) => (
                         <option key={wood} value={wood}>{wood}</option>
@@ -799,7 +814,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                     <select
                       value={formData.wand_length}
                       onChange={(e) => setFormData({ ...formData, wand_length: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-xs text-[#FFF0B2] focus:border-[var(--house-accent)] outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#0d1422] border border-[var(--house-border)] text-xs text-[#FFF0B2] focus:border-[var(--house-accent)] outline-none"
                     >
                       {WAND_LENGTHS.map((len) => (
                         <option key={len} value={len}>{len}</option>
@@ -814,7 +829,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                     <select
                       value={formData.wand_flexibility}
                       onChange={(e) => setFormData({ ...formData, wand_flexibility: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-xs text-[#FFF0B2] focus:border-[var(--house-accent)] outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#0d1422] border border-[var(--house-border)] text-xs text-[#FFF0B2] focus:border-[var(--house-accent)] outline-none"
                     >
                       {WAND_FLEXIBILITIES.map((flex) => (
                         <option key={flex} value={flex}>{flex}</option>
@@ -890,7 +905,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                   placeholder="Ex: Corça Prateada, Falcão-Peregrino, Lobo Ártico, Doninha"
                   value={formData.patronus}
                   onChange={(e) => setFormData({ ...formData, patronus: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#0d1422] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-sm transition"
                 />
               </div>
 
@@ -922,11 +937,12 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                   placeholder="Escreva a biografia detalhada do seu personagem, manifestações mágicas infantis, árvore genealógica, aspirações acadêmicas nos anos 2000 em Hogwarts..."
                   value={formData.character_backstory}
                   onChange={(e) => setFormData({ ...formData, character_backstory: e.target.value })}
-                  className="w-full p-4 rounded-xl bg-[#1C0604] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-xs sm:text-sm font-crimson leading-relaxed custom-scrollbar transition"
+                  className="w-full p-4 rounded-xl bg-[#0d1422] border border-[var(--house-border)] text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[var(--house-accent)] focus:outline-none text-xs sm:text-sm font-crimson leading-relaxed custom-scrollbar transition"
                 />
 
-                <span className="text-[11px] text-[#FFF0B2]/60 block mt-1">
-                  💡 O rascunho é gravado automaticamente no seu navegador. Você pode pausar e continuar a qualquer momento.
+                <span className="text-[11px] text-[#FFF0B2]/60 flex items-center gap-1.5 mt-1">
+                  <Lightbulb className="w-3.5 h-3.5 text-[var(--house-accent)] flex-shrink-0" />
+                  <span>O rascunho é gravado automaticamente no seu navegador. Você pode pausar e continuar a qualquer momento.</span>
                 </span>
               </div>
             </div>
@@ -947,7 +963,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
               </div>
 
               {/* Resumo em Estilo Pergaminho */}
-              <div className="p-5 rounded-2xl bg-[#1C0604] border border-[var(--house-border-strong)] space-y-4 shadow-xl">
+              <div className="p-5 rounded-2xl bg-[#0d1422] border border-[var(--house-border-strong)] space-y-4 shadow-xl">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                   <div>
                     <span className="text-[var(--house-accent)] block font-semibold">Nome Completo:</span>
@@ -1006,7 +1022,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
 
               {/* Vinculação do Discord se Pendente */}
               {!user && (
-                <div className="p-4 rounded-xl bg-[#240604] border border-white/10 space-y-2">
+                <div className="p-4 rounded-xl bg-[#0d1422] border border-white/10 space-y-2">
                   <label className="block text-xs font-semibold text-[#FFC34F]">
                     Ou informe seu usuário do Discord manualmente:
                   </label>
@@ -1048,7 +1064,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
         </div>
 
         {/* ─── Rodapé de Navegação do Modal (Avançar / Voltar / Submeter) ─── */}
-        <div className="px-6 py-4 border-t border-[var(--house-border)] bg-[#180504]/90 backdrop-blur-md flex items-center justify-between">
+        <div className="px-6 py-4 border-t border-[var(--house-border)] bg-[#090e17]/95 backdrop-blur-md flex items-center justify-between">
           <div>
             {step > 1 ? (
               <button
@@ -1057,18 +1073,18 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                   soundManager.playClick();
                   setStep((step - 1) as any);
                 }}
-                className="px-4 py-2.5 rounded-xl bg-[#240604] hover:bg-[#5B1009] border border-white/10 text-xs font-semibold text-[#FFF0B2] transition flex items-center space-x-1.5 cursor-pointer"
+                className="btn-secondary btn-sm"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft />
                 <span>Voltar</span>
               </button>
             ) : (
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2.5 rounded-xl bg-[#240604] hover:bg-[#5B1009] border border-white/10 text-xs font-semibold text-[#FFF0B2]/70 hover:text-white transition cursor-pointer"
+                className="btn-secondary btn-sm"
               >
-                Cancelar
+                <span>Cancelar</span>
               </button>
             )}
           </div>
@@ -1081,20 +1097,20 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                   soundManager.playClick();
                   setStep((step + 1) as any);
                 }}
-                className="px-6 py-2.5 rounded-xl btn-accio-gold text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer shadow-lg"
+                className="btn-primary btn-sm"
               >
                 <span>Avançar</span>
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight />
               </button>
             ) : (
               <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !formData.rules_accepted}
-                className="px-6 py-3 rounded-xl btn-accio-gold text-xs font-black transition flex items-center space-x-2 cursor-pointer shadow-xl disabled:opacity-50"
+                className="btn-primary btn-sm"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>{isSubmitting ? 'Lavrando no Livro da Admissão...' : 'Lavrar Candidatura no Livro da Admissão'}</span>
+                <Sparkles />
+                <span>{isSubmitting ? 'Lavrando...' : 'Lavrar Candidatura'}</span>
               </button>
             )}
           </div>

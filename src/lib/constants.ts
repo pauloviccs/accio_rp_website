@@ -208,5 +208,8 @@ export const OLLIVANDERS_CORE_LORE: Record<string, string> = {
   'Pena de Pássaro-Trovão': 'Poderosa e volátil, intimamente ligada à transfiguração e a tempestades elementais. Capaz de disparar feitiços defensivos instintivamente.'
 };
 
+// Link oficial de convite para o servidor Discord da comunidade
+export const DISCORD_INVITE_URL = 'https://discord.gg/Nr7Tfrbmg';
+
 // Webhook oficial do Discord para notificações formatadas de inscrições
 export const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1573768137713651712/11WwWCSYtxX6X19_rwJZOK6fD-Vy3pMtCo1VBzS-fD1pa9eVel4AQccBJgbmsxbof6EP';

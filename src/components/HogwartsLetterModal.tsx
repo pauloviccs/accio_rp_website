@@ -134,8 +134,9 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
                   </div>
                 </button>
 
-                <span className="text-xs font-semibold text-[#8C2E16] mt-3 animate-bounce">
-                  ✨ Toque no Selo de Cera para Abrir
+                <span className="text-xs font-semibold text-[#8C2E16] mt-3 animate-bounce inline-flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Toque no Selo de Cera para Abrir</span>
                 </span>
               </div>
 

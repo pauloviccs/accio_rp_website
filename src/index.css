@@ -1,151 +1,184 @@
 @import "tailwindcss";
 
 @layer base {
-  /* Paleta Canônica Padrão de Hogwarts (Grifinória / Neutro) */
+  /* ─── Tokens Arquiteturais ArcaneMP + Identidade Visual ACCIO ───────── */
   :root {
-    --house-primary: #7A0A0A;
-    --house-secondary: #5B1009;
-    --house-accent: #FFC34F;
-    --house-accent-secondary: #EEBA30;
-    --house-accent-bright: #FFF0B2;
-    --house-glow: rgba(255, 195, 79, 0.4);
-    --house-glow-lg: rgba(244, 122, 22, 0.45);
-    --house-bg-deep: #160504;
-    --house-bg-radial: #3D0B07;
-    --house-card-bg: rgba(33, 6, 4, 0.78);
-    --house-modal-bg: rgba(22, 5, 4, 0.95);
-    --house-border: rgba(255, 195, 79, 0.28);
-    --house-border-strong: rgba(255, 195, 79, 0.55);
-    --house-grad-start: #FFF0B2;
-    --house-grad-mid: #FFC34F;
-    --house-grad-end: #F47A16;
-    --house-btn-start: #FFC34F;
-    --house-btn-end: #F47A16;
-    --house-btn-text: #160504;
-    --house-pill-bg: #210604;
-    --house-pill-border: rgba(184, 58, 12, 0.4);
+    --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Marcellus", ui-serif, Georgia, serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* Paleta Base ArcaneMP (Sidecar Visual) */
+    --color-base: #090e17;
+    --color-surface: #0a0f19;
+    --color-surface-elevated: #0d1422;
+    --color-ink: #ece7da;
+    --color-muted: #b6bbc5;
+    --color-subtle: #8b93a1;
+    --color-gold: #c9b07a;
+    --color-gold-bright: #ead6a6;
+    --color-gold-deep: #9c7f4a;
+
+    /* Ornamentos & Geometria ArcaneMP */
+    --hair: rgba(201, 176, 122, 0.32);
+    --hair-soft: rgba(201, 176, 122, 0.14);
+    --bevel: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
+    --ease-arcane: cubic-bezier(0.22, 1, 0.36, 1);
+
+    /* Tokens Dinâmicos das Casas (Padrão Grifinória / Ouro ACCIO) */
+    --house-primary: #b5675e;
+    --house-secondary: #5b1009;
+    --house-accent: #ead6a6;
+    --house-accent-secondary: #c9b07a;
+    --house-accent-bright: #ece7da;
+    --house-glow: rgba(201, 176, 122, 0.32);
+    --house-glow-lg: rgba(244, 122, 22, 0.25);
+    --house-bg-deep: #090e17;
+    --house-bg-radial: #161d2e;
+    --house-card-bg: rgba(10, 15, 25, 0.92);
+    --house-modal-bg: rgba(9, 14, 23, 0.96);
+    --house-border: rgba(201, 176, 122, 0.32);
+    --house-border-strong: rgba(234, 214, 166, 0.55);
+    --house-grad-start: #f6ead0;
+    --house-grad-mid: #dcc28d;
+    --house-grad-end: #b39257;
+    --house-btn-start: #efdcab;
+    --house-btn-mid: #cdae6a;
+    --house-btn-end: #a8874c;
+    --house-btn-text: #17130b;
+    --house-pill-bg: #0d1422;
+    --house-pill-border: rgba(201, 176, 122, 0.35);
   }
 
-  /* 🦁 GRIFINÓRIA: Escarlate Imperial & Ouro Solar */
+  /* GRIFINORIA: Escarlate Imperial & Champagne Gold */
   [data-house-theme="gryffindor"] {
-    --house-primary: #7A0A0A;
-    --house-secondary: #5B1009;
-    --house-accent: #FFC34F;
-    --house-accent-secondary: #EEBA30;
-    --house-accent-bright: #FFF0B2;
-    --house-glow: rgba(255, 195, 79, 0.45);
-    --house-glow-lg: rgba(244, 122, 22, 0.5);
-    --house-bg-deep: #160504;
-    --house-bg-radial: #420A07;
-    --house-card-bg: rgba(33, 6, 4, 0.82);
-    --house-modal-bg: rgba(22, 5, 4, 0.96);
-    --house-border: rgba(255, 195, 79, 0.32);
-    --house-border-strong: rgba(255, 195, 79, 0.65);
-    --house-grad-start: #FFF0B2;
-    --house-grad-mid: #FFC34F;
-    --house-grad-end: #F47A16;
-    --house-btn-start: #FFC34F;
-    --house-btn-end: #F47A16;
-    --house-btn-text: #160504;
-    --house-pill-bg: #210604;
-    --house-pill-border: rgba(184, 58, 12, 0.45);
+    --house-primary: #b5675e;
+    --house-secondary: #5b1009;
+    --house-accent: #ead6a6;
+    --house-accent-secondary: #ffc34f;
+    --house-accent-bright: #ece7da;
+    --house-glow: rgba(201, 176, 122, 0.34);
+    --house-glow-lg: rgba(181, 103, 94, 0.28);
+    --house-bg-deep: #090e17;
+    --house-bg-radial: #1c1318;
+    --house-card-bg: rgba(10, 15, 25, 0.92);
+    --house-modal-bg: rgba(9, 14, 23, 0.97);
+    --house-border: rgba(201, 176, 122, 0.34);
+    --house-border-strong: rgba(234, 214, 166, 0.6);
+    --house-grad-start: #f6ead0;
+    --house-grad-mid: #dcc28d;
+    --house-grad-end: #b39257;
+    --house-btn-start: #efdcab;
+    --house-btn-mid: #cdae6a;
+    --house-btn-end: #a8874c;
+    --house-btn-text: #17130b;
+    --house-pill-bg: #111622;
+    --house-pill-border: rgba(201, 176, 122, 0.38);
   }
 
-  /* 🐍 SONSERINA: Verde Esmeralda Profundo & Prata Mithril */
+  /* SONSERINA: Esmeralda Sombria & Prata Antiga */
   [data-house-theme="slytherin"] {
-    --house-primary: #124E2B;
-    --house-secondary: #0A2E19;
-    --house-accent: #2ECC71;
-    --house-accent-secondary: #10B981;
-    --house-accent-bright: #E2E8F0;
-    --house-glow: rgba(46, 204, 113, 0.45);
-    --house-glow-lg: rgba(16, 185, 129, 0.5);
-    --house-bg-deep: #05190E;
-    --house-bg-radial: #08331A;
-    --house-card-bg: rgba(7, 36, 19, 0.84);
-    --house-modal-bg: rgba(5, 25, 14, 0.96);
-    --house-border: rgba(46, 204, 113, 0.35);
-    --house-border-strong: rgba(46, 204, 113, 0.7);
-    --house-grad-start: #F1F5F9;
-    --house-grad-mid: #34D399;
-    --house-grad-end: #059669;
-    --house-btn-start: #34D399;
-    --house-btn-end: #059669;
-    --house-btn-text: #021F10;
-    --house-pill-bg: #072615;
-    --house-pill-border: rgba(46, 204, 113, 0.4);
+    --house-primary: #6e9e81;
+    --house-secondary: #123524;
+    --house-accent: #9fd3b4;
+    --house-accent-secondary: #6e9e81;
+    --house-accent-bright: #e6f2ec;
+    --house-glow: rgba(110, 158, 129, 0.34);
+    --house-glow-lg: rgba(46, 204, 113, 0.2);
+    --house-bg-deep: #080f14;
+    --house-bg-radial: #0e1e1c;
+    --house-card-bg: rgba(9, 17, 20, 0.92);
+    --house-modal-bg: rgba(8, 15, 18, 0.97);
+    --house-border: rgba(110, 158, 129, 0.36);
+    --house-border-strong: rgba(159, 211, 180, 0.6);
+    --house-grad-start: #e6f2ec;
+    --house-grad-mid: #9fd3b4;
+    --house-grad-end: #6e9e81;
+    --house-btn-start: #d7efe0;
+    --house-btn-mid: #8ec1a2;
+    --house-btn-end: #5d8d70;
+    --house-btn-text: #091510;
+    --house-pill-bg: #0c191a;
+    --house-pill-border: rgba(110, 158, 129, 0.4);
   }
 
-  /* 🦅 CORVINAL: Azul Safira Abissal & Bronze Antigo */
+  /* CORVINAL: Safira Abissal & Bronze Estelar */
   [data-house-theme="ravenclaw"] {
-    --house-primary: #0E2954;
-    --house-secondary: #06152C;
-    --house-accent: #60A5FA;
-    --house-accent-secondary: #C59A4E;
-    --house-accent-bright: #DBEAFE;
-    --house-glow: rgba(96, 165, 250, 0.45);
-    --house-glow-lg: rgba(37, 99, 235, 0.5);
-    --house-bg-deep: #030D1C;
-    --house-bg-radial: #0A1E3D;
-    --house-card-bg: rgba(6, 23, 49, 0.84);
-    --house-modal-bg: rgba(4, 15, 33, 0.96);
-    --house-border: rgba(96, 165, 250, 0.35);
-    --house-border-strong: rgba(96, 165, 250, 0.7);
-    --house-grad-start: #EFF6FF;
-    --house-grad-mid: #60A5FA;
-    --house-grad-end: #C59A4E;
-    --house-btn-start: #60A5FA;
-    --house-btn-end: #2563EB;
-    --house-btn-text: #041026;
-    --house-pill-bg: #061A36;
-    --house-pill-border: rgba(96, 165, 250, 0.4);
+    --house-primary: #7e98bd;
+    --house-secondary: #112442;
+    --house-accent: #b6cbe8;
+    --house-accent-secondary: #c9b07a;
+    --house-accent-bright: #e8eef7;
+    --house-glow: rgba(126, 152, 189, 0.35);
+    --house-glow-lg: rgba(96, 165, 250, 0.22);
+    --house-bg-deep: #070d18;
+    --house-bg-radial: #101c33;
+    --house-card-bg: rgba(10, 16, 29, 0.92);
+    --house-modal-bg: rgba(7, 13, 24, 0.97);
+    --house-border: rgba(126, 152, 189, 0.36);
+    --house-border-strong: rgba(182, 203, 232, 0.6);
+    --house-grad-start: #edf3fc;
+    --house-grad-mid: #b6cbe8;
+    --house-grad-end: #7e98bd;
+    --house-btn-start: #dde8f8;
+    --house-btn-mid: #9db6da;
+    --house-btn-end: #6c86ac;
+    --house-btn-text: #07101f;
+    --house-pill-bg: #0c1629;
+    --house-pill-border: rgba(126, 152, 189, 0.4);
   }
 
-  /* 🦡 LUFA-LUFA: Âmbar Dourado Solar & Preto Ônix */
+  /* LUFA-LUFA: Âmbar Solar & Ônix */
   [data-house-theme="hufflepuff"] {
-    --house-primary: #B88200;
-    --house-secondary: #261A08;
-    --house-accent: #F59E0B;
-    --house-accent-secondary: #FFD13B;
-    --house-accent-bright: #FEF08A;
-    --house-glow: rgba(245, 158, 11, 0.45);
-    --house-glow-lg: rgba(217, 119, 6, 0.5);
-    --house-bg-deep: #140E04;
-    --house-bg-radial: #362306;
-    --house-card-bg: rgba(33, 23, 7, 0.84);
-    --house-modal-bg: rgba(22, 15, 4, 0.96);
-    --house-border: rgba(245, 158, 11, 0.35);
-    --house-border-strong: rgba(245, 158, 11, 0.7);
-    --house-grad-start: #FEF08A;
-    --house-grad-mid: #F59E0B;
-    --house-grad-end: #D97706;
-    --house-btn-start: #FBBF24;
-    --house-btn-end: #D97706;
-    --house-btn-text: #190F02;
-    --house-pill-bg: #241806;
-    --house-pill-border: rgba(245, 158, 11, 0.4);
+    --house-primary: #c7ac63;
+    --house-secondary: #2e2410;
+    --house-accent: #ead6a6;
+    --house-accent-secondary: #c7ac63;
+    --house-accent-bright: #f7eed6;
+    --house-glow: rgba(199, 172, 99, 0.36);
+    --house-glow-lg: rgba(245, 158, 11, 0.22);
+    --house-bg-deep: #0c0d12;
+    --house-bg-radial: #1f1b12;
+    --house-card-bg: rgba(16, 16, 20, 0.92);
+    --house-modal-bg: rgba(12, 12, 16, 0.97);
+    --house-border: rgba(199, 172, 99, 0.36);
+    --house-border-strong: rgba(234, 214, 166, 0.62);
+    --house-grad-start: #f9efd4;
+    --house-grad-mid: #e2c57e;
+    --house-grad-end: #b29246;
+    --house-btn-start: #f4e4b8;
+    --house-btn-mid: #d6b86f;
+    --house-btn-end: #a88a42;
+    --house-btn-text: #171206;
+    --house-pill-bg: #171612;
+    --house-pill-border: rgba(199, 172, 99, 0.4);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 7rem;
   }
 
   body {
     background-color: var(--house-bg-deep);
-    color: var(--house-accent-bright);
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.7;
     overflow-x: hidden;
-    transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-                color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color 0.7s ease, color 0.7s ease;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold-bright);
+    outline-offset: 4px;
   }
 }
 
-/* ─── Transições Universais Suaves de Tema ───────────────────── */
-header, section, footer, div, h1, h2, h3, h4, p, span, button {
-  transition-property: background-color, border-color, box-shadow;
-  transition-duration: 0.7s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 /* ─── Tipografia ────────────────────────────────────────────── */
+.font-display,
 .font-cinzel {
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-display);
+  font-synthesis: none;
 }
 
 .font-crimson {
@@ -153,115 +186,524 @@ header, section, footer, div, h1, h2, h3, h4, p, span, button {
 }
 
 .font-mono {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
 }
 
-/* ─── Efeitos 3D para a Carta de Hogwarts ───────────────────── */
-.perspective-1200 {
-  perspective: 1200px;
+.eyebrow {
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--house-accent-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
 }
 
-.preserve-3d {
-  transform-style: preserve-3d;
+.title {
+  font-family: var(--font-display);
+  font-synthesis: none;
+  text-transform: uppercase;
+  letter-spacing: 0.045em;
+  text-wrap: balance;
+  color: var(--house-accent);
+  -webkit-text-fill-color: transparent;
+  background-image:
+    linear-gradient(105deg, rgba(0, 0, 0, 0) 44%, rgba(255, 250, 236, 0.95) 50%, rgba(0, 0, 0, 0) 56%),
+    linear-gradient(var(--house-grad-start) 10%, var(--house-grad-mid) 55%, var(--house-grad-end) 95%);
+  background-position: 0px 0px, 0px 0px;
+  background-repeat: no-repeat;
+  background-size: 300% 100%, 100% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-weight: 400;
+  line-height: 1.12;
+  animation: title-glint 2.6s cubic-bezier(0.45, 0, 0.2, 1) 0.4s 1 normal both;
 }
 
-.rotate-x-0 {
-  transform: rotateX(0deg);
+.text-gold-gradient {
+  background: linear-gradient(135deg, var(--house-grad-start) 0%, var(--house-grad-mid) 50%, var(--house-grad-end) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.-rotate-x-180 {
-  transform: rotateX(-180deg);
+/* ─── Navbar Flutuante com Borda Dupla ArcaneMP ─────────────── */
+.site-nav {
+  z-index: 40;
+  border: 1px solid var(--house-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: linear-gradient(rgba(15, 23, 38, 0.94), rgba(10, 16, 27, 0.94));
+  max-width: 1400px;
+  margin-inline: auto;
+  position: fixed;
+  inset: 16px 24px auto;
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 14px 40px;
+  transition: border-color 0.6s ease, box-shadow 0.6s ease;
 }
 
-.origin-top {
-  transform-origin: top center;
+@media (max-width: 640px) {
+  .site-nav {
+    inset: 10px 12px auto;
+  }
 }
 
-/* ─── Gradientes e Estéticas Mágicas Dinâmicas por Casa ───────── */
+.site-nav::before {
+  content: "";
+  border: 1px solid var(--hair-soft);
+  pointer-events: none;
+  position: absolute;
+  inset: 4px;
+}
+
+.nav-brand-name {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  font-size: 1.2rem;
+  color: var(--color-ink);
+}
+
+.nav-brand-name small {
+  font-family: var(--font-sans);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #9aa6b6;
+  margin-top: 2px;
+  font-size: 0.5625rem;
+  display: block;
+}
+
+.nav-chapter {
+  color: #c9ced7;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.875rem;
+  transition: color 0.2s;
+  position: relative;
+  cursor: pointer;
+}
+
+.nav-chapter::after {
+  content: "";
+  background: var(--house-accent-secondary);
+  opacity: 0;
+  width: 5px;
+  height: 5px;
+  transition: opacity 0.2s;
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  translate: -50%;
+  rotate: 45deg;
+}
+
+.nav-chapter:hover,
+.nav-chapter.is-active {
+  color: var(--house-accent);
+}
+
+.nav-chapter.is-active::after,
+.nav-chapter:hover::after {
+  opacity: 1;
+}
+
+.mobile-menu summary {
+  border-top: 1px solid var(--hair-soft);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  cursor: pointer;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  display: flex;
+  list-style: none;
+}
+
+.mobile-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.mobile-menu[open] .menu-toggle {
+  rotate: 45deg;
+}
+
+.mobile-links {
+  grid-template-columns: 1fr 1fr;
+  gap: 0px 1.5rem;
+  padding: 0.25rem 1.25rem 1rem;
+  display: grid;
+}
+
+.mobile-links button,
+.mobile-links a {
+  border-bottom: 1px solid var(--hair-soft);
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0px;
+  font-size: 0.9rem;
+  display: flex;
+  text-align: left;
+  color: var(--color-ink);
+}
+
+/* ─── Moldura Ornamental ArcaneMP (.frame + .frame-corner) ────── */
+.frame {
+  isolation: isolate;
+  border: 1px solid var(--house-border);
+  background: var(--color-surface);
+  padding: 10px;
+  position: relative;
+  transition: border-color 0.5s ease, background-color 0.5s ease, box-shadow 0.4s ease;
+}
+
+.frame::before {
+  content: "";
+  z-index: 1;
+  border: 1px solid var(--hair-soft);
+  pointer-events: none;
+  position: absolute;
+  inset: 5px;
+}
+
+.frame-corner {
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  color: var(--house-accent-secondary);
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.25px;
+  pointer-events: none;
+  position: absolute;
+  transition: color 0.5s ease;
+}
+
+.frame-corner-tl { top: -1px; left: -1px; }
+.frame-corner-tr { top: -1px; right: -1px; scale: -1 1; }
+.frame-corner-bl { bottom: -1px; left: -1px; scale: 1 -1; }
+.frame-corner-br { bottom: -1px; right: -1px; scale: -1; }
+
+.frame-zoom img {
+  transition: scale 1.4s var(--ease-arcane), filter 1.4s var(--ease-arcane);
+}
+
+@media (hover: hover) {
+  .frame:hover .frame-zoom img {
+    filter: brightness(1.08);
+    scale: 1.045;
+  }
+}
+
+.divider {
+  width: 240px;
+  height: 14px;
+  color: var(--house-accent-secondary);
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1px;
+  display: block;
+}
+
+.arch {
+  border-radius: 999px 999px 0px 0px;
+}
+
+/* ─── Botões Chanfrados Hexagonais ArcaneMP ─────────────────── */
+.btn-primary,
+.btn-secondary,
+.btn-accio-gold {
+  isolation: isolate;
+  min-height: 3.125rem;
+  clip-path: var(--bevel);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0px 2rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: filter 0.2s, color 0.2s, transform 0.2s;
+  display: inline-flex;
+  position: relative;
+  cursor: pointer;
+}
+
+.btn-primary,
+.btn-accio-gold {
+  color: var(--house-btn-text);
+  background: linear-gradient(var(--house-btn-start), var(--house-btn-mid) 55%, var(--house-btn-end));
+}
+
+.btn-primary:hover,
+.btn-accio-gold:hover {
+  filter: brightness(1.1);
+}
+
+.btn-primary:active,
+.btn-accio-gold:active {
+  transform: scale(0.985);
+}
+
+.btn-secondary {
+  color: var(--house-accent);
+  background: rgba(201, 176, 122, 0.6);
+}
+
+.btn-secondary::before {
+  content: "";
+  z-index: -1;
+  clip-path: var(--bevel);
+  background: rgb(11, 17, 28);
+  transition: background-color 0.2s;
+  position: absolute;
+  inset: 1px;
+}
+
+.btn-secondary:hover::before {
+  background: rgb(23, 32, 51);
+}
+
+.btn-secondary:disabled,
+.btn-primary:disabled,
+.btn-accio-gold:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary svg,
+.btn-secondary svg,
+.btn-accio-gold svg {
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+}
+
+.btn-sm {
+  min-height: 2.5rem;
+  padding-inline: 1.35rem;
+  font-size: 0.72rem;
+}
+
+.link-gold {
+  color: var(--house-accent);
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+  transition: color 0.15s;
+  display: inline-flex;
+}
+
+.link-gold:hover {
+  color: #fff3d6;
+}
+
+/* ─── Hero Atmosférico ArcaneMP ─────────────────────────────── */
+.hero {
+  isolation: isolate;
+  background: var(--house-bg-deep);
+  flex-direction: column;
+  min-height: max(820px, min(980px, 100svh));
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-image {
+  z-index: -3;
+  object-fit: cover;
+  object-position: center 42%;
+  transform-origin: 50% 40%;
+  width: 100%;
+  height: 100%;
+  animation: castle-approach 36s ease-in-out infinite alternate;
+  position: absolute;
+  inset: 0px;
+}
+
+.hero-shade {
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(9, 14, 23, 0.55), rgba(9, 14, 23, 0.35) 28%, rgba(9, 14, 23, 0.78) 65%, var(--house-bg-deep) 100%),
+    radial-gradient(ellipse at center, rgba(9, 14, 23, 0.45), transparent 75%);
+  position: absolute;
+  inset: 0px;
+}
+
+.castle-mist {
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.42;
+  filter: blur(22px);
+  background:
+    radial-gradient(at 20% 45%, rgba(184, 203, 211, 0.22), rgba(0, 0, 0, 0) 32%),
+    radial-gradient(at 65% 65%, rgba(196, 212, 219, 0.22), rgba(0, 0, 0, 0) 37%);
+  animation: castle-mist-drift 28s ease-in-out infinite alternate;
+  position: absolute;
+  inset: 18% -30% 0px;
+}
+
+.castle-mist-near {
+  opacity: 0.35;
+  background:
+    radial-gradient(at 30% 65%, rgba(172, 195, 217, 0.29), rgba(0, 0, 0, 0) 40%),
+    radial-gradient(at 80% 30%, rgba(196, 212, 219, 0.19), rgba(0, 0, 0, 0) 30%);
+  animation-duration: 19s;
+  animation-direction: alternate-reverse;
+  inset: 35% -35% -10%;
+}
+
+.castle-light {
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: conic-gradient(
+    from 150deg at 65% -15%,
+    rgba(0, 0, 0, 0) 0deg,
+    rgba(237, 220, 175, 0.085) 12deg,
+    rgba(0, 0, 0, 0) 24deg,
+    rgba(237, 220, 175, 0.04) 38deg,
+    rgba(0, 0, 0, 0) 48deg
+  );
+  animation: castle-light-breathe 12s ease-in-out infinite alternate;
+  position: absolute;
+  inset: 0px;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  color: rgb(242, 233, 212);
+  text-shadow: rgba(0, 0, 0, 0.7) 0px 4px 40px;
+  font-size: clamp(3.3rem, 7.5vw, 7rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.hero-title-sub {
+  font-family: var(--font-sans);
+  letter-spacing: 0.42em;
+  color: var(--house-accent);
+  text-shadow: none;
+  margin-top: 0.9rem;
+  padding-left: 0.42em;
+  font-size: 0.28em;
+  font-weight: 600;
+  display: block;
+}
+
+.hero-facts {
+  border-top: 1px solid;
+  border-image: linear-gradient(90deg, transparent, var(--hair) 15%, var(--hair) 85%, transparent) 1;
+  grid-template-columns: repeat(3, minmax(0px, 1fr));
+  gap: 2rem;
+  padding-top: 1.5rem;
+  display: grid;
+}
+
+@media (max-width: 640px) {
+  .hero-facts {
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+  }
+}
+
+.hero-facts dt {
+  font-family: var(--font-display);
+  color: rgb(242, 233, 212);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.3rem;
+  line-height: 1.2;
+}
+
+.hero-facts dd {
+  color: var(--color-muted);
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.live-dot {
+  vertical-align: 0.2em;
+  background: rgb(127, 210, 154);
+  border-radius: 50%;
+  width: 7px;
+  height: 7px;
+  margin-right: 0.55rem;
+  display: inline-block;
+  box-shadow: rgba(127, 210, 154, 0.15) 0px 0px 0px 3px;
+  animation: live-pulse 2.2s infinite;
+}
+
+/* ─── Superfícies & Modais Harmonizados ───────────────────────── */
 .bg-accio-deep {
-  background: radial-gradient(ellipse at 50% 0%, var(--house-bg-radial) 0%, var(--house-bg-deep) 60%, #030101 100%);
-  transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  background: radial-gradient(ellipse at 50% 0%, var(--house-bg-radial) 0%, var(--house-bg-deep) 65%, #05080f 100%);
+  transition: background 0.7s ease;
 }
 
 .bg-accio-card {
   background: var(--house-card-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--house-border);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bg-accio-modal {
   background: var(--house-modal-bg);
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
   border: 1px solid var(--house-border);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.text-gold-gradient {
-  background: linear-gradient(135deg, var(--house-grad-start) 0%, var(--house-grad-mid) 45%, var(--house-grad-end) 85%, var(--house-accent-bright) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+.chapter-valley {
+  background:
+    radial-gradient(ellipse at 50% 45%, var(--house-bg-radial) 0%, rgba(9, 14, 23, 0.92) 60%, var(--house-bg-deep) 100%);
 }
 
-.border-gold-glow {
-  border-color: var(--house-border);
-  box-shadow: 0 0 20px var(--house-glow), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+/* ─── Efeitos 3D para a Carta de Hogwarts ───────────────────── */
+.perspective-1200 { perspective: 1200px; }
+.preserve-3d { transform-style: preserve-3d; }
+.rotate-x-0 { transform: rotateX(0deg); }
+.-rotate-x-180 { transform: rotateX(-180deg); }
+.origin-top { transform-origin: top center; }
+
+/* ─── Keyframes ─────────────────────────────────────────────── */
+@keyframes castle-approach {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.065); }
 }
 
-.gold-glow {
-  box-shadow: 0 0 25px var(--house-glow);
-  transition: box-shadow 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+@keyframes castle-mist-drift {
+  0% { transform: translate(-5%, 2%) scale(1); }
+  100% { transform: translate(7%, -3%) scale(1.1); }
 }
 
-.gold-glow-lg {
-  box-shadow: 0 0 45px var(--house-glow-lg);
-  transition: box-shadow 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+@keyframes castle-light-breathe {
+  0% { opacity: 0.35; }
+  100% { opacity: 0.9; }
 }
 
-/* ─── Botão Mágico Adaptativo da Casa ───────────────────────── */
-.btn-accio-gold {
-  background: linear-gradient(135deg, var(--house-btn-start) 0%, var(--house-btn-end) 100%);
-  color: var(--house-btn-text);
-  font-weight: 700;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 20px var(--house-glow);
+@keyframes title-glint {
+  0% { background-position: 0px 0px, 0px 0px; }
+  100% { background-position: 100% 0px, 0px 0px; }
 }
 
-.btn-accio-gold:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px var(--house-glow);
-  filter: brightness(1.1);
+@keyframes live-pulse {
+  0% { box-shadow: rgba(127, 210, 154, 0.5) 0px 0px 0px 0px; }
+  70%, 100% { box-shadow: rgba(127, 210, 154, 0) 0px 0px 0px 8px; }
 }
 
-.btn-accio-gold:active {
-  transform: scale(0.98);
-}
-
-/* ─── Apple-like Springs & Modals ────────────────────────────── */
 @keyframes appleSheetUp {
-  0% {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  0% { opacity: 0; transform: translateY(100%); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes appleScaleIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.94) translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  0% { opacity: 0; transform: scale(0.95) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .animate-apple-sheet {
@@ -269,7 +711,7 @@ header, section, footer, div, h1, h2, h3, h4, p, span, button {
 }
 
 .animate-apple-modal {
-  animation: appleScaleIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: appleScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* ─── Scrollbars Customizadas ───────────────────────────────── */
@@ -279,15 +721,15 @@ header, section, footer, div, h1, h2, h3, h4, p, span, button {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--house-bg-deep);
+  background: var(--color-base);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--house-secondary);
-  border-radius: 4px;
-  border: 1px solid var(--house-border);
+  background: #172033;
+  border-radius: 2px;
+  border: 1px solid var(--hair);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--house-primary);
+  background: #23304d;
 }

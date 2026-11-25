@@ -2,100 +2,88 @@
 
 ![ACCIO Roleplay Banner](public/assets/logohigh_4x.jpg)
 
-> **O primeiro servidor de Roleplay sério em Hogwarts Legacy, construído sobre o framework [Arcane MP](https://github.com/arcane-mp).**
+> **Portal oficial de convocação, criação de personagem e admissão ministerial do servidor ACCIO Roleplay (Hogwarts Legacy / [Arcane MP](https://arcane.mp/)).**
 
 ---
 
 ## 📖 Visão Geral
 
-Este webapp foi desenvolvido para gerenciar o pré-cadastro oficial, processo de whitelist e distribuição das vagas de pioneiro do **ACCIO Roleplay**. 
-
-Construído com foco em **retenção de público**, estética cinematográfica inspirada em *Hogwarts Legacy*, animações fluidas estilo Apple (*fluid glassmorphism*) e fidelidade estrita à Identidade Visual oficial do servidor.
+Esta aplicação web em **React 19 + Vite 6 + TypeScript** gerencia o pré-cadastro oficial de pioneiros, a criação de ficha no padrão de *Hogwarts Legacy*, a geração de pergaminhos de matrícula em PDF e a moderação ministerial em tempo real via **Supabase (`ACCIO_Rp`)** e **Discord**.
 
 ---
 
-## ✨ Principais Funcionalidades
+## ✨ Funcionalidades Implementadas
 
-- 📜 **Experiência Imersiva da Carta de Hogwarts 3D**:
-  - Apresentação em perspectiva 3D (`perspective: 1200px`) na primeira visita do usuário.
-  - Brasão carmesim em cera com monograma "A" em alto-relevo.
-  - Interação de quebra de selo com chuva de faíscas estelares douradas (`canvas-confetti`).
-  - Pergaminho oficial de convocação e aceite.
+- 📜 **Carta de Hogwarts 3D (`HogwartsLetterModal.tsx`):**
+  - Apresentação tridimensional na primeira visita do usuário com lacre de cera carmesim e partículas douradas (`canvas-confetti`).
+  - Persistência de visualização em `localStorage` (`accio_letter_opened_v2`) e acesso rápido pela Navbar.
 
-- 🔑 **Autenticação Discord OAuth2**:
-  - Porta de entrada obrigatória para registrar personagens e submeter histórias.
-  - Sincronização automática do avatar, username e Discord ID.
+- 🏰 **Estandartes 3D & Motor Dinâmico de Temas (`CastleBanners3D.tsx` + `index.css`):**
+  - Estandartes das Quatro Casas (Grifinória, Sonserina, Corvinal e Lufa-Lufa) renderizados em **Three.js** com simulação de tecido ao vento e iluminação de tochas.
+  - Alternância dinâmica de tema global via atributo `data-house-theme` no documento, adaptando cores, gradientes, partículas (`ParticleCanvas`) e modais.
 
-- ✍️ **Formulário de Whitelist & Backstory de 3.000 Palavras**:
-  - **Validador Estrito**: Contador de palavras em tempo real que bloqueia envios com menos de 3.000 palavras.
-  - **Auto-save Persistente**: Rascunho salvo no `localStorage` a cada 3 segundos associado ao ID do Discord do usuário.
-  - **Seleção de Linhagem & Casa**: Seletor dinâmico com as 4 casas (Grifinória, Sonserina, Corvinal, Lufa-Lufa) com gradientes e lemas canônicos.
-  - **Configuração da Varinha**: Madeira, Núcleo, Tamanho e Flexibilidade.
-  - **Compatibilidade Arcane MP**: Identificador de conexão do jogador e dados de spawn.
+- 🔑 **Autenticação Discord OAuth2 & RBAC (`supabase.ts`):**
+  - Login via Discord através do Supabase Auth (e opção de vinculação na ficha quando necessário).
+  - Controle de cargos (`user`, `student`, `mod`, `admin`, `super_admin`) na tabela `user_roles`.
 
-- 🎫 **Bilhete de Embarque do Expresso de Hogwarts**:
-  - Bilhete dourado colecionável gerado imediatamente após a submissão com código único `#ACCIO-XXXX`.
-  - Exibição de Casa, Linhagem, Varinha e data de emissão.
+- ✍️ **Criação de Personagem & Oficina Ollivanders (`WhitelistFormModal.tsx`):**
+  - Fluxo em 4 etapas com seletor de dormitório (`Bruxo / Wizard` vs `Bruxa / Witch`), linhagem mágica e escolha da Casa.
+  - **11 Famílias Canônicas de Cabos de Varinha** em PNG transparente (`public/wands/cutouts/`) com alternador entre **`3D Macro`** e **`Guia de Campo`** (sketch em pergaminho).
+  - Seletores de madeira, comprimento, flexibilidade e núcleos com descrição canônica de Garrick Ollivanders.
+  - Validador de crônica com exigência mínima de **3.000 palavras** (`MIN_WORDS_BACKSTORY = 3000`) e auto-save em `localStorage`.
 
-- 📊 **Sincronização em Tempo Real (Zero Placeholders)**:
-  - Painel de vagas consumindo dados diretamente via Supabase (`character_applications`).
-  - Cronômetro regressivo dinâmico para a abertura oficial da fase de pioneiros.
+- 📄 **Gerador de Pergaminho em PDF (`pdfGenerator.ts`):**
+  - Gera documento A4 estilizado como pergaminho envelhecido com `html2canvas` e `jsPDF`.
+  - Faz download automático para o jogador e envia para o bucket público `character_sheets` no Supabase Storage.
 
----
+- 🎫 **Bilhete de Embarque & Validação (`TicketModal.tsx`, `ValidationModal.tsx`, `EnchantedSubmissionModal.tsx`):**
+  - Transição pós-envio, consulta de status da ficha (`pending`, `approved`, `rejected`, `revision_requested`) e exibição do Bilhete do Expresso de Hogwarts.
 
-## 🎨 Identidade Visual & Design System
+- 🛡️ **Painel Ministerial & Cronômetro Realtime (`AdminPanelModal.tsx`, `AppleTimerModal.tsx`):**
+  - Revisão de candidaturas com filtros por Casa/status, notas do revisor, download de PDF e gestão de cargos RBAC.
+  - Modal de cronômetro estilo iOS sincronizado via `supabase_realtime` com a chave `countdown_timer` em `accio_settings` (prazo padrão de 61 dias / `2027-01-21T23:59:59.000Z`).
+  - Notificações automáticas em Rich Embed para o Discord via `discordWebhook.ts`.
 
-Paleta cromática oficial do **ACCIO Roleplay**:
-
-| Cor | Hex | Uso |
-| :--- | :--- | :--- |
-| **Abyss Black** | `#100303` / `#160504` | Fundo principal e containers |
-| **Burgundy Crimson** | `#5B1009` | Bordas e modais secundários |
-| **Flame Amber** | `#B83A0C` / `#F47A16` | Acentos mágicos e gradientes |
-| **Hogwarts Gold** | `#FFC34F` | Destaques nobres e botões de ação |
-| **Parchment Ivory** | `#FFF0B2` | Tipografia principal e pergaminho |
+- 🎵 **Trilha Sonora & Efeitos Sonoros (`audio.ts`, `MusicPlayerWidget.tsx`):**
+  - Efeitos sonoros procedurais gerados via **Web Audio API** (`soundManager`).
+  - Player flutuante com 6 faixas MP3 em `public/audio/`, controle de volume, shuffle e crossfade contextual.
 
 ---
 
 ## 🛠️ Stack Tecnológica
 
-- **Frontend**: [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
-- **Build Tool**: [Vite 6](https://vite.dev/)
-- **Estilização**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Ícones**: [Lucide React](https://lucide.dev/)
-- **Efeitos e Partículas**: Canvas 2D nativo + [canvas-confetti](https://www.npmjs.com/package/canvas-confetti)
-- **Backend / BaaS**: [Supabase](https://supabase.com/) (PostgreSQL + RLS + Auth + Edge Network)
-- **Hospedagem Recomendada**: Vercel / Netlify / Cloudflare Pages
+- **Frontend:** [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/) (~5.7.2)
+- **Build Tool:** [Vite 6](https://vite.dev/)
+- **Estilização:** [Tailwind CSS v4](https://tailwindcss.com/) (`@tailwindcss/vite`, `clsx`, `tailwind-merge`)
+- **3D & Gráficos:** [Three.js](https://threejs.org/), Canvas 2D, [canvas-confetti](https://www.npmjs.com/package/canvas-confetti)
+- **PDF:** [jsPDF](https://www.npmjs.com/package/jspdf) + [html2canvas](https://html2canvas.hertzen.com/)
+- **Ícones:** [Lucide React](https://lucide.dev/)
+- **Backend / BaaS:** [Supabase](https://supabase.com/) (PostgreSQL, Auth Discord, Storage `character_sheets`, Realtime WebSockets)
 
 ---
 
 ## 🚀 Como Executar Localmente
 
-### 1. Clonar o Repositório
+### 1. Instalar Dependências
 ```bash
-git clone https://github.com/pauloviccs/accio_rp_website.git
-cd accio_rp_website
-```
-
-### 2. Instalar Dependências
-```bash
+cd website
 npm install
 ```
 
-### 3. Configurar Variáveis de Ambiente
-Crie um arquivo `.env` baseado no `.env.example`:
+### 2. Configurar Variáveis de Ambiente
+Crie um arquivo `.env` na pasta `website/` baseado em [`.env.example`](.env.example):
 ```env
 VITE_SUPABASE_URL=https://seu-projeto.supabase.co
 VITE_SUPABASE_ANON_KEY=sua-chave-anonima-publicavel
 ```
 
-### 4. Iniciar Servidor de Desenvolvimento
+### 3. Iniciar Servidor de Desenvolvimento
 ```bash
 npm run dev
 ```
-O servidor estará disponível em `http://localhost:3000` (ou `3001`).
+O servidor Vite inicia na porta `3000` (`http://localhost:3000`, configurado em `vite.config.ts`).
 
-### 5. Compilar para Produção
+### 4. Compilar para Produção
 ```bash
 npm run build
 ```
@@ -104,15 +92,16 @@ npm run build
 
 ## 🗄️ Estrutura do Banco de Dados (Supabase)
 
-Tabelas essenciais criadas com Row Level Security (RLS):
+O schema oficial está documentado em [`../scripts/migration_accio_rp.sql`](../scripts/migration_accio_rp.sql) e [`../.agent/context/database_schema.md`](../.agent/context/database_schema.md):
 
-- **`character_applications`**: Armazena as fichas de personagens, história completa (>= 3.000 palavras), status de aprovação (`pending`, `approved`, `rejected`), número sequencial de registro (`registration_number`) e dados da varinha.
-- **`profiles`**: Dados sincronizados dos jogadores via Discord OAuth (avatar, username, email).
+- **`character_applications`**: Armazena as fichas de personagens, dados da varinha, crônica (>= 3.000 palavras), status (`pending`, `approved`, `rejected`), notas de revisão e `pdf_url`.
+- **`accio_settings`**: Configurações globais sincronizadas em Realtime (ex.: `countdown_timer`).
+- **`user_roles`**: Controle de permissões RBAC por `discord_id` (`user`, `student`, `mod`, `admin`, `super_admin`).
+- **Storage Bucket `character_sheets`**: Armazenamento público dos PDFs de matrícula (limite de 10 MB).
 
 ---
 
 ## ⚖️ Licença & Isenção de Responsabilidade
 
-ACCIO Roleplay é um projeto comunitário sem fins lucrativos desenvolvido com o framework **Arcane MP**.  
+ACCIO Roleplay é um projeto comunitário sem fins lucrativos desenvolvido para o framework **Arcane MP**.  
 *Hogwarts Legacy* e o *Wizarding World* são marcas registradas da Warner Bros. Entertainment Inc. e Avalanche Software. Este projeto não possui afiliação oficial com as detentoras da propriedade intelectual.
-

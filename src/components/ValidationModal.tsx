@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, Clock, AlertTriangle, ExternalLink, Ticket, BookOpen, Wand2, Shield, Calendar, MapPin, FileDown } from 'lucide-react';
+import { X, CheckCircle2, Clock, AlertTriangle, ExternalLink, Ticket, BookOpen, Wand2, Shield, Calendar, MapPin, FileDown, Check } from 'lucide-react';
 import { CharacterApplication } from '../types';
-import { HOUSES } from '../lib/constants';
+import { HOUSES, DISCORD_INVITE_URL } from '../lib/constants';
 import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
 import { soundManager } from '../lib/audio';
+import { ArcaneFrame } from './ArcaneOrnaments';
 
 interface ValidationModalProps {
   isOpen: boolean;
@@ -35,36 +36,34 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-xl transition-all duration-300 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#05080f]/85 backdrop-blur-xl transition-all duration-300 overflow-y-auto">
 
       {/* Luz ambiente de feitiço */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[650px] h-[350px] sm:h-[650px] rounded-full blur-[120px] pointer-events-none opacity-30"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[650px] h-[350px] sm:h-[650px] rounded-full blur-[120px] pointer-events-none opacity-25"
         style={{ backgroundColor: house.color }}
       />
 
-      <div className="relative w-full max-w-2xl bg-[#160504]/95 border border-[#B83A0C]/40 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-2xl text-left my-auto max-h-[92vh] overflow-y-auto">
+      <ArcaneFrame className="relative w-full max-w-2xl bg-[#0a0f19]/95 p-5 sm:p-8 shadow-2xl backdrop-blur-2xl text-left my-auto max-h-[92vh] overflow-y-auto">
 
         {/* Botão de Fechar */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 sm:top-6 sm:right-6 text-[#FFF0B2]/60 hover:text-[#FFF0B2] p-1.5 rounded-full hover:bg-white/5 transition"
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 text-[#b6bbc5] hover:text-white p-1.5 hover:bg-white/5 transition cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Cabeçalho de Validação */}
         <div className="flex items-center space-x-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFC34F] via-[#F47A16] to-[#5B1009] p-0.5 shadow-lg shadow-[#F47A16]/20">
-            <div className="w-full h-full rounded-[14px] bg-[#160504] flex items-center justify-center">
-              <Shield className="w-6 h-6 text-[#FFC34F]" />
-            </div>
+          <div className="w-12 h-12 bg-[#0d1422] border border-[var(--house-border)] flex items-center justify-center shadow-lg">
+            <Shield className="w-6 h-6 text-[var(--house-accent)]" />
           </div>
           <div>
-            <span className="text-[10px] tracking-[0.25em] text-[#FFC34F] font-bold block uppercase">
-              Ministério da Magia • ACCIO RP
+            <span className="eyebrow text-[10px] block">
+              Ministério da Magia · ACCIO RP
             </span>
-            <h2 className="font-cinzel text-xl sm:text-2xl font-bold text-[#FFF0B2]">
+            <h2 className="font-display text-xl sm:text-2xl text-[#ece7da]">
               Validação de Pré-Registro
             </h2>
           </div>
@@ -114,7 +113,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
         )}
 
         {/* Cartão de Identificação do Bruxo */}
-        <div className="bg-[#210604]/80 border border-[#B83A0C]/30 rounded-2xl p-4 sm:p-5 mb-6">
+        <div className="bg-[#0d1422]/90 border border-[var(--house-border)] p-4 sm:p-5 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-white/10 gap-3">
             <div className="flex items-center space-x-3">
               {application.discord_avatar ? (
@@ -194,7 +193,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
         </div>
 
         {/* Leitor da História de 3.000+ Palavras */}
-        <div className="bg-[#100303]/90 border border-[#B83A0C]/30 rounded-2xl p-4 sm:p-5 mb-6">
+        <div className="bg-[#090e17] border border-[var(--house-border)] p-4 sm:p-5 mb-6">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
               <BookOpen className="w-4 h-4 text-[#FFC34F]" />
@@ -202,8 +201,9 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                 Crônica do Personagem
               </h4>
             </div>
-            <span className="px-2 py-0.5 rounded-full bg-[#1A6B3C]/20 border border-[#1A6B3C]/40 text-[#4CAF7C] text-[11px] font-mono font-semibold">
-              ✓ {application.word_count.toLocaleString('pt-BR')} palavras validadas
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#1A6B3C]/20 border border-[#1A6B3C]/40 text-[#4CAF7C] text-[11px] font-mono font-semibold">
+              <Check className="w-3 h-3" />
+              <span>{application.word_count.toLocaleString('pt-BR')} palavras validadas</span>
             </span>
           </div>
 
@@ -227,13 +227,13 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
 
         {/* Ações Inferiores */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-          <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full sm:w-auto">
             <button
               onClick={onViewTicket}
-              className="w-full sm:w-auto btn-accio-gold px-4 py-2.5 rounded-xl text-xs sm:text-sm flex items-center justify-center space-x-2 font-bold cursor-pointer"
+              className="w-full sm:w-auto btn-primary btn-sm"
             >
-              <Ticket className="w-4 h-4" />
-              <span>Ver Bilhete do Expresso</span>
+              <Ticket />
+              <span>Ver Bilhete</span>
             </button>
 
             <button
@@ -245,25 +245,25 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                 setPdfProgress(null);
               }}
               disabled={isDownloadingPdf}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#5B1009]/60 hover:bg-[#5B1009] border border-[#FFC34F]/50 text-[#FFF0B2] text-xs sm:text-sm flex items-center justify-center space-x-2 font-semibold transition cursor-pointer disabled:opacity-50"
+              className="w-full sm:w-auto btn-secondary btn-sm"
               title="Baixar a Ficha Oficial do Aluno em Pergaminho com Selo de Cera (PDF)"
             >
-              <FileDown className="w-4 h-4 text-[#FFC34F]" />
-              <span>{isDownloadingPdf ? (pdfProgress || 'Gerando PDF...') : 'Baixar Ficha (PDF)'}</span>
+              <FileDown />
+              <span>{isDownloadingPdf ? (pdfProgress || 'Gerando PDF...') : 'Baixar PDF'}</span>
             </button>
           </div>
 
           <a
-            href="https://discord.gg"
+            href={DISCORD_INVITE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs sm:text-sm font-semibold flex items-center justify-center space-x-2 transition"
+            className="w-full sm:w-auto btn-secondary btn-sm"
           >
-            <span>Comunidade Discord</span>
-            <ExternalLink className="w-4 h-4" />
+            <span>Discord Oficial</span>
+            <ExternalLink />
           </a>
         </div>
-      </div>
+      </ArcaneFrame>
     </div>
   );
 };

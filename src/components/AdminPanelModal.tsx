@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   X, Shield, Clock, 
-  Search, RefreshCw, BookOpen, Check, Ban, UserCheck, Lock, FileDown
+  Search, RefreshCw, BookOpen, Check, Ban, UserCheck, Lock, FileDown,
+  Crown, Scale, Wand2, User
 } from 'lucide-react';
 import { CharacterApplication, UserRole, UserRoleRecord } from '../types';
 import { 
@@ -167,36 +168,34 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const getRoleBadge = (role: UserRole) => {
     switch (role) {
       case 'super_admin':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#A855F7]/20 border border-[#A855F7]/40 text-[#D8B4FE]">👑 Super Admin</span>;
+        return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#A855F7]/20 border border-[#A855F7]/40 text-[#D8B4FE]"><Crown className="w-3 h-3" /><span>Super Admin</span></span>;
       case 'admin':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FFC34F]/20 border border-[#FFC34F]/40 text-[#FFC34F]">🛡️ Admin</span>;
+        return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FFC34F]/20 border border-[#FFC34F]/40 text-[#FFC34F]"><Shield className="w-3 h-3" /><span>Admin</span></span>;
       case 'mod':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#3B82F6]/20 border border-[#3B82F6]/40 text-[#93C5FD]">⚖️ Moderador</span>;
+        return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#3B82F6]/20 border border-[#3B82F6]/40 text-[#93C5FD]"><Scale className="w-3 h-3" /><span>Moderador</span></span>;
       case 'student':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#10B981]/20 border border-[#10B981]/40 text-[#6EE7B7]">🧙 Aluno</span>;
+        return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#10B981]/20 border border-[#10B981]/40 text-[#6EE7B7]"><Wand2 className="w-3 h-3" /><span>Aluno</span></span>;
       default:
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/10 border border-white/20 text-[#FFF0B2]/70">👤 Usuário</span>;
+        return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/10 border border-white/20 text-[#FFF0B2]/70"><User className="w-3 h-3" /><span>Usuário</span></span>;
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md">
-      <div className="w-full sm:max-w-6xl max-h-[94vh] bg-[#160504] border border-[#B83A0C]/40 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-apple-modal">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-[#05080f]/85 backdrop-blur-md">
+      <div className="w-full sm:max-w-6xl max-h-[94vh] bg-[#0a0f19] border border-[var(--house-border)] shadow-2xl flex flex-col overflow-hidden animate-apple-modal">
         
         {/* Topo do Painel */}
-        <div className="px-4 sm:px-6 py-4 border-b border-[#B83A0C]/30 flex flex-wrap items-center justify-between gap-3 bg-[#100303]/90">
+        <div className="px-4 sm:px-6 py-4 border-b border-[var(--hair-soft)] flex flex-wrap items-center justify-between gap-3 bg-[#090e17]">
           
           <div className="flex items-center space-x-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#FFC34F] via-[#F47A16] to-[#5B1009] p-0.5 shadow-lg shadow-[#F47A16]/20">
-              <div className="w-full h-full rounded-[14px] bg-[#160504] flex items-center justify-center">
-                <Shield className="w-5 h-5 text-[#FFC34F]" />
-              </div>
+            <div className="w-11 h-11 bg-[#0d1422] border border-[var(--house-border)] flex items-center justify-center shadow-lg">
+              <Shield className="w-5 h-5 text-[var(--house-accent)]" />
             </div>
             <div>
-              <span className="text-[10px] tracking-[0.25em] text-[#FFC34F] font-bold block uppercase">
+              <span className="eyebrow text-[10px] block">
                 Gabinete de Governança · {currentUserRole?.toUpperCase()}
               </span>
-              <h2 className="font-cinzel text-lg sm:text-2xl font-bold text-[#FFF0B2]">
+              <h2 className="font-display text-lg sm:text-2xl text-[#ece7da]">
                 Ministério da Magia — O Livro da Admissão
               </h2>
             </div>
@@ -209,10 +208,10 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                 soundManager.playClick();
                 onOpenTimerModal();
               }}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#FFC34F]/15 border border-[#FFC34F]/40 text-xs text-[#FFF0B2] hover:bg-[#FFC34F]/25 hover:text-white transition cursor-pointer"
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-[#0d1422] border border-[var(--house-border)] text-xs text-[var(--house-accent)] hover:border-[var(--house-accent)] hover:text-white transition cursor-pointer"
               title="Ajustar o cronômetro oficial do pré-registro (Roleta Apple)"
             >
-              <Clock className="w-3.5 h-3.5 text-[#FFC34F]" />
+              <Clock className="w-3.5 h-3.5 text-[var(--house-accent)]" />
               <span className="hidden sm:inline">Ajustar Cronômetro</span>
             </button>
 
@@ -223,7 +222,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                 loadRoles();
               }}
               disabled={isLoading}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#210604] border border-[#B83A0C]/40 text-xs text-[#FFF0B2] hover:bg-[#5B1009] transition disabled:opacity-50 cursor-pointer"
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-[#0d1422] border border-[var(--house-border)] text-xs text-[#ece7da] hover:bg-[#172033] transition disabled:opacity-50 cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Sincronizar</span>
@@ -231,7 +230,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-full hover:bg-white/10 text-[#FFF0B2]/60 hover:text-[#FFF0B2] transition cursor-pointer"
+              className="p-1.5 hover:bg-white/10 text-[#b6bbc5] hover:text-white transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -239,7 +238,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
         </div>
 
         {/* NAVEGAÇÃO POR ABAS: INSCRIÇÕES vs CARGOS */}
-        <div className="flex items-center px-4 sm:px-6 pt-3 border-b border-[#B83A0C]/20 bg-[#160504] gap-2">
+        <div className="flex items-center px-4 sm:px-6 pt-3 border-b border-[var(--hair-soft)] bg-[#0a0f19] gap-2">
           <button
             onClick={() => {
               soundManager.playClick();
@@ -277,24 +276,24 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
             
             {/* Barra de Métricas */}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-              <div className="bg-[#100303] border border-[#B83A0C]/20 p-3 rounded-2xl">
-                <span className="text-[11px] text-[#FFF0B2]/60 block mb-0.5">Total Inscritos</span>
-                <span className="font-mono text-xl font-bold text-[#FFF0B2]">{totalCount}</span>
+              <div className="bg-[#090e17] border border-[var(--hair-soft)] p-3">
+                <span className="text-[11px] text-[#8b93a1] block mb-0.5">Total Inscritos</span>
+                <span className="font-mono text-xl font-bold text-[#ece7da]">{totalCount}</span>
               </div>
-              <div className="bg-[#100303] border border-[#1A6B3C]/30 p-3 rounded-2xl">
-                <span className="text-[11px] text-[#4CAF7C] block mb-0.5">Aprovados</span>
-                <span className="font-mono text-xl font-bold text-[#4CAF7C]">{approvedCount}</span>
+              <div className="bg-[#090e17] border border-[#6e9e81]/40 p-3">
+                <span className="text-[11px] text-[#7fd29a] block mb-0.5">Aprovados</span>
+                <span className="font-mono text-xl font-bold text-[#7fd29a]">{approvedCount}</span>
               </div>
-              <div className="bg-[#100303] border border-[#FFC34F]/30 p-3 rounded-2xl">
-                <span className="text-[11px] text-[#FFC34F] block mb-0.5">Pendentes</span>
-                <span className="font-mono text-xl font-bold text-[#FFC34F]">{pendingCount}</span>
+              <div className="bg-[#090e17] border border-[var(--house-border)] p-3">
+                <span className="text-[11px] text-[var(--house-accent)] block mb-0.5">Pendentes</span>
+                <span className="font-mono text-xl font-bold text-[var(--house-accent)]">{pendingCount}</span>
               </div>
-              <div className="bg-[#100303] border border-[#CF4A4A]/30 p-3 rounded-2xl">
-                <span className="text-[11px] text-[#CF4A4A] block mb-0.5">Rejeitados</span>
-                <span className="font-mono text-xl font-bold text-[#CF4A4A]">{rejectedCount}</span>
+              <div className="bg-[#090e17] border border-[#b5675e]/40 p-3">
+                <span className="text-[11px] text-[#b5675e] block mb-0.5">Rejeitados</span>
+                <span className="font-mono text-xl font-bold text-[#b5675e]">{rejectedCount}</span>
               </div>
-              <div className="bg-[#100303] border border-[#B83A0C]/20 p-3 rounded-2xl col-span-2 sm:col-span-1">
-                <span className="text-[11px] text-[#FFF0B2]/60 block mb-0.5">Palavras Totais</span>
+              <div className="bg-[#090e17] border border-[var(--hair-soft)] p-3 col-span-2 sm:col-span-1">
+                <span className="text-[11px] text-[#8b93a1] block mb-0.5">Palavras Totais</span>
                 <span className="font-mono text-xl font-bold text-gold-gradient">{totalWords.toLocaleString('pt-BR')}</span>
               </div>
             </div>
@@ -302,20 +301,20 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
             {/* Filtros */}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
-                <Search className="w-4 h-4 text-[#FFF0B2]/40 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-[#8b93a1] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Buscar por Personagem, Discord ou Bilhete..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-[#100303] border border-[#B83A0C]/30 rounded-xl pl-9 pr-4 py-2 text-xs text-[#FFF0B2] placeholder-[#FFF0B2]/30 focus:border-[#FFC34F] focus:outline-none"
+                  className="w-full bg-[#0d1422] border border-[var(--house-border)] pl-9 pr-4 py-2 text-xs text-[#ece7da] placeholder-[#8b93a1] focus:border-[var(--house-accent)] focus:outline-none"
                 />
               </div>
 
               <select
                 value={selectedHouse}
                 onChange={(e) => setSelectedHouse(e.target.value)}
-                className="bg-[#100303] border border-[#B83A0C]/30 rounded-xl px-3 py-2 text-xs text-[#FFF0B2] focus:border-[#FFC34F] focus:outline-none"
+                className="bg-[#0d1422] border border-[var(--house-border)] px-3 py-2 text-xs text-[#ece7da] focus:border-[var(--house-accent)] focus:outline-none"
               >
                 <option value="all">Todas as Casas</option>
                 <option value="gryffindor">Grifinória</option>
@@ -327,19 +326,19 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="bg-[#100303] border border-[#B83A0C]/30 rounded-xl px-3 py-2 text-xs text-[#FFF0B2] focus:border-[#FFC34F] focus:outline-none"
+                className="bg-[#0d1422] border border-[var(--house-border)] px-3 py-2 text-xs text-[#ece7da] focus:border-[var(--house-accent)] focus:outline-none"
               >
                 <option value="all">Todos os Status</option>
-                <option value="pending">⏳ Pendente</option>
-                <option value="approved">✅ Aprovado</option>
-                <option value="rejected">❌ Rejeitado</option>
+                <option value="pending">Pendente</option>
+                <option value="approved">Aprovado</option>
+                <option value="rejected">Rejeitado</option>
               </select>
             </div>
 
             {/* Tabela de Inscrições */}
-            <div className="bg-[#100303] border border-[#B83A0C]/30 rounded-2xl overflow-x-auto flex-1">
+            <div className="bg-[#090e17] border border-[var(--house-border)] overflow-x-auto flex-1">
               <table className="w-full text-left text-xs">
-                <thead className="bg-[#160504] border-b border-[#B83A0C]/30 text-[#FFC34F] font-semibold">
+                <thead className="bg-[#0d1422] border-b border-[var(--house-border)] text-[var(--house-accent)] font-semibold">
                   <tr>
                     <th className="py-3 px-3">Bilhete</th>
                     <th className="py-3 px-3">Bruxo (Discord)</th>
