@@ -82,7 +82,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenLetter, onOpenForm }) => {
               </a>
 
               <p className="mt-5 max-w-[40ch] text-[15px] text-[#b6bbc5]">
-                Servidor de Roleplay MMO-RPG comunitário para Hogwarts Legacy, construído sobre o framework Arcane MP pela equipe VICCS Studios.
+                Servidor de Roleplay MMO-RPG comunitário para Hogwarts Legacy, construído sobre o framework Arcane MP pela equipe VICCS Design e ACCIO Studios.
               </p>
 
               {/* Ícones Sociais em Losango Rotacionado 45° (Assinatura ArcaneMP) */}
@@ -195,7 +195,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenLetter, onOpenForm }) => {
           </div>
 
           <div className="mt-14 flex flex-col gap-4 border-t border-[#c9b07a]/15 pt-8 text-sm text-[#8b93a1] sm:flex-row sm:justify-between">
-            <p>© 2026 ACCIO Roleplay · Desenvolvido por VICCS Studios. Projeto comunitário sem fins lucrativos.</p>
+            <p>© 2026 ACCIO Roleplay · Desenvolvido por VICCS Design. Projeto comunitário sem fins lucrativos.</p>
             <p className="max-w-[60ch] text-[13px] sm:text-right">
               Hogwarts Legacy e o Wizarding World são marcas registradas da Warner Bros. Entertainment Inc. Sem afiliação oficial com Warner Bros., Avalanche Software ou Portkey Games.
             </p>
