@@ -31,6 +31,11 @@ export interface CharacterApplication {
   status?: ApplicationStatus;
   reviewer_notes?: string;
   reviewed_by?: string;
+  sorted_house?: string | null;
+  secondary_house?: string | null;
+  is_hatstall?: boolean;
+  sorted_at?: string | null;
+  game_character_id?: number | null;
   created_at?: string;
   updated_at?: string;
 }

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { X, MessageSquare, Check, FileDown } from 'lucide-react';
+import { X, MessageSquare, Check, FileDown, KeyRound, Copy } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CharacterApplication } from '../types';
 import { HOUSES, DISCORD_INVITE_URL } from '../lib/constants';
 import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
+import { issueServerLinkCode, ServerLinkCodeResult } from '../lib/supabase';
 import { soundManager } from '../lib/audio';
 import { ArcaneFrame } from './ArcaneOrnaments';
 
@@ -20,6 +21,10 @@ export const TicketModal: React.FC<TicketModalProps> = ({
 }) => {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [pdfProgress, setPdfProgress] = useState<string | null>(null);
+  const [isIssuingLinkCode, setIsIssuingLinkCode] = useState(false);
+  const [linkCodeResult, setLinkCodeResult] = useState<ServerLinkCodeResult | null>(null);
+  const [linkError, setLinkError] = useState<string | null>(null);
+  const [copiedLinkCode, setCopiedLinkCode] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -30,6 +35,10 @@ export const TicketModal: React.FC<TicketModalProps> = ({
         origin: { y: 0.6 },
         colors: ['#FFF0B2', '#FFC34F', '#F47A16', '#B83A0C'],
       });
+    } else {
+      setLinkCodeResult(null);
+      setLinkError(null);
+      setCopiedLinkCode(false);
     }
   }, [isOpen]);
 
@@ -128,8 +137,73 @@ export const TicketModal: React.FC<TicketModalProps> = ({
             </div>
           </div>
 
+          {/* Código de Embarque (Direct Connect Anti-Spoofing) */}
+          {(linkCodeResult || linkError) && (
+            <div className="p-3.5 bg-[#0d1422] border border-[var(--house-border)] space-y-2 text-left">
+              {linkCodeResult ? (
+                <>
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-[#9b8d72]">
+                        Código Único de Embarque (válido por 10 min)
+                      </p>
+                      <p className="text-base font-mono font-bold tracking-[0.14em] text-[var(--house-accent)]">
+                        {linkCodeResult.code}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await navigator.clipboard?.writeText(linkCodeResult.code);
+                        setCopiedLinkCode(true);
+                        soundManager.playSparkle();
+                        setTimeout(() => setCopiedLinkCode(false), 2500);
+                      }}
+                      className="px-3 py-1.5 bg-[#121c30] hover:bg-[#192640] border border-[var(--house-border)] text-xs text-[#ece7da] flex items-center gap-1.5 cursor-pointer"
+                    >
+                      {copiedLinkCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedLinkCode ? 'Copiado' : 'Copiar'}</span>
+                    </button>
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-[#b6bbc5]">
+                    Use este código ao entrar no servidor (Direct Connect) para vincular sua conta do ArcaneMP à sua ficha oficial com segurança.
+                  </p>
+                </>
+              ) : (
+                <p className="text-xs text-rose-300">{linkError}</p>
+              )}
+            </div>
+          )}
+
           {/* Call to Actions */}
           <div className="space-y-3 pt-2">
+            <button
+              type="button"
+              onClick={async () => {
+                setIsIssuingLinkCode(true);
+                setLinkError(null);
+                setCopiedLinkCode(false);
+                try {
+                  soundManager.playSparkle();
+                  const result = await issueServerLinkCode();
+                  setLinkCodeResult(result);
+                } catch (err) {
+                  setLinkError(
+                    err instanceof Error
+                      ? err.message
+                      : 'Entre com seu Discord no site para emitir o código de embarque.'
+                  );
+                } finally {
+                  setIsIssuingLinkCode(false);
+                }
+              }}
+              disabled={isIssuingLinkCode}
+              className="w-full btn-secondary"
+            >
+              <KeyRound />
+              <span>{isIssuingLinkCode ? 'Emitindo Selo de Embarque...' : 'Gerar Código de Embarque (In-Game)'}</span>
+            </button>
+
             <button
               onClick={async () => {
                 setIsDownloadingPdf(true);

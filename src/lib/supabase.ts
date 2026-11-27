@@ -348,3 +348,22 @@ export function subscribeToUserRoles(onUpdate: (roleRecord: UserRoleRecord) => v
     supabase.removeChannel(channel);
   };
 }
+
+
+export interface ServerLinkCodeResult {
+  code: string;
+  expires_at: string;
+  application_id?: string | null;
+  application_status?: string | null;
+}
+
+export async function issueServerLinkCode(): Promise<ServerLinkCodeResult> {
+  const { data, error } = await supabase.rpc('issue_server_link_code');
+  if (error) {
+    throw new Error(error.message || 'Falha ao gerar o código de embarque.');
+  }
+  if (!data || typeof (data as ServerLinkCodeResult).code !== 'string') {
+    throw new Error('Resposta inválida do servidor ao emitir código de vínculo.');
+  }
+  return data as ServerLinkCodeResult;
+}
