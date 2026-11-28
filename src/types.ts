@@ -2,6 +2,8 @@ export type HouseId = 'gryffindor' | 'slytherin' | 'ravenclaw' | 'hufflepuff';
 
 export type BloodStatus = 'pure-blood' | 'half-blood' | 'muggle-born';
 
+export type DormitoryType = 'witch' | 'wizard';
+
 export type ApplicationStatus = 'pending' | 'approved' | 'rejected' | 'revision_requested';
 
 export interface CharacterApplication {
@@ -16,6 +18,7 @@ export interface CharacterApplication {
   birth_date: string;
   birth_place: string;
   blood_status: BloodStatus;
+  dormitory?: DormitoryType;
   preferred_house: HouseId;
   wand_wood: string;
   wand_core: string;

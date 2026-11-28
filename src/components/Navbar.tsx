@@ -256,6 +256,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <Sparkles className="w-3.5 h-3.5 text-[var(--house-accent)]" />
                     <span>Bilhete</span>
                   </button>
+                  <button
+                    type="button"
+                    onClick={onOpenForm}
+                    className="hidden 2xl:inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0d1422] border border-[var(--house-border)] text-[var(--house-accent)] hover:border-[var(--house-accent)] text-xs font-semibold transition cursor-pointer"
+                    title="Criar nova ficha de personagem para sincronizar in-game"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Nova Ficha</span>
+                  </button>
                 </>
               ) : (
                 <button

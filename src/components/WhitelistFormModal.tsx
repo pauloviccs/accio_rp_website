@@ -26,7 +26,6 @@ interface WhitelistFormModalProps {
   user: DiscordUser | null;
   onLogin: () => void;
   onSubmit: (app: CharacterApplication) => Promise<void>;
-  onManualUserSet?: (user: DiscordUser) => void;
   activeHouseTheme?: HouseId;
   onSelectHouseTheme?: (house: HouseId) => void;
 }
@@ -37,7 +36,6 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
   user,
   onLogin,
   onSubmit,
-  onManualUserSet,
   activeHouseTheme = 'gryffindor',
   onSelectHouseTheme,
 }) => {
@@ -45,7 +43,6 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
-  const [manualDiscordInput, setManualDiscordInput] = useState('');
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [pdfProgress, setPdfProgress] = useState<string | null>(null);
   const [wandViewMode, setWandViewMode] = useState<'3d' | 'sketch'>('3d');
@@ -138,25 +135,6 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
 
   const currentWandHandle = WAND_HANDLES.find((w) => w.name === formData.wand_handle) || WAND_HANDLES[0];
 
-  const handleManualLink = () => {
-    if (!manualDiscordInput.trim()) {
-      setErrorMessage('Informe seu usuário ou tag do Discord.');
-      return;
-    }
-    const cleanNick = manualDiscordInput.trim().replace(/^@/, '');
-    const dummyId = '14' + Math.floor(1000000000000000 + Math.random() * 9000000000000000);
-    const newUser: DiscordUser = {
-      id: dummyId,
-      username: cleanNick,
-      global_name: cleanNick,
-      avatar: null,
-    };
-    if (onManualUserSet) {
-      onManualUserSet(newUser);
-    }
-    setErrorMessage(null);
-  };
-
   const handleHouseSelect = (hId: HouseId) => {
     soundManager.playSparkle();
     setFormData({ ...formData, preferred_house: hId });
@@ -180,6 +158,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
         birth_date: formData.birth_date,
         birth_place: formData.birth_place || 'Grã-Bretanha',
         blood_status: formData.blood_status,
+        dormitory: formData.dormitory,
         preferred_house: formData.preferred_house,
         wand_wood: formData.wand_wood,
         wand_core: formData.wand_core,
@@ -206,14 +185,8 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    const activeUser = user || (manualDiscordInput.trim() ? {
-      id: '14' + Math.floor(1000000000000000 + Math.random() * 9000000000000000),
-      username: manualDiscordInput.trim().replace(/^@/, ''),
-      avatar: null,
-    } : null);
-
-    if (!activeUser) {
-      setErrorMessage('Vincule sua conta do Discord antes de enviar sua submissão.');
+    if (!user) {
+      setErrorMessage('Conecte sua conta oficial do Discord (OAuth2) antes de lavrar a ficha e gerar seu código de sincronização.');
       setStep(4);
       return;
     }
@@ -241,14 +214,15 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
 
     try {
       const applicationPayload: CharacterApplication = {
-        discord_id: activeUser.id,
-        discord_username: activeUser.username,
-        discord_avatar: resolveDiscordAvatarUrl(activeUser.id, activeUser.avatar) || undefined,
+        discord_id: user.id,
+        discord_username: user.username,
+        discord_avatar: resolveDiscordAvatarUrl(user.id, user.avatar) || undefined,
         first_name: formData.first_name.trim(),
         last_name: formData.last_name.trim(),
         birth_date: formData.birth_date,
         birth_place: formData.birth_place.trim(),
         blood_status: formData.blood_status,
+        dormitory: formData.dormitory,
         preferred_house: formData.preferred_house,
         wand_wood: formData.wand_wood,
         wand_core: formData.wand_core,
@@ -265,11 +239,30 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
 
       await onSubmit(applicationPayload);
 
-      // Limpar rascunho salvo
-      const userDraftKey = `${LOCAL_STORAGE_DRAFT_KEY}_${activeUser.id}`;
-      const userFormKey = `${LOCAL_STORAGE_FORM_KEY}_${activeUser.id}`;
+      // Limpar rascunho salvo e preparar para eventual próximo personagem
+      const userDraftKey = `${LOCAL_STORAGE_DRAFT_KEY}_${user.id}`;
+      const userFormKey = `${LOCAL_STORAGE_FORM_KEY}_${user.id}`;
       localStorage.removeItem(userDraftKey);
       localStorage.removeItem(userFormKey);
+      setFormData({
+        first_name: '',
+        last_name: '',
+        birth_date: '1989-09-01',
+        birth_place: '',
+        blood_status: 'half-blood',
+        dormitory: 'wizard',
+        preferred_house: activeHouseTheme,
+        wand_wood: WAND_WOODS[0],
+        wand_core: WAND_CORES[0],
+        wand_length: WAND_LENGTHS[3],
+        wand_flexibility: WAND_FLEXIBILITIES[2],
+        wand_handle: WAND_HANDLES[0].name,
+        patronus: '',
+        character_backstory: '',
+        rp_experience: '',
+        rules_accepted: true,
+      });
+      setStep(1);
 
       onClose();
     } catch (err: any) {
@@ -991,9 +984,9 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                     </span>
                   </div>
                   <div>
-                    <span className="text-[var(--house-accent)] block font-semibold">Linhagem:</span>
+                    <span className="text-[var(--house-accent)] block font-semibold">Linhagem &amp; Dormitório:</span>
                     <span className="text-sm text-[#FFF0B2] capitalize">
-                      {formData.blood_status}
+                      {formData.blood_status === 'pure-blood' ? 'Sangue-Puro' : formData.blood_status === 'half-blood' ? 'Mestiço' : 'Nascido-Trouxa'} · {formData.dormitory === 'witch' ? 'Bruxa' : 'Bruxo'}
                     </span>
                   </div>
                   <div>
@@ -1033,28 +1026,25 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                 </div>
               </div>
 
-              {/* Vinculação do Discord se Pendente */}
+              {/* Vinculação OAuth Obrigatória do Discord para gerar Código In-Game */}
               {!user && (
-                <div className="p-4 rounded-xl bg-[#0d1422] border border-white/10 space-y-2">
-                  <label className="block text-xs font-semibold text-[#FFC34F]">
-                    Ou informe seu usuário do Discord manualmente:
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Ex: paulo_viccs ou Paulo#1234"
-                      value={manualDiscordInput}
-                      onChange={(e) => setManualDiscordInput(e.target.value)}
-                      className="flex-1 px-3 py-2 rounded-xl bg-[#120404] border border-white/20 text-xs text-white"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleManualLink}
-                      className="px-4 py-2 rounded-xl bg-[var(--house-accent)] text-[#160504] font-bold text-xs cursor-pointer hover:brightness-110"
-                    >
-                      Vincular
-                    </button>
+                <div className="p-4 rounded-xl bg-[#5865F2]/10 border border-[#5865F2]/40 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div>
+                    <span className="block text-xs font-bold text-[#FFC34F]">
+                      Autenticação Discord OAuth2 Obrigatória
+                    </span>
+                    <p className="text-[11px] text-[#FFF0B2]/75 mt-0.5">
+                      Para garantir que seu Código de Sincronização funcione na criação de personagem dentro do jogo, conecte seu Discord oficial.
+                    </p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={onLogin}
+                    className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold text-xs cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+                  >
+                    <LogIn className="w-3.5 h-3.5" />
+                    <span>Conectar Discord</span>
+                  </button>
                 </div>
               )}
 

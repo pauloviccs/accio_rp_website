@@ -20,7 +20,7 @@ import {
   supabase,
   signInWithDiscord,
   signOut,
-  getExistingApplication,
+  getUserApplications,
   submitApplication,
   getTotalApplicationsCount,
   getCountdownTimer,
@@ -31,7 +31,10 @@ import {
 export const App: React.FC = () => {
   const [user, setUser] = useState<DiscordUser | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
-  const [application, setApplication] = useState<CharacterApplication | null>(null);
+  const [applications, setApplications] = useState<CharacterApplication[]>([]);
+  const [selectedApplicationId, setSelectedApplicationId] = useState<string | null>(null);
+  const application =
+    applications.find((item) => item.id && item.id === selectedApplicationId) || applications[0] || null;
   const [totalRegistered, setTotalRegistered] = useState<number>(0);
   const [targetEndDate, setTargetEndDate] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -142,7 +145,8 @@ export const App: React.FC = () => {
       } else {
         setUser(null);
         setUserRole(null);
-        setApplication(null);
+        setApplications([]);
+        setSelectedApplicationId(null);
         setIsValidationOpen(false);
       }
     });
@@ -160,10 +164,14 @@ export const App: React.FC = () => {
   }, []);
 
   const loadUserApplication = async (discordId: string) => {
-    const existing = await getExistingApplication(discordId);
-    if (existing) {
-      setApplication(existing);
+    const list = await getUserApplications(discordId);
+    setApplications(list);
+    if (list.length > 0) {
+      const preferred = list.find((a) => !a.game_character_id) || list[0];
+      setSelectedApplicationId(preferred.id || null);
       setIsValidationOpen(true);
+    } else {
+      setSelectedApplicationId(null);
     }
   };
 
@@ -180,13 +188,15 @@ export const App: React.FC = () => {
     await signOut();
     setUser(null);
     setUserRole(null);
-    setApplication(null);
+    setApplications([]);
+    setSelectedApplicationId(null);
     setIsValidationOpen(false);
   };
 
   const handleSubmitApplication = async (appData: CharacterApplication) => {
     const created = await submitApplication(appData);
-    setApplication(created);
+    setApplications((prev) => [created, ...prev]);
+    setSelectedApplicationId(created.id || null);
     setTotalRegistered((prev) => prev + 1);
     setIsFormOpen(false);
     // Abre a transição mágica da carta sendo selada e enviada com comprovante do Supabase
@@ -302,12 +312,6 @@ export const App: React.FC = () => {
         user={user}
         onLogin={handleLogin}
         onSubmit={handleSubmitApplication}
-        onManualUserSet={(manualUser) => {
-          setUser(manualUser);
-          syncUserRole(manualUser).then((roleRec) => {
-            setUserRole(roleRec.role);
-          });
-        }}
         activeHouseTheme={activeHouseTheme}
         onSelectHouseTheme={(h) => setActiveHouseTheme(h)}
       />
@@ -326,6 +330,9 @@ export const App: React.FC = () => {
         isOpen={isValidationOpen}
         onClose={() => setIsValidationOpen(false)}
         application={application}
+        applications={applications}
+        onSelectApplication={(appItem) => setSelectedApplicationId(appItem.id || null)}
+        onCreateNewCharacter={() => setIsFormOpen(true)}
         onViewTicket={() => {
           setIsValidationOpen(false);
           setIsTicketOpen(true);

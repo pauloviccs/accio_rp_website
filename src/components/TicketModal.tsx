@@ -137,15 +137,19 @@ export const TicketModal: React.FC<TicketModalProps> = ({
             </div>
           </div>
 
-          {/* Código de Embarque (Direct Connect Anti-Spoofing) */}
-          {(linkCodeResult || linkError) && (
+          {/* Código de Sincronização (Criação de Personagem In-Game Anti-Spoofing) */}
+          {(linkCodeResult || linkError || application.game_character_id) && (
             <div className="p-3.5 bg-[#0d1422] border border-[var(--house-border)] space-y-2 text-left">
-              {linkCodeResult ? (
+              {application.game_character_id ? (
+                <div className="text-xs text-[#7fd29a] font-semibold">
+                  Personagem já sincronizado e criado no servidor ArcaneMP (ID #{application.game_character_id}). Crie uma nova ficha no portal para outro personagem.
+                </div>
+              ) : linkCodeResult ? (
                 <>
                   <div className="flex items-center justify-between gap-2">
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.18em] text-[#9b8d72]">
-                        Código Único de Embarque (válido por 10 min)
+                        Código do Personagem (válido por 30 min)
                       </p>
                       <p className="text-base font-mono font-bold tracking-[0.14em] text-[var(--house-accent)]">
                         {linkCodeResult.code}
@@ -166,7 +170,9 @@ export const TicketModal: React.FC<TicketModalProps> = ({
                     </button>
                   </div>
                   <p className="text-[11px] leading-relaxed text-[#b6bbc5]">
-                    Use este código ao entrar no servidor (Direct Connect) para vincular sua conta do ArcaneMP à sua ficha oficial com segurança.
+                    {application.status === 'approved'
+                      ? 'Ficha aprovada! Cole este código na criação de personagem dentro do jogo para importar nome, dormitório, varinha e história integral.'
+                      : 'Código gerado! Aguarde a aprovação ministerial da ficha para que o criador de personagem do jogo libere sua sincronização.'}
                   </p>
                 </>
               ) : (
@@ -177,32 +183,34 @@ export const TicketModal: React.FC<TicketModalProps> = ({
 
           {/* Call to Actions */}
           <div className="space-y-3 pt-2">
-            <button
-              type="button"
-              onClick={async () => {
-                setIsIssuingLinkCode(true);
-                setLinkError(null);
-                setCopiedLinkCode(false);
-                try {
-                  soundManager.playSparkle();
-                  const result = await issueServerLinkCode();
-                  setLinkCodeResult(result);
-                } catch (err) {
-                  setLinkError(
-                    err instanceof Error
-                      ? err.message
-                      : 'Entre com seu Discord no site para emitir o código de embarque.'
-                  );
-                } finally {
-                  setIsIssuingLinkCode(false);
-                }
-              }}
-              disabled={isIssuingLinkCode}
-              className="w-full btn-secondary"
-            >
-              <KeyRound />
-              <span>{isIssuingLinkCode ? 'Emitindo Selo de Embarque...' : 'Gerar Código de Embarque (In-Game)'}</span>
-            </button>
+            {!application.game_character_id && (
+              <button
+                type="button"
+                onClick={async () => {
+                  setIsIssuingLinkCode(true);
+                  setLinkError(null);
+                  setCopiedLinkCode(false);
+                  try {
+                    soundManager.playSparkle();
+                    const result = await issueServerLinkCode(application.id);
+                    setLinkCodeResult(result);
+                  } catch (err) {
+                    setLinkError(
+                      err instanceof Error
+                        ? err.message
+                        : 'Entre com seu Discord no site para emitir o código de sincronização.'
+                    );
+                  } finally {
+                    setIsIssuingLinkCode(false);
+                  }
+                }}
+                disabled={isIssuingLinkCode}
+                className="w-full btn-secondary"
+              >
+                <KeyRound />
+                <span>{isIssuingLinkCode ? 'Emitindo Código do Personagem...' : 'Gerar Código do Personagem (In-Game)'}</span>
+              </button>
+            )}
 
             <button
               onClick={async () => {

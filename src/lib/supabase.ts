@@ -24,25 +24,28 @@ export async function signOut() {
   if (error) throw error;
 }
 
-export async function getExistingApplication(discordId: string): Promise<CharacterApplication | null> {
+export async function getUserApplications(discordId: string): Promise<CharacterApplication[]> {
   try {
     const { data, error } = await supabase
       .from('character_applications')
       .select('*')
       .eq('discord_id', discordId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .order('created_at', { ascending: false });
 
     if (error) {
-      console.warn('Erro ao consultar candidatura existente:', error.message);
-      return null;
+      console.warn('Erro ao consultar candidaturas do usuário:', error.message);
+      return [];
     }
-    return data as CharacterApplication | null;
+    return (data || []) as CharacterApplication[];
   } catch (err) {
-    console.error('Falha ao buscar candidatura no Supabase:', err);
-    return null;
+    console.error('Falha ao buscar candidaturas no Supabase:', err);
+    return [];
   }
+}
+
+export async function getExistingApplication(discordId: string): Promise<CharacterApplication | null> {
+  const list = await getUserApplications(discordId);
+  return list.length > 0 ? list[0] : null;
 }
 
 export async function submitApplication(app: CharacterApplication): Promise<CharacterApplication> {
@@ -355,10 +358,15 @@ export interface ServerLinkCodeResult {
   expires_at: string;
   application_id?: string | null;
   application_status?: string | null;
+  character_name?: string | null;
+  preferred_house?: string | null;
+  dormitory?: string | null;
 }
 
-export async function issueServerLinkCode(): Promise<ServerLinkCodeResult> {
-  const { data, error } = await supabase.rpc('issue_server_link_code');
+export async function issueServerLinkCode(applicationId?: string | null): Promise<ServerLinkCodeResult> {
+  const { data, error } = await supabase.rpc('issue_server_link_code', {
+    p_application_id: applicationId || null,
+  });
   if (error) {
     throw new Error(error.message || 'Falha ao gerar o código de embarque.');
   }

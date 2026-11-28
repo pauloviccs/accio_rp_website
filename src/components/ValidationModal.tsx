@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, Clock, AlertTriangle, ExternalLink, Ticket, BookOpen, Wand2, Shield, Calendar, MapPin, FileDown, Check } from 'lucide-react';
+import { X, CheckCircle2, Clock, AlertTriangle, ExternalLink, Ticket, BookOpen, Wand2, Shield, Calendar, MapPin, FileDown, Check, PlusCircle } from 'lucide-react';
 import { CharacterApplication } from '../types';
 import { HOUSES, DISCORD_INVITE_URL } from '../lib/constants';
 import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
@@ -10,6 +10,9 @@ interface ValidationModalProps {
   isOpen: boolean;
   onClose: () => void;
   application: CharacterApplication | null;
+  applications?: CharacterApplication[];
+  onSelectApplication?: (app: CharacterApplication) => void;
+  onCreateNewCharacter?: () => void;
   onViewTicket: () => void;
 }
 
@@ -17,6 +20,9 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
   isOpen,
   onClose,
   application,
+  applications = [],
+  onSelectApplication,
+  onCreateNewCharacter,
   onViewTicket,
 }) => {
   const [isReadingStory, setIsReadingStory] = useState(false);
@@ -68,6 +74,49 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
             </h2>
           </div>
         </div>
+
+        {/* Seletor de Personagens do Jogador + Botão Novo Personagem */}
+        {(applications.length > 0 || onCreateNewCharacter) && (
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-white/10">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {applications.map((item) => {
+                const isSelected = item.id === application.id;
+                return (
+                  <button
+                    key={item.id || `${item.first_name}-${item.last_name}`}
+                    type="button"
+                    onClick={() => {
+                      soundManager.playClick();
+                      onSelectApplication?.(item);
+                    }}
+                    className={`px-3 py-1.5 text-xs font-semibold border transition cursor-pointer ${
+                      isSelected
+                        ? 'bg-[var(--house-secondary)] border-[var(--house-accent)] text-[#FFF0B2]'
+                        : 'bg-[#0d1422] border-white/10 text-[#b6bbc5] hover:border-[var(--house-border)] hover:text-white'
+                    }`}
+                  >
+                    {item.first_name} {item.last_name}
+                    {item.game_character_id ? ' ✓' : ''}
+                  </button>
+                );
+              })}
+            </div>
+            {onCreateNewCharacter && (
+              <button
+                type="button"
+                onClick={() => {
+                  soundManager.playClick();
+                  onClose();
+                  onCreateNewCharacter();
+                }}
+                className="px-3 py-1.5 text-xs font-semibold bg-[#0d1422] border border-[var(--house-border)] hover:border-[var(--house-accent)] text-[var(--house-accent)] inline-flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>Novo Personagem</span>
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Banner de Status Dinâmico */}
         {status === 'approved' && (
@@ -186,14 +235,22 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
               </span>
             </div>
 
-            <div className="sm:col-span-2 pt-2 border-t border-white/5">
-              <span className="text-[#FFF0B2]/60 block mb-1 flex items-center space-x-1">
-                <Wand2 className="w-3.5 h-3.5 text-[#FFC34F]" />
-                <span>Varinha Mágica Registrada:</span>
-              </span>
-              <p className="text-xs text-[#FFF0B2]/90 font-medium">
-                Madeira de <strong>{application.wand_wood}</strong>, com núcleo de <strong>{application.wand_core}</strong>, medindo <strong>{application.wand_length}</strong> e flexibilidade <strong>{application.wand_flexibility}</strong>.
-              </p>
+            <div className="sm:col-span-2 pt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span className="text-[#FFF0B2]/60 block mb-1 flex items-center space-x-1">
+                  <Wand2 className="w-3.5 h-3.5 text-[#FFC34F]" />
+                  <span>Varinha Mágica Registrada:</span>
+                </span>
+                <p className="text-xs text-[#FFF0B2]/90 font-medium">
+                  Madeira de <strong>{application.wand_wood}</strong>, com núcleo de <strong>{application.wand_core}</strong>, medindo <strong>{application.wand_length}</strong> e flexibilidade <strong>{application.wand_flexibility}</strong>.
+                </p>
+              </div>
+              <div className="text-[11px] text-[#b6bbc5]">
+                Dormitório: <strong className="text-[#FFF0B2]">{application.dormitory === 'witch' ? 'Bruxa' : 'Bruxo'}</strong>
+                {application.game_character_id ? (
+                  <span className="ml-2 text-[#7fd29a] font-mono">· In-Game #{application.game_character_id}</span>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>

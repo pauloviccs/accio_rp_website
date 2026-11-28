@@ -182,7 +182,7 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
                 Submissão enviada à Escola, aguarde retorno.
               </h2>
               <p className="font-crimson text-sm sm:text-base text-[#b6bbc5] max-w-md mx-auto leading-relaxed">
-                Sua crônica e antecedentes foram lavrados no Livro da Admissão pela lendária Pena da Aceitação. O Conselho de Magizoologia iniciará a análise formal de sua admissão.
+                Sua crônica e antecedentes foram lavrados no Livro da Admissão pela lendária Pena da Aceitação. Após a aprovação ministerial, gere seu <strong className="text-[#ece7da]">Código do Personagem</strong> no Bilhete para sincronizar tudo dentro do jogo.
               </p>
             </div>
 

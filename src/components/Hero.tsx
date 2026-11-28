@@ -209,11 +209,15 @@ export const Hero: React.FC<HeroProps> = ({
                 <>
                   <button type="button" onClick={onOpenValidation} className="btn-primary">
                     <ShieldCheck />
-                    <span>Validação de Pré-Registro</span>
+                    <span>Minhas Fichas &amp; Código</span>
                   </button>
                   <button type="button" onClick={onViewTicket} className="btn-secondary">
                     <Ticket />
-                    <span>Meu Bilhete</span>
+                    <span>Bilhete &amp; Código</span>
+                  </button>
+                  <button type="button" onClick={onOpenForm} className="btn-secondary">
+                    <Sparkles />
+                    <span>Novo Personagem</span>
                   </button>
                 </>
               ) : (
