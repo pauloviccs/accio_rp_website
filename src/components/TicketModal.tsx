@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { X, MessageSquare, Check, FileDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CharacterApplication } from '../types';
-import { HOUSES, DISCORD_INVITE_URL } from '../lib/constants';
+import { DISCORD_INVITE_URL } from '../lib/constants';
+import { resolveEffectiveHouse } from '../lib/houseResolution';
 import { formatTicketNumber } from '../lib/ticketFormat';
 import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
 import { soundManager } from '../lib/audio';
@@ -37,13 +38,22 @@ export const TicketModal: React.FC<TicketModalProps> = ({
 
   if (!isOpen || !application) return null;
 
-  const house = HOUSES[application.preferred_house] || HOUSES.gryffindor;
+  const {
+    houseInfo: house,
+    isSortedOfficial,
+    preferredHouseInfo,
+    differsFromPreferred,
+  } = resolveEffectiveHouse(application);
   const ticketCode = formatTicketNumber(application);
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center p-2.5 sm:p-5 bg-[#05080f]/85 backdrop-blur-md overflow-y-auto">
       
-      <ArcaneFrame className="w-full max-w-xl max-h-[92dvh] my-auto bg-[#0a0f19] shadow-2xl overflow-y-auto custom-scrollbar animate-apple-modal relative p-4 sm:p-6">
+      <ArcaneFrame
+        scrollable
+        className="w-full max-w-xl max-h-[92dvh] my-auto bg-[#0a0f19] shadow-2xl animate-apple-modal"
+        bodyClassName="p-3.5 sm:p-5"
+      >
         
         {/* Glow Superior */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-[var(--house-glow)] rounded-full blur-2xl pointer-events-none" />
@@ -83,7 +93,9 @@ export const TicketModal: React.FC<TicketModalProps> = ({
             </div>
 
             <div className="bg-[#0d1422] p-3 border border-[var(--hair-soft)]">
-              <span className="text-[10px] text-[#8b93a1] uppercase tracking-wider block">Casa Selecionada</span>
+              <span className="text-[10px] text-[#8b93a1] uppercase tracking-wider block">
+                {isSortedOfficial ? 'Casa Oficial' : 'Casa Solicitada'}
+              </span>
               <span className="font-display text-sm flex items-center gap-1.5 mt-0.5" style={{ color: house.secondaryColor }}>
                 <img
                   src={house.emblemImg}
@@ -93,6 +105,11 @@ export const TicketModal: React.FC<TicketModalProps> = ({
                 />
                 <span>{house.name}</span>
               </span>
+              {differsFromPreferred && (
+                <span className="text-[10px] text-[#8b93a1] block mt-0.5">
+                  Portal: {preferredHouseInfo.name}
+                </span>
+              )}
             </div>
 
             <div className="bg-[#0d1422] p-3 border border-[var(--hair-soft)]">

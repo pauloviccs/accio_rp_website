@@ -16,6 +16,7 @@ import { AppleTimerModal } from './components/AppleTimerModal';
 import { MusicPlayerWidget } from './components/MusicPlayerWidget';
 import { CharacterApplication, DiscordUser, UserRole, HouseId } from './types';
 import { LOCAL_STORAGE_LETTER_KEY } from './lib/constants';
+import { resolveEffectiveHouse } from './lib/houseResolution';
 import {
   supabase,
   signInWithDiscord,
@@ -25,6 +26,7 @@ import {
   getTotalApplicationsCount,
   getCountdownTimer,
   subscribeToCountdownTimer,
+  subscribeToUserApplications,
   syncUserRole,
 } from './lib/supabase';
 
@@ -57,10 +59,10 @@ export const App: React.FC = () => {
     localStorage.setItem('accio_house_theme', activeHouseTheme);
   }, [activeHouseTheme]);
 
-  // Se o usuário logado tiver uma candidatura lavrada, manter o tema da sua Casa
+  // Se o usuário logado tiver uma candidatura lavrada, manter o tema da sua Casa oficial (ou pretendida)
   useEffect(() => {
-    if (application?.preferred_house) {
-      setActiveHouseTheme(application.preferred_house);
+    if (application) {
+      setActiveHouseTheme(resolveEffectiveHouse(application).houseKey);
     }
   }, [application]);
 
@@ -163,17 +165,29 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  const loadUserApplication = async (discordId: string) => {
+  const loadUserApplication = async (discordId: string, autoOpen = true) => {
     const list = await getUserApplications(discordId);
     setApplications(list);
     if (list.length > 0) {
       const preferred = list.find((a) => !a.game_character_id) || list[0];
-      setSelectedApplicationId(preferred.id || null);
-      setIsValidationOpen(true);
+      setSelectedApplicationId((prev) => (prev && list.some((a) => a.id === prev) ? prev : preferred.id || null));
+      if (autoOpen) {
+        setIsValidationOpen(true);
+      }
     } else {
       setSelectedApplicationId(null);
     }
   };
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const unsubscribe = subscribeToUserApplications(user.id, () => {
+      void loadUserApplication(user.id, false);
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, [user?.id]);
 
   const handleLogin = async () => {
     try {

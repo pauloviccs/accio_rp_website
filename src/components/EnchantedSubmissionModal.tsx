@@ -168,7 +168,11 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
 
         {/* ESTÁGIO 3: CONFIRMAÇÃO DE RECEBIMENTO NO BACK-END (SUPABASE) */}
         {stage === 'confirmed' && (
-          <ArcaneFrame className="bg-[#0a0f19]/95 p-4 sm:p-7 max-h-[92dvh] overflow-y-auto custom-scrollbar shadow-2xl backdrop-blur-2xl text-left animate-apple-modal">
+          <ArcaneFrame
+            scrollable
+            className="bg-[#0a0f19]/95 max-h-[92dvh] shadow-2xl backdrop-blur-2xl text-left animate-apple-modal"
+            bodyClassName="p-3.5 sm:p-6"
+          >
             
             {/* Ícone de Sucesso Mágico */}
             <div className="text-center pb-5 border-b border-white/10">

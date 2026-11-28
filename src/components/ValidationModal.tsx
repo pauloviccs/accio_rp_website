@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { X, CheckCircle2, Clock, AlertTriangle, ExternalLink, Ticket, BookOpen, Wand2, Shield, Calendar, MapPin, FileDown, Check, PlusCircle } from 'lucide-react';
 import { CharacterApplication } from '../types';
-import { HOUSES, DISCORD_INVITE_URL } from '../lib/constants';
+import { DISCORD_INVITE_URL } from '../lib/constants';
+import { resolveEffectiveHouse } from '../lib/houseResolution';
 import { formatTicketNumber } from '../lib/ticketFormat';
 import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
 import { soundManager } from '../lib/audio';
@@ -33,7 +34,12 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
 
   if (!isOpen || !application) return null;
 
-  const house = HOUSES[application.preferred_house] || HOUSES.gryffindor;
+  const {
+    houseInfo: house,
+    isSortedOfficial,
+    preferredHouseInfo,
+    differsFromPreferred,
+  } = resolveEffectiveHouse(application);
   const registrationCode = formatTicketNumber(application);
   const status = application.status || 'pending';
 
@@ -52,7 +58,11 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
         style={{ backgroundColor: house.color }}
       />
 
-      <ArcaneFrame className="relative w-full max-w-2xl bg-[#0a0f19]/95 p-4 sm:p-7 shadow-2xl backdrop-blur-2xl text-left my-auto max-h-[92dvh] overflow-y-auto custom-scrollbar">
+      <ArcaneFrame
+        scrollable
+        className="w-full max-w-2xl bg-[#0a0f19]/95 shadow-2xl backdrop-blur-2xl text-left my-auto max-h-[92dvh]"
+        bodyClassName="p-3.5 sm:p-6"
+      >
 
         {/* Botão de Fechar */}
         <button
@@ -214,7 +224,9 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
             </div>
 
             <div>
-              <span className="text-[#FFF0B2]/60 block mb-0.5">Casa Designada:</span>
+              <span className="text-[#FFF0B2]/60 block mb-0.5">
+                {isSortedOfficial ? 'Casa Oficial (Chapéu Seletor):' : 'Casa Solicitada (Pré-Registro):'}
+              </span>
               <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md font-bold text-white shadow-sm" style={{ backgroundColor: house.color }}>
                 <img
                   src={house.emblemImg}
@@ -224,6 +236,14 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                 />
                 <span>{house.name}</span>
               </span>
+              {isSortedOfficial && (
+                <span className="block text-[10px] text-[#7fd29a] mt-1">
+                  {differsFromPreferred
+                    ? `Confirmada in-game (Pré-seleção no portal: ${preferredHouseInfo.name})`
+                    : 'Confirmada pelo Chapéu Seletor em Hogwarts'}
+                  {application.is_hatstall ? ' · Hatstall' : ''}
+                </span>
+              )}
             </div>
 
             <div>

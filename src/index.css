@@ -756,8 +756,14 @@
   background: transparent;
 }
 
-.frame.overflow-y-auto {
-  overflow-x: hidden;
+.frame.frame-scrollable {
+  padding: 6px;
+}
+
+@media (max-width: 480px) {
+  .frame.frame-scrollable {
+    padding: 6px;
+  }
 }
 
 @media (max-width: 1023px) {

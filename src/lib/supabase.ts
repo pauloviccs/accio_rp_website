@@ -84,6 +84,50 @@ export async function getAllApplications(): Promise<CharacterApplication[]> {
   }
 }
 
+export function subscribeToUserApplications(discordId: string, onChange: () => void): () => void {
+  if (!discordId) return () => {};
+  const channel = supabase
+    .channel(`user_apps_${discordId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'character_applications',
+        filter: `discord_id=eq.${discordId}`,
+      },
+      () => {
+        onChange();
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}
+
+export function subscribeToAllApplications(onChange: () => void): () => void {
+  const channel = supabase
+    .channel('admin_all_applications_changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'character_applications',
+      },
+      () => {
+        onChange();
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}
+
 export async function updateApplicationStatus(
   id: string,
   status: 'pending' | 'approved' | 'rejected',

@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import { CharacterApplication } from '../types';
-import { HOUSES, WAND_HANDLES, OLLIVANDERS_CORE_LORE } from './constants';
+import { WAND_HANDLES, OLLIVANDERS_CORE_LORE } from './constants';
+import { resolveEffectiveHouse } from './houseResolution';
 import { formatTicketNumber } from './ticketFormat';
 import { supabase } from './supabase';
 
@@ -200,12 +201,8 @@ function formatDormitory(dorm?: string): string {
 }
 
 function formatHouseDisplay(app: CharacterApplication) {
-  const activeKey =
-    (app.sorted_house && HOUSES[app.sorted_house as keyof typeof HOUSES] ? app.sorted_house : null) ||
-    app.preferred_house;
-  const info = HOUSES[activeKey as keyof typeof HOUSES] || HOUSES.gryffindor;
-  const isOfficialSorted = Boolean(app.sorted_house && HOUSES[app.sorted_house as keyof typeof HOUSES]);
-  return { info, isOfficialSorted };
+  const { houseInfo, isSortedOfficial } = resolveEffectiveHouse(app);
+  return { info: houseInfo, isOfficialSorted: isSortedOfficial };
 }
 
 function drawCornerOrnament(pdf: jsPDF, cx: number, cy: number, dx: number, dy: number) {

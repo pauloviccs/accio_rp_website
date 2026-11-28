@@ -3,6 +3,8 @@ import React from 'react';
 interface ArcaneFrameProps {
   children: React.ReactNode;
   className?: string;
+  bodyClassName?: string;
+  scrollable?: boolean;
   style?: React.CSSProperties;
 }
 
@@ -21,15 +23,28 @@ const CornerBracket: React.FC<{ posClass: string }> = ({ posClass }) => (
 export const ArcaneFrame: React.FC<ArcaneFrameProps> = ({
   children,
   className = '',
+  bodyClassName = '',
+  scrollable = false,
   style,
 }) => {
   return (
-    <div className={`frame ${className}`} style={style}>
+    <div
+      className={`frame ${scrollable ? 'frame-scrollable flex flex-col' : ''} ${className}`.trim()}
+      style={style}
+    >
       <CornerBracket posClass="frame-corner-tl" />
       <CornerBracket posClass="frame-corner-tr" />
       <CornerBracket posClass="frame-corner-bl" />
       <CornerBracket posClass="frame-corner-br" />
-      {children}
+      {scrollable ? (
+        <div
+          className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scrollbar ${bodyClassName}`.trim()}
+        >
+          {children}
+        </div>
+      ) : (
+        children
+      )}
     </div>
   );
 };

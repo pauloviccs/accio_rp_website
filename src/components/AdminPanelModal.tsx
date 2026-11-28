@@ -9,9 +9,10 @@ import {
   getAllApplications, 
   updateApplicationStatus, 
   getAllUserRoles, 
-  updateUserRole 
+  updateUserRole,
+  subscribeToAllApplications
 } from '../lib/supabase';
-import { HOUSES } from '../lib/constants';
+import { resolveEffectiveHouse } from '../lib/houseResolution';
 import { formatTicketNumber } from '../lib/ticketFormat';
 import { soundManager, musicPlayer } from '../lib/audio';
 import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
@@ -47,11 +48,16 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const [roleUpdatingId, setRoleUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      musicPlayer.setContextTheme('dungeon');
-      loadApplications();
-      loadRoles();
-    }
+    if (!isOpen) return;
+    musicPlayer.setContextTheme('dungeon');
+    loadApplications();
+    loadRoles();
+    const unsub = subscribeToAllApplications(() => {
+      void loadApplications();
+    });
+    return () => {
+      unsub();
+    };
   }, [isOpen]);
 
   const loadApplications = async () => {
@@ -149,7 +155,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
       `${app.first_name} ${app.last_name} ${app.discord_username} ${ticketLabel}`
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
-    const matchesHouse = selectedHouse === 'all' || app.preferred_house === selectedHouse;
+    const matchesHouse = selectedHouse === 'all' || resolveEffectiveHouse(app).houseKey === selectedHouse;
     const matchesStatus = selectedStatus === 'all' || app.status === selectedStatus;
     return matchesSearch && matchesHouse && matchesStatus;
   });
@@ -361,13 +367,18 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                     </tr>
                   ) : (
                     filteredApps.map((app) => {
-                      const house = HOUSES[app.preferred_house] || HOUSES.gryffindor;
+                      const { houseInfo: house, isSortedOfficial, preferredHouseInfo, differsFromPreferred } = resolveEffectiveHouse(app);
                       const regCode = formatTicketNumber(app);
                       const appStatus = app.status || 'pending';
 
                       return (
                         <tr key={app.id || app.discord_id} className="hover:bg-white/[0.02] transition">
-                          <td className="py-3 px-3 font-mono font-bold text-gold-gradient">{regCode}</td>
+                          <td className="py-3 px-3 font-mono font-bold text-gold-gradient">
+                            {regCode}
+                            {app.game_character_id ? (
+                              <span className="block text-[9px] text-[#7fd29a] font-normal">ID #{app.game_character_id}</span>
+                            ) : null}
+                          </td>
                           <td className="py-3 px-3">
                             <span className="font-semibold block">{app.discord_username}</span>
                             <span className="text-[10px] text-[#FFF0B2]/40 font-mono">{app.discord_id}</span>
@@ -383,6 +394,11 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                               />
                               <span>{house.name}</span>
                             </span>
+                            {isSortedOfficial && (
+                              <span className="block text-[9px] text-[#7fd29a] mt-0.5">
+                                {differsFromPreferred ? `Chapéu (Site: ${preferredHouseInfo.name})` : 'Confirmada in-game'}
+                              </span>
+                            )}
                           </td>
                           <td className="py-3 px-3 text-[11px] text-[#FFF0B2]/70">{app.wand_wood} • {app.wand_core}</td>
                           <td className="py-3 px-3 font-mono font-bold">{app.word_count?.toLocaleString('pt-BR')}</td>
@@ -527,6 +543,21 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                   <span>Discord: <strong>{selectedApp.discord_username}</strong> ({selectedApp.discord_id})</span>
                   <span>Palavras: <strong className="text-gold-gradient">{selectedApp.word_count}</strong></span>
                 </div>
+                {(() => {
+                  const resolved = resolveEffectiveHouse(selectedApp);
+                  return (
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#FFF0B2]/75">
+                      <span>
+                        {resolved.isSortedOfficial ? 'Casa Oficial (Jogo): ' : 'Casa Solicitada: '}
+                        <strong className="text-[#FFF0B2]">{resolved.houseInfo.name}</strong>
+                        {resolved.differsFromPreferred ? ` (Pré-seleção no portal: ${resolved.preferredHouseInfo.name})` : ''}
+                      </span>
+                      {selectedApp.game_character_id ? (
+                        <span className="font-mono text-[#7fd29a]">Personagem #{selectedApp.game_character_id}</span>
+                      ) : null}
+                    </div>
+                  );
+                })()}
                 <div className="p-3 bg-[#100303] rounded-xl border border-white/5 max-h-48 overflow-y-auto leading-relaxed text-[#FFF0B2]/80 font-serif">
                   {selectedApp.character_backstory}
                 </div>
