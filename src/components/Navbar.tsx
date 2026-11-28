@@ -96,7 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <nav aria-label="Navegação principal" className="site-nav">
-      <div className="relative flex h-16 sm:h-18 items-center justify-between gap-3 px-4 sm:px-5 xl:h-20 xl:px-7">
+      <div className="relative flex h-16 sm:h-18 items-center justify-between gap-1.5 sm:gap-3 px-2.5 sm:px-5 xl:h-20 xl:px-7">
 
         {/* Brand Tipográfico (Sem Isotipo no Header) */}
         <a
@@ -163,7 +163,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Ações à Direita */}
-        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
 
           {/* Seletor de Casa Dinâmico */}
           <div className="relative">
@@ -277,7 +277,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               )}
 
-              <div className="flex items-center gap-2 bg-[#0d1422] border border-[var(--house-border)] px-2 py-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-[#0d1422] border border-[var(--house-border)] px-1.5 sm:px-2 py-1">
                 {userAvatarUrl && !avatarFailed ? (
                   <img
                     src={userAvatarUrl}
@@ -304,7 +304,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={onLogout}
-                className="p-2 bg-[#0d1422] hover:bg-[#172033] text-[#b6bbc5] hover:text-white transition cursor-pointer border border-[var(--house-border)]"
+                className="p-1.5 sm:p-2 bg-[#0d1422] hover:bg-[#172033] text-[#b6bbc5] hover:text-white transition cursor-pointer border border-[var(--house-border)]"
                 title="Desconectar"
               >
                 <LogOut className="w-3.5 h-3.5" />

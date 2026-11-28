@@ -232,8 +232,8 @@ export const AppleTimerModal: React.FC<AppleTimerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-[#05080f]/90 backdrop-blur-2xl overflow-y-auto">
-      <div className="relative w-full max-w-lg max-h-[92vh] flex flex-col bg-[#0a0f19] border border-[var(--house-border)] p-4 sm:p-6 shadow-2xl overflow-y-auto my-auto animate-apple-modal">
+    <div className="fixed inset-0 z-[70] flex items-start justify-center p-2.5 sm:p-4 bg-[#05080f]/90 backdrop-blur-2xl overflow-y-auto">
+      <div className="relative w-full max-w-lg max-h-[92dvh] flex flex-col bg-[#0a0f19] border border-[var(--house-border)] p-4 sm:p-6 shadow-2xl overflow-y-auto custom-scrollbar my-auto animate-apple-modal">
         
         {/* Glow de fundo */}
         <div className="absolute top-0 right-1/4 w-60 h-60 bg-[var(--house-glow)] rounded-full blur-[80px] pointer-events-none opacity-25" />

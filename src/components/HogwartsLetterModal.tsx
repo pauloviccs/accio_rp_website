@@ -51,7 +51,7 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-xl transition-all duration-500 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-2.5 sm:p-5 bg-black/90 backdrop-blur-xl transition-all duration-500 overflow-y-auto">
       
       {/* Luz ambiente de velas e feitiço */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[600px] h-[320px] sm:h-[600px] bg-gradient-to-r from-[#B83A0C]/20 via-[#FFC34F]/15 to-[#5B1009]/25 rounded-full blur-[120px] pointer-events-none" />
@@ -68,7 +68,7 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
       </div>
 
       {/* CONTAINER DO ENVELOPE / CARTA 3D */}
-      <div className="relative w-full max-w-lg my-auto py-8 transition-all duration-700">
+      <div className="relative w-full max-w-lg my-auto py-10 sm:py-12 transition-all duration-700">
         
         {/* ENVELOPE */}
         <div
@@ -145,7 +145,7 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
 
           {/* ESTADO 2: CARTA ABERTA (Deslizada para fora com a convocação oficial) */}
           {isBroken && (
-            <div className="p-6 sm:p-8 space-y-5 animate-apple-modal bg-[#FDF9F3]">
+            <div className="p-4 sm:p-7 space-y-5 animate-apple-modal bg-[#FDF9F3] max-h-[82dvh] overflow-y-auto custom-scrollbar">
               
               {/* Cabeçalho da Carta */}
               <div className="text-center space-y-1.5 border-b-2 border-[#8C6D58]/30 pb-4">
@@ -178,7 +178,7 @@ export const HogwartsLetterModal: React.FC<HogwartsLetterModalProps> = ({
                   Aguardamos sua resposta oficial por coruja com brevidade. O Expresso de Hogwarts partirá rigorosamente às onze horas da manhã da Plataforma 9¾ na Estação de King's Cross.
                 </p>
                 
-                <div className="pt-2 border-t border-[#8C6D58]/20 flex justify-between items-end text-xs text-[#6B4E3D]">
+                <div className="pt-2 border-t border-[#8C6D58]/20 flex flex-wrap justify-between items-end gap-2 text-xs text-[#6B4E3D]">
                   <span className="italic">"Draco Dormiens Nunquam Titillandus"</span>
                   <div className="text-right font-serif not-italic">
                     <span className="block font-bold text-[#160504]">Aurelian Vale Diggory</span>

@@ -41,9 +41,9 @@ export const TicketModal: React.FC<TicketModalProps> = ({
   const ticketCode = formatTicketNumber(application);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#05080f]/85 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-2.5 sm:p-5 bg-[#05080f]/85 backdrop-blur-md overflow-y-auto">
       
-      <ArcaneFrame className="w-full max-w-lg bg-[#0a0f19] shadow-2xl overflow-hidden animate-apple-modal relative">
+      <ArcaneFrame className="w-full max-w-xl max-h-[92dvh] my-auto bg-[#0a0f19] shadow-2xl overflow-y-auto custom-scrollbar animate-apple-modal relative p-4 sm:p-6">
         
         {/* Glow Superior */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-[var(--house-glow)] rounded-full blur-2xl pointer-events-none" />
@@ -51,20 +51,21 @@ export const TicketModal: React.FC<TicketModalProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-8 h-8 bg-[#0d1422] border border-[var(--house-border)] hover:border-[var(--house-accent)] text-[#ece7da] flex items-center justify-center transition cursor-pointer"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 w-8 h-8 bg-[#0d1422] border border-[var(--house-border)] hover:border-[var(--house-accent)] text-[#ece7da] flex items-center justify-center transition cursor-pointer"
+          aria-label="Fechar bilhete"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Bilhete do Expresso de Hogwarts */}
-        <div className="p-6 sm:p-8 space-y-6">
+        <div className="space-y-4">
           
           {/* Header do Bilhete */}
-          <div className="text-center space-y-2 border-b border-[var(--hair-soft)] pb-5">
+          <div className="text-center space-y-1.5 border-b border-[var(--hair-soft)] pb-4 px-8">
             <span className="eyebrow text-[10px]">
               Expresso de Hogwarts · 1º Lote de Admissão
             </span>
-            <h2 className="font-display text-2xl sm:text-3xl text-[#ece7da]">
+            <h2 className="font-display text-xl sm:text-3xl text-[#ece7da]">
               Passe de Embarque Oficial
             </h2>
             <div className="inline-block px-3 py-1 bg-[#0d1422] border border-[var(--house-border)] font-mono text-xs font-bold text-[var(--house-accent)]">
@@ -73,7 +74,7 @@ export const TicketModal: React.FC<TicketModalProps> = ({
           </div>
 
           {/* Dados do Personagem */}
-          <div className="grid grid-cols-2 gap-3.5 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div className="bg-[#0d1422] p-3 border border-[var(--hair-soft)]">
               <span className="text-[10px] text-[#8b93a1] uppercase tracking-wider block">Bruxo(a)</span>
               <span className="font-display text-sm text-[#ece7da] block truncate">
@@ -111,7 +112,7 @@ export const TicketModal: React.FC<TicketModalProps> = ({
           </div>
 
           {/* Código de Barras / Emblema Mágico */}
-          <div className="p-4 bg-[#090e17] border border-[var(--house-border)] flex items-center justify-between">
+          <div className="p-3.5 bg-[#090e17] border border-[var(--house-border)] flex flex-wrap items-center justify-between gap-2">
             <div>
               <span className="text-[10px] text-[#8b93a1] block">Discord Vinculado</span>
               <span className="text-xs font-mono font-bold text-[var(--house-accent)]">

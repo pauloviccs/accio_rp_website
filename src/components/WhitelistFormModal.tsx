@@ -284,17 +284,17 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-[#05080f]/90 backdrop-blur-xl overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-2 sm:p-4 md:p-6 bg-[#05080f]/90 backdrop-blur-xl overflow-y-auto">
       
       {/* Container Principal Estilo ArcaneMP + Hogwarts Legacy */}
-      <div className="relative w-full max-w-4xl max-h-[94vh] bg-[#0a0f19] border border-[var(--house-border-strong)] shadow-[0_0_50px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden animate-apple-modal my-auto">
+      <div className="relative w-full max-w-4xl max-h-[92dvh] bg-[#0a0f19] border border-[var(--house-border-strong)] shadow-[0_0_50px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden animate-apple-modal my-auto">
         
         {/* Glow de Ambiente da Casa Selecionada */}
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-[var(--house-glow)] rounded-full blur-[120px] pointer-events-none opacity-35" />
         <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[var(--house-primary)] rounded-full blur-[140px] pointer-events-none opacity-15" />
 
         {/* ─── Topo: Stepper com Medalhões Inspirado em Hogwarts Legacy ─── */}
-        <div className="relative z-10 px-5 sm:px-8 pt-5 pb-4 border-b border-[var(--house-border)] bg-[#090e17]/95 backdrop-blur-md">
+        <div className="relative z-10 px-4 sm:px-7 pt-4 sm:pt-5 pb-3.5 border-b border-[var(--house-border)] bg-[#090e17]/95 backdrop-blur-md">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-[#0d1422] border border-[var(--house-border)] flex items-center justify-center shadow-lg">
@@ -369,7 +369,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
                     )}
                   </div>
                   <span
-                    className={`text-[10px] sm:text-xs font-display mt-1.5 transition ${
+                    className={`text-[9px] sm:text-xs font-display mt-1.5 text-center leading-tight transition ${
                       isActive
                         ? 'text-gold-gradient scale-105'
                         : isDone
@@ -1067,7 +1067,7 @@ export const WhitelistFormModal: React.FC<WhitelistFormModalProps> = ({
         </div>
 
         {/* ─── Rodapé de Navegação do Modal (Avançar / Voltar / Submeter) ─── */}
-        <div className="px-6 py-4 border-t border-[var(--house-border)] bg-[#090e17]/95 backdrop-blur-md flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-[var(--house-border)] bg-[#090e17]/95 backdrop-blur-md flex items-center justify-between gap-2">
           <div>
             {step > 1 ? (
               <button

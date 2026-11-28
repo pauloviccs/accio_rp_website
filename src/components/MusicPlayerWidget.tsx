@@ -24,10 +24,10 @@ export const MusicPlayerWidget: React.FC = () => {
   const { isPlaying, currentTrack, volume, isMuted, shuffle } = playerState;
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 select-none">
+    <div className="fixed bottom-3 left-3 sm:bottom-4 sm:left-4 z-40 select-none max-w-[calc(100vw-1.5rem)]">
       {/* Widget Expandido com Playlist Completa */}
       {isExpanded ? (
-        <ArcaneFrame className="w-80 sm:w-96 bg-[#0a0f19]/95 p-4 sm:p-5 shadow-2xl backdrop-blur-xl animate-apple-modal">
+        <ArcaneFrame className="w-[calc(100vw-1.5rem)] max-w-[23rem] sm:w-96 max-h-[80dvh] overflow-y-auto custom-scrollbar bg-[#0a0f19]/95 p-4 sm:p-5 shadow-2xl backdrop-blur-xl animate-apple-modal">
           
           {/* Topo do Player */}
           <div className="flex items-center justify-between pb-2.5 border-b border-white/10 mb-3">

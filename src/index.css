@@ -156,6 +156,7 @@
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 7rem;
+    overflow-x: hidden;
   }
 
   body {
@@ -490,6 +491,21 @@
   font-size: 0.72rem;
 }
 
+@media (max-width: 480px) {
+  .frame {
+    padding: 1.15rem;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-accio-gold {
+    min-height: 2.85rem;
+    padding: 0.55rem 1.25rem;
+    letter-spacing: 0.09em;
+    font-size: 0.75rem;
+  }
+}
+
 .link-gold {
   color: var(--house-accent);
   align-items: center;
@@ -508,7 +524,7 @@
   isolation: isolate;
   background: var(--house-bg-deep);
   flex-direction: column;
-  min-height: max(820px, min(980px, 100svh));
+  min-height: clamp(640px, 100svh, 940px);
   display: flex;
   position: relative;
   overflow: hidden;
@@ -734,4 +750,18 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #23304d;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.frame.overflow-y-auto {
+  overflow-x: hidden;
+}
+
+@media (max-width: 1023px) {
+  .hero > .relative.z-10 {
+    padding-top: 1.75rem;
+  }
 }

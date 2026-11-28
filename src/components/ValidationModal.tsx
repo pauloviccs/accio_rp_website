@@ -44,7 +44,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#05080f]/85 backdrop-blur-xl transition-all duration-300 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-2.5 sm:p-5 bg-[#05080f]/85 backdrop-blur-xl transition-all duration-300 overflow-y-auto">
 
       {/* Luz ambiente de feitiço */}
       <div
@@ -52,18 +52,19 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
         style={{ backgroundColor: house.color }}
       />
 
-      <ArcaneFrame className="relative w-full max-w-2xl bg-[#0a0f19]/95 p-5 sm:p-8 shadow-2xl backdrop-blur-2xl text-left my-auto max-h-[92vh] overflow-y-auto">
+      <ArcaneFrame className="relative w-full max-w-2xl bg-[#0a0f19]/95 p-4 sm:p-7 shadow-2xl backdrop-blur-2xl text-left my-auto max-h-[92dvh] overflow-y-auto custom-scrollbar">
 
         {/* Botão de Fechar */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 sm:top-6 sm:right-6 text-[#b6bbc5] hover:text-white p-1.5 hover:bg-white/5 transition cursor-pointer"
+          className="absolute top-3.5 right-3.5 sm:top-5 sm:right-5 text-[#b6bbc5] hover:text-white p-1.5 hover:bg-white/5 transition cursor-pointer"
+          aria-label="Fechar validação"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Cabeçalho de Validação */}
-        <div className="flex items-center space-x-3 mb-6">
+        <div className="flex items-center space-x-3 mb-5 pr-10">
           <div className="w-12 h-12 bg-[#0d1422] border border-[var(--house-border)] flex items-center justify-center shadow-lg">
             <Shield className="w-6 h-6 text-[var(--house-accent)]" />
           </div>
@@ -234,12 +235,12 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
 
             <div>
               <span className="text-[#FFF0B2]/60 block mb-0.5">Nascimento & Local:</span>
-              <span className="text-[#FFF0B2] font-medium flex items-center space-x-1">
-                <Calendar className="w-3.5 h-3.5 text-[#FFC34F]" />
+              <span className="text-[#FFF0B2] font-medium flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                <Calendar className="w-3.5 h-3.5 text-[#FFC34F] shrink-0" />
                 <span>{application.birth_date}</span>
                 <span className="text-white/40">•</span>
-                <MapPin className="w-3.5 h-3.5 text-[#FFC34F]" />
-                <span>{application.birth_place}</span>
+                <MapPin className="w-3.5 h-3.5 text-[#FFC34F] shrink-0" />
+                <span className="break-words">{application.birth_place}</span>
               </span>
             </div>
 
@@ -264,8 +265,8 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
         </div>
 
         {/* Leitor da História de 3.000+ Palavras */}
-        <div className="bg-[#090e17] border border-[var(--house-border)] p-4 sm:p-5 mb-6">
-          <div className="flex items-center justify-between mb-3">
+        <div className="bg-[#090e17] border border-[var(--house-border)] p-4 sm:p-5 mb-5">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div className="flex items-center space-x-2">
               <BookOpen className="w-4 h-4 text-[#FFC34F]" />
               <h4 className="text-xs sm:text-sm font-bold text-[#FFF0B2]">

@@ -86,7 +86,7 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-2xl transition-all duration-500 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-2.5 sm:p-5 bg-black/90 backdrop-blur-2xl transition-all duration-500 overflow-y-auto">
       
       {/* Luz ambiente de feitiço */}
       <div 
@@ -113,7 +113,7 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
             
             {/* O Envelope Mágico 3D */}
             <div 
-              className={`relative w-80 sm:w-96 h-56 bg-[#EADBCE] border-2 border-[#8C6D58] rounded-2xl shadow-2xl transition-all duration-1000 flex items-center justify-center overflow-hidden ${
+              className={`relative w-[calc(100vw-2.5rem)] max-w-sm h-52 sm:h-56 bg-[#EADBCE] border-2 border-[#8C6D58] rounded-2xl shadow-2xl transition-all duration-1000 flex items-center justify-center overflow-hidden ${
                 stage === 'flying' 
                   ? '-translate-y-16 scale-90 rotate-2 opacity-90 shadow-[0_25px_60px_rgba(255,195,79,0.4)]' 
                   : 'translate-y-0 scale-100'
@@ -168,7 +168,7 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
 
         {/* ESTÁGIO 3: CONFIRMAÇÃO DE RECEBIMENTO NO BACK-END (SUPABASE) */}
         {stage === 'confirmed' && (
-          <ArcaneFrame className="bg-[#0a0f19]/95 p-6 sm:p-8 shadow-2xl backdrop-blur-2xl text-left animate-apple-modal">
+          <ArcaneFrame className="bg-[#0a0f19]/95 p-4 sm:p-7 max-h-[92dvh] overflow-y-auto custom-scrollbar shadow-2xl backdrop-blur-2xl text-left animate-apple-modal">
             
             {/* Ícone de Sucesso Mágico */}
             <div className="text-center pb-5 border-b border-white/10">
@@ -244,7 +244,7 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
                   </span>
                 </div>
 
-                <div className="sm:col-span-2 flex items-center justify-between pt-2 border-t border-white/5 text-[11px]">
+                <div className="sm:col-span-2 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5 text-[11px]">
                   <span className="text-[#4CAF7C] font-mono font-semibold inline-flex items-center gap-1">
                     <Check className="w-3.5 h-3.5" />
                     <span>{application.word_count.toLocaleString('pt-BR')} palavras inscritas no Livro da Admissão</span>

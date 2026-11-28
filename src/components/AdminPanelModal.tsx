@@ -120,8 +120,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
 
   if (!hasAccess) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div className="w-full max-w-md bg-[#160504] border border-[#CF4A4A]/50 rounded-3xl p-6 text-center space-y-4 shadow-2xl animate-apple-modal">
+      <div className="fixed inset-0 z-50 flex items-start justify-center p-2.5 sm:p-4 bg-black/90 backdrop-blur-md overflow-y-auto">
+        <div className="w-full max-w-md my-auto max-h-[92dvh] overflow-y-auto custom-scrollbar bg-[#160504] border border-[#CF4A4A]/50 rounded-3xl p-5 sm:p-6 text-center space-y-4 shadow-2xl animate-apple-modal">
           <div className="w-12 h-12 rounded-2xl bg-[#CF4A4A]/20 border border-[#CF4A4A]/40 flex items-center justify-center mx-auto text-[#CF4A4A]">
             <Lock className="w-6 h-6" />
           </div>
@@ -183,8 +183,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-[#05080f]/85 backdrop-blur-md">
-      <div className="w-full sm:max-w-6xl max-h-[94vh] bg-[#0a0f19] border border-[var(--house-border)] shadow-2xl flex flex-col overflow-hidden animate-apple-modal">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-2 sm:p-4 bg-[#05080f]/85 backdrop-blur-md overflow-y-auto">
+      <div className="w-full sm:max-w-6xl my-auto max-h-[92dvh] bg-[#0a0f19] border border-[var(--house-border)] shadow-2xl flex flex-col overflow-hidden animate-apple-modal">
         
         {/* Topo do Painel */}
         <div className="px-4 sm:px-6 py-4 border-b border-[var(--hair-soft)] flex flex-wrap items-center justify-between gap-3 bg-[#090e17]">
@@ -240,7 +240,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
         </div>
 
         {/* NAVEGAÇÃO POR ABAS: INSCRIÇÕES vs CARGOS */}
-        <div className="flex items-center px-4 sm:px-6 pt-3 border-b border-[var(--hair-soft)] bg-[#0a0f19] gap-2">
+        <div className="flex items-center px-3 sm:px-6 pt-3 border-b border-[var(--hair-soft)] bg-[#0a0f19] gap-2 overflow-x-auto whitespace-nowrap">
           <button
             onClick={() => {
               soundManager.playClick();
@@ -508,8 +508,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
 
         {/* MODAL DE JULGAMENTO DE FICHA */}
         {selectedApp && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-            <div className="w-full max-w-2xl bg-[#160504] border border-[#B83A0C]/50 rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 z-[60] flex items-start justify-center p-2.5 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+            <div className="w-full max-w-2xl my-auto bg-[#160504] border border-[#B83A0C]/50 rounded-3xl p-4 sm:p-6 shadow-2xl space-y-4 max-h-[92dvh] overflow-y-auto custom-scrollbar">
               <div className="flex items-center justify-between pb-3 border-b border-white/10">
                 <h3 className="font-cinzel text-lg font-bold text-[#FFF0B2]">
                   Julgamento Ministerial: {selectedApp.first_name} {selectedApp.last_name}
@@ -523,7 +523,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
               </div>
 
               <div className="text-xs space-y-2">
-                <div className="flex items-center justify-between text-[#FFF0B2]/70">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-[#FFF0B2]/70">
                   <span>Discord: <strong>{selectedApp.discord_username}</strong> ({selectedApp.discord_id})</span>
                   <span>Palavras: <strong className="text-gold-gradient">{selectedApp.word_count}</strong></span>
                 </div>
