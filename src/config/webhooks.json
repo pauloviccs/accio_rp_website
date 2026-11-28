@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "notifyOnSubmitPending": true,
+  "notifyOnStatusTransitions": ["pending", "approved", "rejected"],
+  "channels": {
+    "approved": {
+      "enabled": true,
+      "url": "https://discord.com/api/webhooks/1576207497428078694/ogYsaVHpz_YQF8WXkF1zqkd9Wwkjg08A8bSK59R6S2fm8SBLindybpCfve7OS9aTfPrI",
+      "username": "Expresso de Hogwarts",
+      "avatarUrl": "https://btxwhsbccfwhajrmopzm.supabase.co/storage/v1/object/public/assets/logohigh.jpg"
+    },
+    "rejected": {
+      "enabled": true,
+      "url": "https://discord.com/api/webhooks/1576208796018016317/juaBGwiSLtFe38xczIgyWgtndv69wkur7ungjKKL46K_x68zmQ9oowlwyuon49TY3MdN",
+      "username": "Ministério da Magia",
+      "avatarUrl": "https://btxwhsbccfwhajrmopzm.supabase.co/storage/v1/object/public/assets/logohigh.jpg"
+    },
+    "pending": {
+      "enabled": true,
+      "url": "https://discord.com/api/webhooks/1576209071718269171/5rwFhIP1H6TedV_9vDZuXczpMDAoqZP6RJVdDCIUlCdvrZnhrA2ho3DvTx1V6muF2w6f",
+      "username": "Ministério da Magia",
+      "avatarUrl": "https://btxwhsbccfwhajrmopzm.supabase.co/storage/v1/object/public/assets/logohigh.jpg"
+    }
+  }
+}
+

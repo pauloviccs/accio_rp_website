@@ -1,6 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import { CharacterApplication, DiscordUser, UserRole, UserRoleRecord } from '../types';
-import { sendRegistrationToDiscord } from './discordWebhook';
+import {
+  normalizeWebhookStatus,
+  sendApplicationStatusToDiscord,
+  WebhookApplicationStatus,
+} from './discordWebhook';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://siwjyavftankitbdagzo.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpd2p5YXZmdGFua2l0YmRhZ3pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUyNzU3NjcsImV4cCI6MjExMDg1MTc2N30.wnRe2Pk2f0PQbY4JT-iKjN27_xKot88QO3WY-YkphtU';
@@ -48,6 +52,52 @@ export async function getExistingApplication(discordId: string): Promise<Charact
   return list.length > 0 ? list[0] : null;
 }
 
+async function dispatchApplicationStatusWebhook(
+  app: CharacterApplication,
+  targetStatus: WebhookApplicationStatus,
+  previousStatus?: string | null
+): Promise<boolean> {
+  if (!app?.id) return false;
+
+  let shouldSend = true;
+  try {
+    const { data, error } = await supabase.rpc('claim_application_webhook_dispatch', {
+      p_application_id: app.id,
+      p_expected_status: targetStatus,
+    });
+    if (!error && data && typeof data === 'object' && 'claimed' in data) {
+      shouldSend = Boolean((data as { claimed?: boolean }).claimed);
+      const rpcPrev = (data as { previous_status?: string | null }).previous_status;
+      if (rpcPrev && !previousStatus) {
+        previousStatus = rpcPrev;
+      }
+    }
+  } catch (claimErr) {
+    console.warn('Falha ao reservar disparo de webhook no Supabase:', claimErr);
+  }
+
+  if (!shouldSend) return true;
+
+  const sent = await sendApplicationStatusToDiscord(app, {
+    status: targetStatus,
+    previousStatus,
+  });
+
+  if (!sent) {
+    try {
+      await supabase.rpc('release_application_webhook_dispatch', {
+        p_application_id: app.id,
+        p_failed_status: targetStatus,
+        p_restore_status: previousStatus ?? null,
+      });
+    } catch {
+      // Se não for possível liberar no frontend, o servidor sincroniza via Supabase
+    }
+  }
+
+  return sent;
+}
+
 export async function submitApplication(app: CharacterApplication): Promise<CharacterApplication> {
   const { data, error } = await supabase
     .from('character_applications')
@@ -58,9 +108,9 @@ export async function submitApplication(app: CharacterApplication): Promise<Char
   if (error) throw error;
   const created = data as CharacterApplication;
 
-  // Notificar canal do Discord com embed diagramado
-  sendRegistrationToDiscord(created).catch((err) => {
-    console.warn('Falha assíncrona ao disparar webhook do Discord:', err);
+  const initialStatus = normalizeWebhookStatus(created.status || 'pending') || 'pending';
+  dispatchApplicationStatusWebhook(created, initialStatus, null).catch((err) => {
+    console.warn('Falha assíncrona ao disparar webhook de pendência no Discord:', err);
   });
 
   return created;
@@ -135,6 +185,14 @@ export async function updateApplicationStatus(
   reviewedBy: string = 'Ministério da Magia'
 ): Promise<CharacterApplication | null> {
   try {
+    const { data: currentRow } = await supabase
+      .from('character_applications')
+      .select('status')
+      .eq('id', id)
+      .maybeSingle();
+
+    const previousStatus = (currentRow as { status?: string } | null)?.status || null;
+
     const { data, error } = await supabase
       .from('character_applications')
       .update({
@@ -151,7 +209,15 @@ export async function updateApplicationStatus(
       console.error('Erro ao atualizar status da candidatura:', error.message);
       return null;
     }
-    return data as CharacterApplication;
+
+    const updated = data as CharacterApplication;
+    if (previousStatus !== status) {
+      dispatchApplicationStatusWebhook(updated, status, previousStatus).catch((err) => {
+        console.warn(`Falha assíncrona ao despachar webhook (${status}) no Discord:`, err);
+      });
+    }
+
+    return updated;
   } catch (err) {
     console.error('Falha de rede ao atualizar status:', err);
     return null;
