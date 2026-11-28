@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { X, CheckCircle2, Clock, AlertTriangle, ExternalLink, Ticket, BookOpen, Wand2, Shield, Calendar, MapPin, FileDown, Check, PlusCircle } from 'lucide-react';
 import { CharacterApplication } from '../types';
 import { HOUSES, DISCORD_INVITE_URL } from '../lib/constants';
+import { formatTicketNumber } from '../lib/ticketFormat';
 import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
 import { soundManager } from '../lib/audio';
 import { ArcaneFrame } from './ArcaneOrnaments';
+import { GameSyncCodeCard } from './GameSyncCodeCard';
 
 interface ValidationModalProps {
   isOpen: boolean;
@@ -32,7 +34,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
   if (!isOpen || !application) return null;
 
   const house = HOUSES[application.preferred_house] || HOUSES.gryffindor;
-  const registrationCode = `#ACCIO-${String(application.registration_number || 1).padStart(4, '0')}`;
+  const registrationCode = formatTicketNumber(application);
   const status = application.status || 'pending';
 
   const bloodStatusMap: Record<string, string> = {
@@ -161,6 +163,12 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
           </div>
         )}
 
+        {(status === 'approved' || application.game_character_id) && (
+          <div className="mb-6">
+            <GameSyncCodeCard application={application} isOpen={isOpen} />
+          </div>
+        )}
+
         {/* Cartão de Identificação do Bruxo */}
         <div className="bg-[#0d1422]/90 border border-[var(--house-border)] p-4 sm:p-5 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-white/10 gap-3">
@@ -188,7 +196,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
             </div>
 
             <div className="sm:text-right">
-              <span className="text-xs text-[#FFF0B2]/60">Número do Bilhete</span>
+              <span className="text-xs text-[#FFF0B2]/60">Bilhete de Registro</span>
               <p className="font-mono text-lg font-extrabold text-gold-gradient">
                 {registrationCode}
               </p>

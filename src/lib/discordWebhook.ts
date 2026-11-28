@@ -1,10 +1,11 @@
 import { CharacterApplication } from '../types';
 import { DISCORD_WEBHOOK_URL, HOUSES } from './constants';
+import { formatTicketNumber } from './ticketFormat';
 
 export const sendRegistrationToDiscord = async (app: CharacterApplication): Promise<boolean> => {
   try {
     const house = HOUSES[app.preferred_house] || HOUSES.gryffindor;
-    const registrationCode = `#ACCIO-${String(app.registration_number || 1).padStart(4, '0')}`;
+    const registrationCode = formatTicketNumber(app);
 
     // Mapeamento cromático para os embeds do Discord
     const houseColors: Record<string, number> = {
@@ -22,7 +23,7 @@ export const sendRegistrationToDiscord = async (app: CharacterApplication): Prom
 
     const bloodStatusLabel =
       app.blood_status === 'pure-blood' ? 'Sangue Puro 🩸' :
-      app.blood_status === 'half-blood' ? 'Mestiço ⚖️' : 'Nascido Trouxa 📜';
+        app.blood_status === 'half-blood' ? 'Mestiço ⚖️' : 'Nascido Trouxa 📜';
 
     const payload = {
       username: 'ACCIO Roleplay — Ministério da Magia',

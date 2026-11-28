@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { X, MessageSquare, Check, FileDown, KeyRound, Copy } from 'lucide-react';
+import { X, MessageSquare, Check, FileDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CharacterApplication } from '../types';
 import { HOUSES, DISCORD_INVITE_URL } from '../lib/constants';
+import { formatTicketNumber } from '../lib/ticketFormat';
 import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
-import { issueServerLinkCode, ServerLinkCodeResult } from '../lib/supabase';
 import { soundManager } from '../lib/audio';
 import { ArcaneFrame } from './ArcaneOrnaments';
+import { GameSyncCodeCard } from './GameSyncCodeCard';
 
 interface TicketModalProps {
   isOpen: boolean;
@@ -21,10 +22,6 @@ export const TicketModal: React.FC<TicketModalProps> = ({
 }) => {
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [pdfProgress, setPdfProgress] = useState<string | null>(null);
-  const [isIssuingLinkCode, setIsIssuingLinkCode] = useState(false);
-  const [linkCodeResult, setLinkCodeResult] = useState<ServerLinkCodeResult | null>(null);
-  const [linkError, setLinkError] = useState<string | null>(null);
-  const [copiedLinkCode, setCopiedLinkCode] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -35,19 +32,13 @@ export const TicketModal: React.FC<TicketModalProps> = ({
         origin: { y: 0.6 },
         colors: ['#FFF0B2', '#FFC34F', '#F47A16', '#B83A0C'],
       });
-    } else {
-      setLinkCodeResult(null);
-      setLinkError(null);
-      setCopiedLinkCode(false);
     }
   }, [isOpen]);
 
   if (!isOpen || !application) return null;
 
   const house = HOUSES[application.preferred_house] || HOUSES.gryffindor;
-  const ticketCode = application.registration_number
-    ? `#ACCIO-${String(application.registration_number).padStart(4, '0')}`
-    : '#ACCIO-PIONEER';
+  const ticketCode = formatTicketNumber(application);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#05080f]/85 backdrop-blur-md">
@@ -77,7 +68,7 @@ export const TicketModal: React.FC<TicketModalProps> = ({
               Passe de Embarque Oficial
             </h2>
             <div className="inline-block px-3 py-1 bg-[#0d1422] border border-[var(--house-border)] font-mono text-xs font-bold text-[var(--house-accent)]">
-              {ticketCode}
+              Bilhete {ticketCode}
             </div>
           </div>
 
@@ -138,79 +129,10 @@ export const TicketModal: React.FC<TicketModalProps> = ({
           </div>
 
           {/* Código de Sincronização (Criação de Personagem In-Game Anti-Spoofing) */}
-          {(linkCodeResult || linkError || application.game_character_id) && (
-            <div className="p-3.5 bg-[#0d1422] border border-[var(--house-border)] space-y-2 text-left">
-              {application.game_character_id ? (
-                <div className="text-xs text-[#7fd29a] font-semibold">
-                  Personagem já sincronizado e criado no servidor ArcaneMP (ID #{application.game_character_id}). Crie uma nova ficha no portal para outro personagem.
-                </div>
-              ) : linkCodeResult ? (
-                <>
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.18em] text-[#9b8d72]">
-                        Código do Personagem (válido por 30 min)
-                      </p>
-                      <p className="text-base font-mono font-bold tracking-[0.14em] text-[var(--house-accent)]">
-                        {linkCodeResult.code}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        await navigator.clipboard?.writeText(linkCodeResult.code);
-                        setCopiedLinkCode(true);
-                        soundManager.playSparkle();
-                        setTimeout(() => setCopiedLinkCode(false), 2500);
-                      }}
-                      className="px-3 py-1.5 bg-[#121c30] hover:bg-[#192640] border border-[var(--house-border)] text-xs text-[#ece7da] flex items-center gap-1.5 cursor-pointer"
-                    >
-                      {copiedLinkCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>{copiedLinkCode ? 'Copiado' : 'Copiar'}</span>
-                    </button>
-                  </div>
-                  <p className="text-[11px] leading-relaxed text-[#b6bbc5]">
-                    {application.status === 'approved'
-                      ? 'Ficha aprovada! Cole este código na criação de personagem dentro do jogo para importar nome, dormitório, varinha e história integral.'
-                      : 'Código gerado! Aguarde a aprovação ministerial da ficha para que o criador de personagem do jogo libere sua sincronização.'}
-                  </p>
-                </>
-              ) : (
-                <p className="text-xs text-rose-300">{linkError}</p>
-              )}
-            </div>
-          )}
+          <GameSyncCodeCard application={application} isOpen={isOpen} compact />
 
           {/* Call to Actions */}
           <div className="space-y-3 pt-2">
-            {!application.game_character_id && (
-              <button
-                type="button"
-                onClick={async () => {
-                  setIsIssuingLinkCode(true);
-                  setLinkError(null);
-                  setCopiedLinkCode(false);
-                  try {
-                    soundManager.playSparkle();
-                    const result = await issueServerLinkCode(application.id);
-                    setLinkCodeResult(result);
-                  } catch (err) {
-                    setLinkError(
-                      err instanceof Error
-                        ? err.message
-                        : 'Entre com seu Discord no site para emitir o código de sincronização.'
-                    );
-                  } finally {
-                    setIsIssuingLinkCode(false);
-                  }
-                }}
-                disabled={isIssuingLinkCode}
-                className="w-full btn-secondary"
-              >
-                <KeyRound />
-                <span>{isIssuingLinkCode ? 'Emitindo Código do Personagem...' : 'Gerar Código do Personagem (In-Game)'}</span>
-              </button>
-            )}
 
             <button
               onClick={async () => {

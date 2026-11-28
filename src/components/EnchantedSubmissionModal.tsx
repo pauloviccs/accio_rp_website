@@ -3,6 +3,7 @@ import { CheckCircle2, Ticket, ShieldCheck, ArrowRight, X, Clock, Wand2, FileDow
 import confetti from 'canvas-confetti';
 import { CharacterApplication } from '../types';
 import { HOUSES } from '../lib/constants';
+import { formatTicketNumber } from '../lib/ticketFormat';
 import { soundManager, musicPlayer } from '../lib/audio';
 import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
 import { ArcaneFrame } from './ArcaneOrnaments';
@@ -76,7 +77,7 @@ export const EnchantedSubmissionModal: React.FC<EnchantedSubmissionModalProps> =
   if (!isOpen || !application) return null;
 
   const house = HOUSES[application.preferred_house] || HOUSES.gryffindor;
-  const registrationCode = `#ACCIO-${String(application.registration_number || 1).padStart(4, '0')}`;
+  const registrationCode = formatTicketNumber(application);
 
   const bloodStatusMap: Record<string, string> = {
     'pure-blood': 'Sangue Puro',

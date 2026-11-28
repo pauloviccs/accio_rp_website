@@ -363,9 +363,13 @@ export interface ServerLinkCodeResult {
   dormitory?: string | null;
 }
 
-export async function issueServerLinkCode(applicationId?: string | null): Promise<ServerLinkCodeResult> {
+export async function issueServerLinkCode(
+  applicationId?: string | null,
+  forceNew = false
+): Promise<ServerLinkCodeResult> {
   const { data, error } = await supabase.rpc('issue_server_link_code', {
     p_application_id: applicationId || null,
+    p_force_new: forceNew,
   });
   if (error) {
     throw new Error(error.message || 'Falha ao gerar o código de embarque.');

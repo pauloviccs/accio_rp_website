@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import { CharacterApplication } from '../types';
 import { HOUSES, WAND_HANDLES, OLLIVANDERS_CORE_LORE } from './constants';
+import { formatTicketNumber } from './ticketFormat';
 import { supabase } from './supabase';
 
 // Dimensões A4 em milímetros e grade tipográfica (conforme .agent/skills/pdf-editorial-design.md)
@@ -398,9 +399,7 @@ export async function buildCharacterPdfDocument(
   const { info: houseInfo, isOfficialSorted } = formatHouseDisplay(app);
   const wandHandle =
     WAND_HANDLES.find((w) => w.name === app.wand_handle || w.id === app.wand_handle) || WAND_HANDLES[0];
-  const ticketNum = app.registration_number
-    ? `#ACCIO-${String(app.registration_number).padStart(4, '0')}`
-    : '#ACCIO-0001';
+  const ticketNum = formatTicketNumber(app);
   const coreDescription =
     OLLIVANDERS_CORE_LORE[app.wand_core] || 'Núcleo dotado de extraordinária ressonância mágica.';
   const fullName = `${app.first_name || ''} ${app.last_name || ''}`.trim() || 'Bruxo Sem Nome';

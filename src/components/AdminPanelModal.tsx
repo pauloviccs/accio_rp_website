@@ -12,6 +12,7 @@ import {
   updateUserRole 
 } from '../lib/supabase';
 import { HOUSES } from '../lib/constants';
+import { formatTicketNumber } from '../lib/ticketFormat';
 import { soundManager, musicPlayer } from '../lib/audio';
 import { generateAndDownloadCharacterPdf } from '../lib/pdfGenerator';
 
@@ -143,8 +144,9 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
 
   // Filtros de Inscrições
   const filteredApps = applications.filter((app) => {
+    const ticketLabel = formatTicketNumber(app);
     const matchesSearch =
-      `${app.first_name} ${app.last_name} ${app.discord_username} #ACCIO-${app.registration_number}`
+      `${app.first_name} ${app.last_name} ${app.discord_username} ${ticketLabel}`
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
     const matchesHouse = selectedHouse === 'all' || app.preferred_house === selectedHouse;
@@ -360,7 +362,7 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                   ) : (
                     filteredApps.map((app) => {
                       const house = HOUSES[app.preferred_house] || HOUSES.gryffindor;
-                      const regCode = `#ACCIO-${String(app.registration_number || 1).padStart(4, '0')}`;
+                      const regCode = formatTicketNumber(app);
                       const appStatus = app.status || 'pending';
 
                       return (
